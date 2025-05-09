@@ -4,7 +4,7 @@
 
 ### Interfaz NI: [Nombre de la interfaz]
 - **Responsable**: [Nombre del Compañero 1]
-- **Requisitos**:
+**Requisitos**:
 | ID      | Requisito | Descripción       |
 |---------|-----------|-------------------|
 | RF 00   | Ejemplo   | Ejemplo           |
