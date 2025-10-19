@@ -65,7 +65,7 @@
       </div>
   </div>
 
-  <script src="https://unpkg.com/lucide/dist/lucide.browser.min.js"></script>
+  
 
   <style>
     /* Pequeños ajustes para que el layout sea más fiel en móvil */
@@ -1369,5 +1369,13 @@
     });
 
   </script>
+</script>
+
+<script src="assets/js/lucide.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        if (window.lucide) lucide.createIcons();
+    });
+</script>
 </body>
 </html>
