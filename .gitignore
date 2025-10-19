@@ -1,3 +1,62 @@
+# Node / JS (if any node_modules appear later)
+node_modules/
+
+# Python artifacts (scripts/convert_images.py exists)
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+env/
+venv/
+ENV/
+.venv/
+
+# Byte-compiled / packaged files
+*.egg-info/
+dist/
+build/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Backup and temp files
+*~
+*.bak
+*.tmp
+*.swp
+*.swo
+*.old
+
+# Images assets that are generated/converted at runtime
+prototipo/assets/**/generated/
+prototipo/assets/**/thumbs/
+
+# The prototipo has backups
+prototipo/index.html.backup.*
+
+# Logs
+.log
+logs/
+
+# If you ever add build artifacts or compiled assets
+*.min.js
+*.map
+
+# Secrets/local env
+.env
+.env.local
+secrets/
+
+# Git keep placeholder
+!.gitkeep
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

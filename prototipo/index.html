@@ -1,0 +1,1224 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Aprendices SENA - Red Social</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    // === CONFIGURACIÓN DE IDENTIDAD CORPORATIVA SENA (2024) ===
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            // Verde Institucional (Principal y para el logosímbolo)
+            'sena-verde': '#39A900', // HEX: 39A900
+            // Azul Oscuro (Color Secundario para contraste formal)
+            'sena-azul-oscuro': '#00304D', // HEX: 00304D
+            // Gris Claro (Fondo Dominante)
+            'sena-fondo': '#F6F6F6', // HEX: F6F6F6
+            // Colores de acento (si se necesitan) - Usamos una variante del verde para acentos claros
+            'sena-verde-claro': '#EAF7E2', 
+          },
+          fontFamily: {
+            // Se usa una sans-serif limpia como Inter o la del sistema.
+            'sans': ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
+          }
+        },
+      }
+    }
+  </script>
+  
+  <!-- Modal Crear Publicación -->
+  <div id="createPostModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative">
+          <button id="closePostModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+              <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+          <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Crear Nueva Publicación</h2>
+
+          <form id="newPostForm" class="space-y-6">
+              <div>
+                  <textarea id="postContent" class="w-full h-32 px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors resize-none" placeholder="¿Qué quieres compartir con los aprendices?"></textarea>
+              </div>
+              
+              <div class="flex items-center gap-3">
+                  <label for="postImageUpload" class="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-xl transition-colors flex items-center gap-2 cursor-pointer">
+                      <i data-lucide="image" class="w-6 h-6"></i>
+                      <span>Subir Imagen</span>
+                  </label>
+                  <input type="file" id="postImageUpload" class="hidden" accept="image/*">
+                  <span id="imageFileName" class="text-gray-600 text-sm flex-1 truncate">Ningún archivo seleccionado</span>
+              </div>
+
+              <div class="flex justify-end gap-4">
+                  <button type="button" id="cancelPostBtn" class="px-6 py-3 bg-gray-200 text-gray-800 rounded-xl font-semibold hover:bg-gray-300 transition-colors">
+                      Cancelar
+                  </button>
+                  <button type="submit" class="px-6 py-3 bg-sena-verde text-white rounded-xl font-bold shadow-lg hover:bg-green-700 transition-colors">
+                      Publicar
+                  </button>
+              </div>
+          </form>
+      </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide/dist/lucide.browser.min.js"></script>
+
+  <style>
+    /* Pequeños ajustes para que el layout sea más fiel en móvil */
+    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    .rounded-3xl { border-radius: 24px; }
+    .rounded-2xl { border-radius: 18px; }
+    .rounded-xl  { border-radius: 12px; }
+    
+    /* Estilo para la burbuja de chat del usuario activo (tú) - Alinear con el verde SENA */
+    .bubble-self {
+        background-color: #7BE04D; /* Una variante clara del sena-verde */
+        color: #1f2937; /* gray-800 */
+        border-radius: 12px 12px 0 12px;
+    }
+    /* Estilo para la burbuja de chat del otro usuario */
+    .bubble-other {
+        background-color: #e5e7eb; /* gray-200 */
+        color: #1f2937; /* gray-800 */
+        border-radius: 12px 12px 12px 0;
+    }
+    /* Ajuste para que el feed en el perfil de otros se vea mejor */
+    .other-profile-feed {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    /* Estilo para el contenedor de comentarios */
+    .comments-section {
+        max-height: 250px; /* Limita la altura de la sección de comentarios */
+        overflow-y: auto; /* Permite desplazamiento */
+        padding-top: 1rem;
+    }
+    /* Estilos utilitarios para el nav activo del perfil */
+    .nav-active {
+        background: white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        border-left: 4px solid var(--tw-color-sena-verde, #39A900);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-sena-fondo">
+  <main id="loginView" class="min-h-screen bg-sena-verde flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-md">
+      <div class="text-center mb-12">
+        <img src="assets/logo-sena-blanco.png" alt="Logo SENA" class="mx-auto w-28 mb-4" /> 
+        <p class="text-white font-semibold text-xl tracking-wide">Red Social de Aprendices</p>
+      </div>
+
+      <div class="bg-sena-fondo rounded-3xl shadow-2xl p-8">
+        <h2 class="text-2xl font-semibold text-gray-700 text-center mb-8">
+          Ingresa tus datos
+        </h2>
+
+        <form id="loginForm" class="space-y-6">
+          <div>
+            <label class="block text-lg font-semibold text-gray-800 mb-3">Tipo de Documento</label>
+            <div class="relative">
+              <select id="tipoDoc" required
+                class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors appearance-none cursor-pointer">
+                <option value="">Seleccionar</option>
+                <option value="CC">Cédula de Ciudadanía</option>
+                <option value="TI">Tarjeta de Identidad</option>
+                <option value="CE">Cédula de Extranjería</option>
+              </select>
+              <div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-lg font-semibold text-gray-800 mb-3">Número de Documento</label>
+            <input id="documento" type="text" required
+              class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
+          </div>
+
+          <div>
+            <label class="block text-lg font-semibold text-gray-800 mb-3">Contraseña</label>
+            <input id="password" type="password" required
+              class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
+          </div>
+
+          <button
+            type="submit"
+            class="w-full bg-sena-verde text-white font-bold py-4 rounded-xl shadow-lg hover:bg-green-700 transform hover:scale-105 transition-all duration-200 mt-8"
+          >
+            Ingresar
+          </button>
+        </form>
+      </div>
+    </div>
+
+        <footer class="mt-10 text-center">
+            <img src="assets/firma-digital-sena.png" alt="Firma Digital SENA" class="mx-auto h-24 sm:h-auto max-w-full" />
+        </footer>
+  </main>
+
+  <div id="appView" class="hidden min-h-screen">
+    <header class="bg-sena-verde shadow-lg">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <img src="assets/logo-sena-verde.png" alt="Logo SENA" class="w-10 h-auto bg-white rounded-lg p-1" />
+          <span class="text-white font-bold text-2xl tracking-wide">Aprendices</span>
+        </div>
+        <button id="logoutBtn" class="text-white bg-transparent border border-white/30 px-3 py-2 rounded-xl hover:bg-white/10">Cerrar sesión</button>
+      </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+      <div class="flex gap-6">
+        <div class="flex-1">
+          <div class="flex gap-2 mb-6">
+            <button id="tabInicio" class="tab-button px-8 py-3 rounded-t-xl font-semibold bg-gray-200 text-gray-900 border-b-4 border-sena-verde">Inicio</button>
+            <button id="tabNoticias" class="tab-button px-8 py-3 rounded-t-xl font-semibold bg-gray-300 text-gray-600 border-b-4 border-transparent hover:border-gray-400">Noticias</button>
+          </div>
+
+          <div id="feedContentContainer">
+            
+            <div id="homeFeed">
+                <div class="mb-6">
+                    <div class="bg-sena-azul-oscuro rounded-2xl p-4 flex gap-4 shadow-lg">
+                        <button id="createPostBtn" class="bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all">
+                            <i data-lucide="edit-3" class="w-6 h-6"></i>
+                        </button>
+                        <button id="toggleFilterBtn" class="bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all flex items-center gap-2">
+                            <i data-lucide="filter" class="w-6 h-6"></i>
+                            <span id="filterText">Filtros Avanzados</span>
+                        </button>
+                    </div>
+
+                    <div id="filterPanel" class="hidden bg-white p-6 rounded-2xl shadow-xl mt-4 border border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Filtrar Publicaciones por Formación</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Centro de Formación</label>
+                                <select class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-sena-verde focus:outline-none">
+                                    <option>Todos los Centros</option>
+                                    <option>Centro de Electricidad y Automatización Industrial</option>
+                                    <option>Centro de Diseño y Metrología</option>
+                                    <option>Centro para la Industria Petroquímica</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Etapa</label>
+                                <select class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-sena-verde focus:outline-none">
+                                    <option>Todas las Etapas</option>
+                                    <option>Lectiva</option>
+                                    <option>Productiva</option>
+                                    <option>Egresado</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Trimestre</label>
+                                <select class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-sena-verde focus:outline-none">
+                                    <option>Todos los Trimestres</option>
+                                    <option>1°</option>
+                                    <option>2°</option>
+                                    <option>3°</option>
+                                    <option>4° o superior</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 flex justify-end gap-3">
+                            <button class="px-5 py-2 bg-gray-200 text-gray-800 rounded-xl font-semibold hover:bg-gray-300 transition-colors">
+                                Limpiar Filtros
+                            </button>
+                            <button class="px-5 py-2 bg-sena-verde text-white rounded-xl font-semibold hover:bg-green-700 transition-colors">
+                                Aplicar Filtros
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="postsFeed" class="space-y-6">
+                    <article class="bg-white rounded-3xl shadow-xl overflow-hidden">
+                        <div class="bg-sena-verde-claro p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="bg-sena-azul-oscuro rounded-full p-3">
+                                    <i data-lucide="user" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <div class="flex-1 cursor-pointer view-other-profile">
+                                    <h3 class="text-xl font-bold text-gray-900 hover:text-sena-verde transition-colors">Juan Miguel Álvarez</h3>
+                                    <p class="text-gray-800 font-semibold">2° Trimestre</p>
+                                    <p class="text-gray-700 text-sm">Técnico Contabilización de Operaciones Comerciales y Financieras</p>
+                                </div>
+                                <div class="bg-yellow-400 rounded-full p-2">
+                                    <svg class="w-6 h-6 text-yellow-700" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <p class="text-gray-800 font-semibold text-lg mb-4">¡Reunión con mis compañeros!</p>
+                            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80" alt="Post" class="w-full rounded-2xl shadow-lg" />
+                        </div>
+
+                        <div class="bg-gray-100 p-6">
+                            
+                            <div id="commentsContainer-1" class="comments-section space-y-4 border-b border-gray-300 pb-4 mb-4">
+                                
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                                        <i data-lucide="user" class="w-4 h-4"></i>
+                                    </div>
+                                    <div class="bg-white p-3 rounded-xl shadow-sm flex-1">
+                                        <p class="text-sm font-semibold text-gray-800 cursor-pointer view-other-profile hover:text-sena-verde transition-colors">María Fernanda Castro</p>
+                                        <p class="text-gray-700 text-sm">¡Qué bien! Se ve que están muy concentrados en su proyecto. Mucho éxito con la evidencia final.</p>
+                                        <p class="text-xs text-gray-500 text-right mt-1">Hace 2 horas</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-sena-verde rounded-full flex items-center justify-center text-white flex-shrink-0">
+                                        <i data-lucide="user" class="w-4 h-4"></i>
+                                    </div>
+                                    <div class="bubble-self p-3 shadow-sm flex-1">
+                                        <p class="text-sm font-semibold text-gray-800">Tú (Daniel Esteban)</p>
+                                        <p class="text-gray-700 text-sm">¡Gracias por el ánimo! Estamos terminando los ajustes.</p>
+                                        <p class="text-xs text-gray-700 text-right mt-1">Hace 1 hora</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                            
+                            <div class="flex items-center gap-4">
+                                <div class="bg-gray-800 rounded-full p-2">
+                                    <i data-lucide="user" class="w-6 h-6 text-white"></i>
+                                </div>
+                                <input type="text" placeholder="Crea un comentario" class="comment-input flex-1 px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" data-post-id="1" />
+                                <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                                    <i data-lucide="paperclip" class="w-6 h-6 text-gray-700"></i>
+                                </button>
+                                <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                                    <i data-lucide="camera" class="w-6 h-6 text-gray-700"></i>
+                                </button>
+                                <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                                    <i data-lucide="smile" class="w-6 h-6 text-gray-700"></i>
+                                </button>
+                                <button class="send-comment-btn bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all" data-post-id="1">
+                                    <i data-lucide="send" class="w-6 h-6"></i>
+                                </button>
+                            </div>
+                            
+                            <p class="comment-count text-gray-600 text-sm mt-3 ml-14">2 comentarios</p>
+                        </div>
+                    </article>
+
+                    <article class="bg-white rounded-3xl shadow-xl overflow-hidden">
+                        <div class="bg-sena-verde-claro p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="bg-sena-azul-oscuro rounded-full p-3">
+                                    <i data-lucide="user" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <div class="flex-1 cursor-pointer view-other-profile">
+                                    <h3 class="text-xl font-bold text-gray-900 hover:text-sena-verde transition-colors">María Fernanda Castro</h3>
+                                    <p class="text-gray-800 font-semibold">4° Trimestre</p>
+                                    <p class="text-gray-700 text-sm">Tecnólogo en Análisis y Desarrollo de Software</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <p class="text-gray-800 font-semibold text-lg mb-4">Proyecto final de trimestre - Sistema de gestión para aprendices 💻</p>
+                            <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80" alt="Post" class="w-full rounded-2xl shadow-lg" />
+                        </div>
+
+                        <div class="bg-gray-100 p-6">
+                            
+                            <div id="commentsContainer-2" class="comments-section space-y-4 border-b border-gray-300 pb-4 mb-4">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                                        <i data-lucide="user" class="w-4 h-4"></i>
+                                    </div>
+                                    <div class="bg-white p-3 rounded-xl shadow-sm flex-1">
+                                        <p class="text-sm font-semibold text-gray-800 cursor-pointer view-other-profile hover:text-sena-verde transition-colors">Carlos Peña</p>
+                                        <p class="text-gray-700 text-sm">Excelente trabajo con la interfaz, muy profesional.</p>
+                                        <p class="text-xs text-gray-500 text-right mt-1">Hace 5 horas</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-4">
+                                <div class="bg-gray-800 rounded-full p-2">
+                                    <i data-lucide="user" class="w-6 h-6 text-white"></i>
+                                </div>
+                                <input type="text" placeholder="Crea un comentario" class="comment-input flex-1 px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" data-post-id="2" />
+                                <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                                    <i data-lucide="paperclip" class="w-6 h-6 text-gray-700"></i>
+                                </button>
+                                <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                                    <i data-lucide="camera" class="w-6 h-6 text-gray-700"></i>
+                                </button>
+                                <button class="send-comment-btn bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all" data-post-id="2">
+                                    <i data-lucide="send" class="w-6 h-6"></i>
+                                </button>
+                            </div>
+                            
+                            <p class="comment-count text-gray-600 text-sm mt-3 ml-14">1 comentario</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div id="newsFeed" class="space-y-6 hidden">
+                <article class="bg-white rounded-3xl shadow-xl overflow-hidden border-t-4 border-red-600">
+                    <div class="p-6">
+                        <div class="flex items-start gap-4 mb-4">
+                            <div class="bg-red-600 rounded-full p-2">
+                                <i data-lucide="megaphone" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 flex-1">¡ATENCIÓN! Abiertas las Convocatorias de Formación Titulada - Modalidad Virtual</h3>
+                            <p class="text-sm text-gray-500 pt-2">Publicado: 10/Oct/2025</p>
+                        </div>
+                        
+                        <p class="text-gray-700 mb-4">
+                            El SENA informa a todos los interesados que se ha abierto una nueva ronda de inscripciones para programas de formación titulada en modalidad virtual. Esta es una oportunidad única para estudiar desde cualquier lugar del país.
+                        </p>
+                        
+                                                <picture>
+                                                    <source srcset="assets/noticias/noticia1.webp" type="image/webp" />
+                                                    <img src="assets/noticias/noticia1.png" alt="Inscripciones" class="w-full rounded-xl shadow-md mb-4" />
+                                                </picture>
+
+                        <div class="mt-4 pt-4 border-t border-gray-200 space-y-3">
+                            <h4 class="text-lg font-semibold text-gray-800">Enlaces y Documentos de Interés:</h4>
+                            <a href="https://www.sena.edu.co/inscripciones" target="_blank" class="flex items-center gap-3 text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                                <i data-lucide="link" class="w-5 h-5"></i>
+                                Enlace Directo a la Fuente Original
+                            </a>
+                            <div class="flex items-center gap-3 text-gray-700">
+                                <i data-lucide="file-text" class="w-5 h-5 text-red-600"></i>
+                                <span class="font-medium">Documento de Requisitos.PDF</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="bg-white rounded-3xl shadow-xl overflow-hidden border-t-4 border-sena-verde">
+                    <div class="p-6">
+                        <div class="flex items-start gap-4 mb-4">
+                            <div class="bg-sena-verde rounded-full p-2">
+                                <i data-lucide="rocket" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 flex-1">Proyecto Innovador: SENA Lanza Simulador de Negocios en Metaverso</h3>
+                            <p class="text-sm text-gray-500 pt-2">Publicado: 01/Oct/2025</p>
+                        </div>
+                        
+                        <p class="text-gray-700 mb-4">
+                            El Centro de Tecnología de la Manufactura Avanzada desarrolla un entorno de realidad virtual para la práctica empresarial, permitiendo a los aprendices interactuar con clientes y tomar decisiones en un ambiente sin riesgos.
+                        </p>
+
+                                                <picture>
+                                                    <source srcset="assets/noticias/noticia2.webp" type="image/webp" />
+                                                    <img src="assets/noticias/noticia2.png" alt="Simulador de Negocios" class="w-full rounded-xl shadow-md mb-4" />
+                                                </picture>
+                        
+                        <a href="https://www.sena.edu.co/noticias/metaverso-sena" target="_blank" class="flex items-center gap-3 text-blue-600 hover:text-blue-800 font-medium transition-colors mt-4">
+                            <i data-lucide="link" class="w-5 h-5"></i>
+                            Leer la noticia completa en SENA Comunicaciones
+                        </a>
+                    </div>
+                </article>
+            </div>
+          </div>
+        </div>
+
+        <aside class="w-32">
+          <div class="bg-sena-verde-claro rounded-3xl shadow-xl p-4 space-y-6 sticky top-6">
+            <button id="goToProfileEditBtn" class="w-full bg-white hover:bg-gray-100 rounded-2xl p-4 transition-all group">
+              <i data-lucide="user" class="mx-auto mb-2 text-gray-800 group-hover:text-sena-verde"></i>
+              <span class="text-sm font-semibold text-gray-800">Perfil</span>
+            </button>
+
+            <button id="goToChatBtn" class="w-full bg-white hover:bg-gray-100 rounded-2xl p-4 transition-all group">
+              <i data-lucide="message-circle" class="mx-auto mb-2 text-gray-800 group-hover:text-sena-verde"></i>
+              <span class="text-sm font-semibold text-gray-800">Chats</span>
+            </button>
+
+            <button class="w-full bg-white hover:bg-gray-100 rounded-2xl p-4 transition-all group">
+              <i data-lucide="settings" class="mx-auto mb-2 text-gray-800 group-hover:text-sena-verde"></i>
+              <span class="text-sm font-semibold text-gray-800">Config</span>
+            </button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="otherProfileView" class="hidden min-h-screen">
+    <header class="bg-sena-azul-oscuro shadow-lg">
+      <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+        <h1 class="text-white text-3xl font-bold">Perfil de Aprendiz</h1>
+        <button id="returnToAppBtnOtherProfile" class="text-white bg-transparent border border-white/30 px-3 py-2 rounded-xl flex items-center gap-2 hover:bg-white/10">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i> Volver al Feed
+        </button>
+      </div>
+    </header>
+
+    <div class="max-w-4xl mx-auto px-4 py-6 relative"> <div class="bg-gray-300 h-48 rounded-t-3xl overflow-hidden shadow-xl">
+            <img src="https://images.unsplash.com/photo-1510511459019-5be77da821fb?q=80&w=1961&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Banner" class="w-full h-full object-cover" />
+        </div>
+        
+        <div class="absolute top-32 left-6"> 
+            <div class="w-32 h-32 bg-white rounded-full p-1 border-4 border-sena-verde shadow-xl flex items-center justify-center">
+                <div class="w-full h-full bg-gray-500 rounded-full flex items-center justify-center text-white">
+                    <i data-lucide="user" class="w-12 h-12"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 pt-16 rounded-b-3xl shadow-xl"> <div class="flex justify-between items-start mb-6">
+                <div class="pl-36"> 
+                    <h2 id="otherProfileName" class="text-4xl font-bold text-gray-900">María Fernanda Castro</h2>
+                    <p class="text-xl font-semibold text-gray-700">@MariaF_ADS</p>
+                    <p class="text-sena-verde text-lg font-bold mt-1">
+                        <i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i> Bogotá D.C.
+                    </p>
+                </div>
+                
+                <button class="bg-sena-verde text-white font-bold py-3 px-6 rounded-xl shadow-md hover:bg-green-700 transition-colors flex items-center gap-2">
+                    <i data-lucide="message-square" class="w-5 h-5"></i>
+                    Enviar Mensaje
+                </button>
+            </div>
+
+            <div class="border-t border-gray-200 pt-6 space-y-4">
+                <h3 class="text-2xl font-bold text-gray-800">Biografía</h3>
+                <p class="text-gray-700 leading-relaxed bg-sena-fondo p-4 rounded-xl border border-gray-200">
+                    Tecnóloga en Análisis y Desarrollo de Software (4° Trimestre). Apasionada por el diseño de interfaces (UI/UX) y las soluciones cloud. Buscando mi práctica productiva en el área de desarrollo web.
+                </p>
+
+                <div class="grid grid-cols-2 gap-4 text-lg">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="graduation-cap" class="w-6 h-6 text-sena-azul-oscuro"></i>
+                        <span class="font-semibold text-gray-800">Tecnólogo en Análisis y Desarrollo de Software</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="calendar" class="w-6 h-6 text-sena-azul-oscuro"></i>
+                        <span class="font-semibold text-gray-800">4° Trimestre - Etapa Lectiva</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">Publicaciones Recientes</h3>
+                
+                <article class="bg-sena-fondo rounded-2xl shadow-md overflow-hidden other-profile-feed p-4 mb-4">
+                    <div class="p-4 border-b border-gray-200">
+                         <p class="text-gray-800 font-semibold text-lg mb-3">Proyecto final de trimestre - Sistema de gestión para aprendices 💻</p>
+                        <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80" alt="Post" class="w-full rounded-xl shadow-lg" />
+                    </div>
+                    <div class="p-4 text-right text-sm text-gray-500">
+                        Publicado hace 5 horas
+                    </div>
+                </article>
+                
+                <p class="text-center text-gray-600 mt-6">No hay más publicaciones por el momento.</p>
+            </div>
+        </div>
+
+    </div>
+  </div>
+
+
+  <div id="editProfileView" class="hidden min-h-screen">
+    <header class="bg-sena-verde shadow-lg">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        <h1 class="text-white text-3xl font-bold">Editar Perfil</h1>
+        <button id="returnToAppBtnProfile" class="text-white bg-transparent border border-white/30 px-3 py-2 rounded-xl flex items-center gap-2 hover:bg-white/10">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i> Volver al Menú
+        </button>
+      </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+      <div class="flex gap-6">
+
+        <aside class="w-64">
+          <div class="bg-sena-verde-claro rounded-3xl shadow-xl p-4 space-y-2 sticky top-6">
+            <h3 class="text-lg font-bold text-gray-900 mb-3">Editar:</h3>
+
+            <a href="#" id="navPersonal" class="nav-link flex items-center gap-3 p-3 rounded-2xl text-gray-800 hover:bg-white/70 transition-colors nav-active">
+                <i data-lucide="user-circle" class="w-6 h-6"></i>
+                Información Personal
+            </a>
+
+            <a href="#" id="navContact" class="nav-link flex items-center gap-3 p-3 rounded-2xl text-gray-800 hover:bg-white/70 transition-colors">
+                <i data-lucide="contact" class="w-6 h-6"></i>
+                Contacto y Formación
+            </a>
+
+            <a href="#" id="navPassword" class="nav-link flex items-center gap-3 p-3 rounded-2xl text-gray-800 hover:bg-white/70 transition-colors">
+                <i data-lucide="lock" class="w-6 h-6"></i>
+                Cambiar Contraseña
+            </a>
+          </div>
+        </aside>
+
+        <div class="flex-1" id="profileContent">
+            <div id="contentPersonal" class="profile-content bg-white p-8 rounded-3xl shadow-xl">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Información Personal (Simulación)</h2>
+                <div class="text-center mb-8">
+                    <div class="w-32 h-32 bg-gray-300 rounded-full mx-auto flex items-center justify-center text-gray-600 mb-4">
+                        <i data-lucide="image" class="w-10 h-10"></i>
+                    </div>
+                    <button class="px-4 py-2 bg-sena-verde text-white rounded-xl font-semibold hover:bg-green-700 transition-colors">
+                        Cambiar Foto de Perfil
+                    </button>
+                </div>
+
+                <form class="space-y-6">
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-800 mb-2">Nombre de Usuario</label>
+                        <input type="text" value="DanielEsteban98" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
+                    </div>
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-800 mb-2">Ciudad de Residencia</label>
+                        <input type="text" value="Bogotá D.C." class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
+                    </div>
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-800 mb-2">Biografía / Presentación</label>
+                        <textarea rows="4" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors">Aprendiz del SENA apasionado por el desarrollo de software y la contabilidad. Buscando oportunidades de práctica.</textarea>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-sena-azul-oscuro text-white font-bold py-3 rounded-xl shadow-md hover:bg-sena-verde transition-all duration-200">
+                        Guardar Cambios Personales
+                    </button>
+                </form>
+            </div>
+
+            <div id="contentContact" class="profile-content bg-white p-8 rounded-3xl shadow-xl hidden">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Contacto y Formación</h2>
+                <form class="space-y-6">
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-800 mb-2">Correo Electrónico (Soy SENA)</label>
+                        <input type="email" value="danielesteban@soy.sena.edu.co" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-2 border-gray-300 transition-colors" />
+                        <p class="text-sm text-gray-500 mt-1">Este campo no puede ser modificado.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-800 mb-2">Regional SENA</label>
+                        <select class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none">
+                            <option>Distrito Capital</option>
+                            <option>Antioquia</option>
+                            <option>Valle del Cauca</option>
+                            </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-800 mb-2">Trimestre Cursando</label>
+                        <select class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none">
+                            <option>2°</option>
+                            <option>1°</option>
+                            <option>3°</option>
+                            <option>4° o superior</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-sena-azul-oscuro text-white font-bold py-3 rounded-xl shadow-md hover:bg-sena-verde transition-all duration-200">
+                        Guardar Contacto y Formación
+                    </button>
+                </form>
+            </div>
+
+            <div id="contentPassword" class="profile-content bg-white p-8 rounded-3xl shadow-xl hidden">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Cambiar Contraseña</h2>
+                <form class="space-y-6">
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-800 mb-2">Contraseña Actual</label>
+                        <input type="password" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
+                    </div>
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-800 mb-2">Nueva Contraseña</label>
+                        <input type="password" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
+                    </div>
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-800 mb-2">Confirmar Nueva Contraseña</label>
+                        <input type="password" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-red-600 text-white font-bold py-3 rounded-xl shadow-md hover:bg-red-700 transition-all duration-200">
+                        Actualizar Contraseña
+                    </button>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="chatView" class="hidden min-h-screen">
+    <header class="bg-sena-verde shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <h1 class="text-white text-3xl font-bold">Chats</h1>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <div class="flex gap-6 min-h-[80vh]">
+            <aside class="w-64 bg-sena-verde-claro rounded-3xl shadow-xl p-4 space-y-3 sticky top-6 self-start">
+                <button id="returnToAppBtnChat" class="w-full flex items-center justify-center gap-2 bg-sena-verde hover:bg-green-700 text-white rounded-2xl p-3 mb-4 transition-all group shadow-md">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    <span class="text-sm font-semibold">Volver</span>
+                </button>
+                
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Chats:</h3>
+
+                <button class="w-full flex items-center gap-3 bg-white rounded-2xl p-3 transition-colors shadow-md border-2 border-sena-verde">
+                    <div class="bg-sena-azul-oscuro rounded-full p-2">
+                        <i data-lucide="user" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div class="text-left overflow-hidden">
+                        <p class="font-semibold text-gray-900 truncate">Emanuel Mendoza Al...</p>
+                        <p class="text-xs text-gray-600 truncate">En qué consiste la formación?</p>
+                    </div>
+                </button>
+
+                <button class="w-full flex items-center gap-3 bg-white/70 hover:bg-white rounded-2xl p-3 transition-colors">
+                    <div class="bg-sena-azul-oscuro rounded-full p-2">
+                        <i data-lucide="users" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div class="text-left overflow-hidden">
+                        <p class="font-semibold text-gray-900 truncate">Grupo Proyecto ADS</p>
+                        <p class="text-xs text-gray-600 truncate">Juan: Ya enviaron la evidencia?</p>
+                    </div>
+                </button>
+
+                <button class="w-full flex items-center gap-3 bg-white/70 hover:bg-white rounded-2xl p-3 transition-colors">
+                    <div class="bg-sena-azul-oscuro rounded-full p-2">
+                        <i data-lucide="user" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div class="text-left overflow-hidden">
+                        <p class="font-semibold text-gray-900 truncate">Sara Sánchez Gutiérrez</p>
+                        <p class="text-xs text-gray-600 truncate">Hola, ¿cómo estás?</p>
+                    </div>
+                </button>
+            </aside>
+
+            <div id="activeChatArea" class="flex-1 bg-white rounded-3xl shadow-xl flex flex-col overflow-hidden">
+                
+                <div class="bg-gray-100 p-4 border-b border-gray-200 flex items-center gap-4">
+                    <div class="bg-sena-azul-oscuro rounded-full p-3">
+                        <i data-lucide="user" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 flex-1">Emanuel Mendoza Al...</h2>
+                    <button class="text-gray-600 hover:text-sena-verde p-2 rounded-full transition-colors">
+                        <i data-lucide="info" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+                <div class="flex-1 p-6 space-y-4 overflow-y-auto" id="messagesContainer">
+                    
+                    <div class="flex justify-start">
+                        <div class="bubble-other p-3 max-w-xs md:max-w-md shadow-md">
+                            <p class="text-sm">Hola Juan Miguel. ¿En qué consiste la formación?</p>
+                            <p class="text-xs text-gray-500 text-right mt-1">14:05</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <div class="bubble-self p-3 max-w-xs md:max-w-md shadow-md">
+                            <p class="text-sm">¡Hola Emanuel! Es un Técnico en Contabilización de Operaciones Comerciales y Financieras.</p>
+                            <p class="text-xs text-gray-700 text-right mt-1">14:07</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-start">
+                        <div class="bubble-other p-3 max-w-xs md:max-w-md shadow-md">
+                            <p class="text-sm">Ah, perfecto. ¿Y ya estás en etapa productiva?</p>
+                            <p class="text-xs text-gray-500 text-right mt-1">14:10</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <div class="bubble-self p-3 max-w-xs md:max-w-md shadow-md">
+                            <p class="text-sm">Aún no, pero estoy buscando información sobre empresas que patrocinen.</p>
+                            <p class="text-xs text-gray-700 text-right mt-1">14:11</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="bg-gray-100 p-4 border-t border-gray-200 flex items-center gap-3">
+                    <input type="text" id="chatInput" placeholder="Escribe tu mensaje..." class="flex-1 px-4 py-3 rounded-2xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
+                    <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                        <i data-lucide="image" class="w-6 h-6 text-gray-700"></i>
+                    </button>
+                    <button id="sendChatBtn" class="bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all">
+                        <i data-lucide="send" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+  <script>
+    // Variables globales (Simulación de usuario activo)
+    const activeUserName = "Tú (Daniel Esteban)";
+    const activeUserIconClass = "bg-sena-verde"; // Icono propio usa el color SENA
+
+        // Función que carga los iconos de Lucide con un pequeño retraso para asegurar DOM actualizado
+        function loadLucideIcons() {
+            setTimeout(() => {
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
+            }, 50);
+        }
+
+        // Inicializar al cargar la página
+        document.addEventListener("DOMContentLoaded", function() {
+            loadLucideIcons();
+            // Inicializar el nav-active en perfil
+            const navPersonal = document.getElementById('navPersonal');
+            if (navPersonal) navPersonal.classList.add('nav-active');
+        });
+
+    // Elementos principales de la interfaz
+    const loginForm = document.getElementById('loginForm');
+    const loginView = document.getElementById('loginView');
+    const appView = document.getElementById('appView');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    const tabInicio = document.getElementById('tabInicio');
+    const tabNoticias = document.getElementById('tabNoticias');
+    const homeFeed = document.getElementById('homeFeed');
+    const newsFeed = document.getElementById('newsFeed');
+
+    const goToProfileEditBtn = document.getElementById('goToProfileEditBtn');
+    const goToChatBtn = document.getElementById('goToChatBtn');
+    const editProfileView = document.getElementById('editProfileView');
+    const chatView = document.getElementById('chatView');
+    const otherProfileView = document.getElementById('otherProfileView'); // Nueva vista de perfil de otro usuario
+    
+    const returnToAppBtnProfile = document.getElementById('returnToAppBtnProfile');
+    const returnToAppBtnChat = document.getElementById('returnToAppBtnChat');
+    const returnToAppBtnOtherProfile = document.getElementById('returnToAppBtnOtherProfile'); // Botón de regreso de perfil de otro
+
+
+    // Funciones de Navegación de Vistas
+    function showView(viewToShow) {
+        // Ocultar todas las vistas principales
+        loginView.classList.add('hidden');
+        appView.classList.add('hidden');
+        editProfileView.classList.add('hidden');
+        chatView.classList.add('hidden');
+        otherProfileView.classList.add('hidden');
+        
+        // Mostrar la vista solicitada
+        viewToShow.classList.remove('hidden');
+
+        // Re-inicializar iconos si es necesario
+                loadLucideIcons();
+    }
+
+
+    // Manejo de Eventos de Navegación
+
+    // Login
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      // ... (Lógica de validación)
+      showView(appView);
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', function() {
+      showView(loginView);
+      loginForm.reset();
+    });
+
+    // Navegación a Perfil Personal
+    goToProfileEditBtn.addEventListener('click', () => {
+        showView(editProfileView);
+    });
+    returnToAppBtnProfile.addEventListener('click', () => {
+        showView(appView);
+    });
+    
+    // Navegación a Chats
+    goToChatBtn.addEventListener('click', () => {
+        showView(chatView);
+    });
+    returnToAppBtnChat.addEventListener('click', () => {
+        showView(appView);
+    });
+
+    // Navegación a Perfil de Otro Usuario (Activado al hacer clic en nombres)
+    document.querySelectorAll('.view-other-profile').forEach(element => {
+        element.addEventListener('click', function() {
+            // Se puede simular la carga del nombre del perfil.
+            // Primero intentamos buscar en un h3, luego en el elemento directamente si no hay h3.
+            const profileElement = this.querySelector('h3') || this;
+            const profileName = profileElement.textContent.trim().replace('Tú (Daniel Esteban)', 'Daniel Esteban'); // Ajuste si se hace clic en el nombre propio
+            
+            document.getElementById('otherProfileName').textContent = profileName;
+
+            showView(otherProfileView);
+        });
+    });
+    
+    // Botón de regreso del Perfil de Otro
+    returnToAppBtnOtherProfile.addEventListener('click', () => {
+        showView(appView);
+    });
+
+
+    // Manejo de pestañas Inicio / Noticias
+    tabInicio.addEventListener('click', () => {
+        tabInicio.classList.replace('bg-gray-300', 'bg-gray-200');
+        tabInicio.classList.replace('text-gray-600', 'text-gray-900');
+        tabInicio.classList.remove('border-transparent', 'hover:border-gray-400');
+        tabInicio.classList.add('border-sena-verde');
+
+        tabNoticias.classList.replace('bg-gray-200', 'bg-gray-300');
+        tabNoticias.classList.replace('text-gray-900', 'text-gray-600');
+        tabNoticias.classList.remove('border-sena-verde');
+        tabNoticias.classList.add('border-transparent', 'hover:border-gray-400');
+
+        homeFeed.classList.remove('hidden');
+        newsFeed.classList.add('hidden');
+    });
+
+    tabNoticias.addEventListener('click', () => {
+        tabNoticias.classList.replace('bg-gray-300', 'bg-gray-200');
+        tabNoticias.classList.replace('text-gray-600', 'text-gray-900');
+        tabNoticias.classList.remove('border-transparent', 'hover:border-gray-400');
+        tabNoticias.classList.add('border-sena-verde');
+
+        tabInicio.classList.replace('bg-gray-200', 'bg-gray-300');
+        tabInicio.classList.replace('text-gray-900', 'text-gray-600');
+        tabInicio.classList.remove('border-sena-verde');
+        tabInicio.classList.add('border-transparent', 'hover:border-gray-400');
+
+        homeFeed.classList.add('hidden');
+        newsFeed.classList.remove('hidden');
+    });
+
+    // Manejo de Filtros Avanzados
+    const toggleFilterBtn = document.getElementById('toggleFilterBtn');
+    const filterPanel = document.getElementById('filterPanel');
+    const filterText = document.getElementById('filterText');
+
+    toggleFilterBtn.addEventListener('click', () => {
+        filterPanel.classList.toggle('hidden');
+        if (filterPanel.classList.contains('hidden')) {
+            filterText.textContent = "Filtros Avanzados";
+        } else {
+            filterText.textContent = "Ocultar Filtros";
+        }
+    });
+
+    // Manejo de Navegación de Perfil de Edición
+    const navLinks = document.querySelectorAll('.nav-link');
+    const profileContents = document.querySelectorAll('.profile-content');
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.id.replace('nav', 'content');
+            
+            // 1. Desactivar todos los enlaces y ocultar todos los contenidos
+            navLinks.forEach(nav => nav.classList.remove('nav-active'));
+            profileContents.forEach(content => content.classList.add('hidden'));
+
+            // 2. Activar el enlace clickeado
+            e.currentTarget.classList.add('nav-active');
+
+            // 3. Mostrar el contenido correspondiente
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+            }
+
+            loadLucideIcons();
+        });
+    });
+
+
+    // Manejo de Comentarios (Simulación)
+    
+    // Función para manejar el envío de comentarios
+    function setupCommentHandling() {
+        document.querySelectorAll('.send-comment-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const postId = this.getAttribute('data-post-id');
+                const input = document.querySelector(`.comment-input[data-post-id="${postId}"]`);
+                const commentText = input.value.trim();
+                
+                if (commentText === "") {
+                    alert("No puedes enviar un comentario vacío.");
+                    return;
+                }
+                
+                const commentsContainer = document.getElementById(`commentsContainer-${postId}`);
+                const commentCountElement = commentsContainer.closest('.bg-gray-100').querySelector('.comment-count');
+
+                // 1. Crear el HTML del nuevo comentario (simulando que es el usuario activo)
+                const newCommentHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 ${activeUserIconClass} rounded-full flex items-center justify-center text-white flex-shrink-0">
+                            <i data-lucide="user" class="w-4 h-4"></i>
+                        </div>
+                        <div class="bubble-self p-3 shadow-sm flex-1">
+                            <p class="text-sm font-semibold text-gray-800">${activeUserName}</p>
+                            <p class="text-gray-700 text-sm">${commentText}</p>
+                            <p class="text-xs text-gray-700 text-right mt-1">Recién publicado</p>
+                        </div>
+                    </div>
+                `;
+                
+                // 2. Insertar el comentario al inicio del contenedor (el más reciente)
+                commentsContainer.insertAdjacentHTML('afterbegin', newCommentHTML);
+                loadLucideIcons(); // Recargar iconos para el nuevo comentario
+
+                // 3. Limpiar el input
+                input.value = "";
+                
+                // 4. Actualizar el contador
+                const count = commentsContainer.children.length;
+                commentCountElement.textContent = `${count} comentario${count !== 1 ? 's' : ''}`; // Corregido: ya no incluye el nombre de usuario
+                
+                // 5. Desplazar el contenedor para ver el nuevo comentario
+                commentsContainer.scrollTop = 0;
+            });
+        });
+    }
+
+    // Ejecutar la función para configurar los manejadores de eventos
+    document.addEventListener("DOMContentLoaded", setupCommentHandling);
+
+
+    // Manejo de Chat (Simulación de envío de mensajes)
+    const chatInput = document.getElementById('chatInput');
+    const sendChatBtn = document.getElementById('sendChatBtn');
+    const messagesContainer = document.getElementById('messagesContainer');
+
+    if (sendChatBtn) {
+        sendChatBtn.addEventListener('click', function() {
+            const messageText = chatInput.value.trim();
+
+            if (messageText === "") {
+                alert("No puedes enviar un mensaje vacío.");
+                return;
+            }
+
+            // 1. Crear el HTML del nuevo mensaje (simulando que es el usuario activo)
+            const newMessageHTML = `
+                <div class="flex justify-end">
+                    <div class="bubble-self p-3 max-w-xs md:max-w-md shadow-md">
+                        <p class="text-sm">${messageText}</p>
+                        <p class="text-xs text-gray-700 text-right mt-1">${new Date().toLocaleTimeString('es-CO', {hour: '2-digit', minute:'2-digit'})}</p>
+                    </div>
+                </div>
+            `;
+
+            // 2. Insertar el mensaje al final del contenedor
+            messagesContainer.insertAdjacentHTML('beforeend', newMessageHTML);
+            loadLucideIcons(); // Recargar iconos (aunque aquí no debería ser necesario)
+
+            // 3. Limpiar el input y desplazar al final
+            chatInput.value = "";
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        });
+    }
+
+    // --- Modal Crear Publicación: lógica añadida ---
+    // Define la función para inicializar iconos si no está definida (prevención de errores)
+    if (!window.loadLucideIcons) {
+      window.loadLucideIcons = function() {
+        setTimeout(() => {
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }, 50);
+      };
+      // Llama a la función al inicio si es necesario
+      document.addEventListener("DOMContentLoaded", window.loadLucideIcons);
+    }
+    
+    // --- Lógica para la Modal de Crear Publicación ---
+    const createPostBtnEl = document.getElementById('createPostBtn');
+    const createPostModal = document.getElementById('createPostModal');
+    // Los elementos de la modal se crearán en el DOM; usar operadores opcionales al asignar handlers
+
+    function setupCreatePostModalHandlers() {
+        const closePostModalBtn = document.getElementById('closePostModalBtn');
+        const cancelPostBtn = document.getElementById('cancelPostBtn');
+        const newPostForm = document.getElementById('newPostForm');
+        const postImageUpload = document.getElementById('postImageUpload');
+        const imageFileName = document.getElementById('imageFileName');
+
+        // Abre la modal
+        createPostBtnEl?.addEventListener('click', () => {
+            createPostModal.classList.remove('hidden');
+            loadLucideIcons(); // Recargar iconos para los de la modal (ej. 'x')
+        });
+
+        // Cierra la modal (botón 'x' y botón 'Cancelar')
+        const closeAndCleanModal = () => {
+            createPostModal.classList.add('hidden');
+            newPostForm?.reset(); // Limpia el formulario al cerrar
+            if (imageFileName) imageFileName.textContent = 'Ningún archivo seleccionado'; // Limpia el texto del archivo
+            loadLucideIcons(); // Recarga iconos después de cerrar
+        };
+
+        closePostModalBtn?.addEventListener('click', closeAndCleanModal);
+        cancelPostBtn?.addEventListener('click', closeAndCleanModal);
+
+        // Manejar la selección de imagen
+        postImageUpload?.addEventListener('change', (event) => {
+            if (event.target.files.length > 0) {
+                imageFileName.textContent = event.target.files[0].name;
+            } else {
+                imageFileName.textContent = 'Ningún archivo seleccionado';
+            }
+        });
+
+        // Define el nombre del usuario activo (simulado) para el nuevo post
+        const ACTIVE_USER_NAME = "Aprendiz SENA (Tú)";
+        const ACTIVE_USER_TRIMESTER = "3° Trimestre";
+        const ACTIVE_USER_PROGRAM = "Tecnólogo en Análisis y Desarrollo de Software";
+
+        // Función para generar el HTML del nuevo post
+        // Ahora acepta la URL de la imagen (que puede ser la Data URL)
+        function createNewPostHTML(content, imageUrl) {
+            // Bloque de imagen: utiliza la imageUrl dinámica o queda vacío
+            const imageBlock = imageUrl ? 
+                `<img src="${imageUrl}" alt="Post del usuario" class="w-full rounded-2xl shadow-lg" />` : 
+                '';
+
+            // Usamos un ID temporal y simulamos el HTML completo de una publicación
+            const postId = Date.now(); 
+            
+            return `
+                <article class="bg-white rounded-3xl shadow-xl overflow-hidden">
+                    <div class="bg-sena-verde-claro p-6">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-sena-verde rounded-full p-3">
+                                <i data-lucide="user" class="w-8 h-8 text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-gray-900">${ACTIVE_USER_NAME}</h3>
+                                <p class="text-gray-800 font-semibold">${ACTIVE_USER_TRIMESTER}</p>
+                                <p class="text-gray-700 text-sm">${ACTIVE_USER_PROGRAM}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <p class="text-gray-800 text-lg mb-4">${content}</p>
+                        ${imageBlock}
+                    </div>
+
+                    <div class="bg-gray-100 p-6">
+                        <div id="commentsContainer-${postId}" class="comments-section space-y-4 border-b border-gray-300 pb-4 mb-4">
+                            </div>
+                    
+                        <div class="flex items-center gap-4">
+                            <div class="bg-gray-800 rounded-full p-2">
+                                <i data-lucide="user" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <input type="text" placeholder="Crea un comentario" class="comment-input flex-1 px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" data-post-id="${postId}" />
+                            
+                            <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                                <i data-lucide="paperclip" class="w-6 h-6 text-gray-700"></i>
+                            </button>
+                            <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                                <i data-lucide="camera" class="w-6 h-6 text-gray-700"></i>
+                            </button>
+                            
+                            <button class="send-comment-btn bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all" data-post-id="${postId}">
+                                <i data-lucide="send" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+                        
+                        <p class="comment-count text-gray-600 text-sm mt-3 ml-14">0 comentarios</p>
+                    </div>
+                </article>
+            `;
+        }
+
+        // Encuentra el contenedor donde se insertarán los posts (al inicio del feed)
+        const postsFeed = document.getElementById('postsFeed');
+
+        // Simular envío del formulario (¡NUEVA LÓGICA CON MANEJO DE ARCHIVOS!)
+        newPostForm?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const content = document.getElementById('postContent').value.trim();
+            const imageFile = postImageUpload.files[0];
+            
+            if (!content && !imageFile) {
+                alert('Por favor, escribe algo o selecciona una imagen para tu publicación.');
+                return;
+            }
+
+            // Si hay una imagen, la procesamos antes de publicar
+            if (imageFile) {
+                const reader = new FileReader();
+
+                // Esto se ejecuta cuando el lector termina de cargar el archivo
+                reader.onload = (event) => {
+                    const imageUrl = event.target.result; // Data URL de la imagen
+
+                    // 1. Generar e insertar el HTML del nuevo post con la URL de la imagen
+                    const newPostHTML = createNewPostHTML(content, imageUrl);
+                    postsFeed.insertAdjacentHTML('afterbegin', newPostHTML);
+
+                    // 2. Inicializar iconos para el nuevo post
+                    loadLucideIcons();
+
+                    // 3. Cerrar y limpiar la modal
+                    closeAndCleanModal();
+                };
+
+                // Lee el archivo como una URL de datos (esto activa reader.onload)
+                reader.readAsDataURL(imageFile);
+
+            } else {
+                // Si NO hay imagen, se publica inmediatamente
+                
+                // 1. Generar e insertar el HTML del nuevo post (sin URL de imagen)
+                const newPostHTML = createNewPostHTML(content, null);
+                postsFeed.insertAdjacentHTML('afterbegin', newPostHTML);
+
+                // 2. Inicializar iconos para el nuevo post
+                loadLucideIcons();
+
+                // 3. Cerrar y limpiar la modal
+                closeAndCleanModal();
+            }
+        });
+    }
+
+    // Asegurar que los handlers se configuren cuando el DOM esté listo y la modal exista
+    document.addEventListener('DOMContentLoaded', () => {
+        // Si la modal ya está en el DOM, configurar handlers
+        if (document.getElementById('createPostModal')) setupCreatePostModalHandlers();
+    });
+
+  </script>
+</body>
+</html>
