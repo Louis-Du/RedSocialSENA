@@ -195,6 +195,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# Keep local lucide runtime tracked (we ship a copy in prototipo/assets/js)
+!prototipo/assets/js/lucide.min.js
+
 # Spyder project settings
 .spyderproject
 .spyproject
