@@ -103,6 +103,30 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.06);
         border-left: 4px solid var(--tw-color-sena-verde, #39A900);
     }
+
+    /* Animación para el panel de creación rápida */
+    #quickPostInline {
+        transition: max-height 260ms cubic-bezier(0.4,0,0.2,1), opacity 200ms ease, transform 220ms ease;
+        transform-origin: top;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    /* Estado abierto */
+    #quickPostInline.open {
+        max-height: 640px; /* suficiente para el contenido */
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Estado inicial/cerrado */
+    #quickPostInline.collapsed {
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-6px);
+    }
   </style>
 </head>
 <body class="min-h-screen bg-sena-fondo">
@@ -196,6 +220,29 @@
                             <span id="filterText">Filtros Avanzados</span>
                         </button>
                     </div>
+
+                            <!-- Inline Quick-Post Panel: permite texto + imagen y publicar directamente -->
+                            <div id="quickPostInline" class="collapsed bg-white rounded-2xl p-4 shadow-md mt-4">
+                                <form id="quickPostForm" class="flex flex-col gap-3">
+                                    <textarea id="quickPostContent" class="w-full h-28 px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors resize-none" placeholder="¿Qué quieres compartir con los aprendices?"></textarea>
+
+                                    <div class="flex items-center gap-3">
+                                        <label for="quickPostImage" class="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-xl transition-colors flex items-center gap-2 cursor-pointer">
+                                            <i data-lucide="image" class="w-5 h-5"></i>
+                                            <span class="text-sm">Subir Imagen</span>
+                                        </label>
+                                        <input type="file" id="quickPostImage" class="hidden" accept="image/*">
+                                        <span id="quickImageFileName" class="text-gray-600 text-sm flex-1 truncate">Ningún archivo seleccionado</span>
+
+                                        <div class="ml-auto">
+                                            <button type="button" id="quickPublishBtn" class="px-5 py-2 bg-sena-verde text-white rounded-xl font-bold shadow-lg hover:bg-green-700 transition-colors flex items-center gap-2">
+                                                <i data-lucide="send" class="w-5 h-5"></i>
+                                                <span>Publicar</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
 
                     <div id="filterPanel" class="hidden bg-white p-6 rounded-2xl shadow-xl mt-4 border border-gray-200">
                         <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Filtrar Publicaciones por Formación</h3>
@@ -302,12 +349,15 @@
                                     <i data-lucide="user" class="w-6 h-6 text-white"></i>
                                 </div>
                                 <input type="text" placeholder="Crea un comentario" class="comment-input flex-1 px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" data-post-id="1" />
-                                <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                                <label for="commentFile-1" class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors cursor-pointer">
                                     <i data-lucide="paperclip" class="w-6 h-6 text-gray-700"></i>
-                                </button>
-                                <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                                </label>
+                                <input type="file" id="commentFile-1" class="hidden" />
+
+                                <label for="commentCamera-1" class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors cursor-pointer">
                                     <i data-lucide="camera" class="w-6 h-6 text-gray-700"></i>
-                                </button>
+                                </label>
+                                <input type="file" id="commentCamera-1" accept="image/*" class="hidden" />
                                 <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
                                     <i data-lucide="smile" class="w-6 h-6 text-gray-700"></i>
                                 </button>
@@ -359,12 +409,15 @@
                                     <i data-lucide="user" class="w-6 h-6 text-white"></i>
                                 </div>
                                 <input type="text" placeholder="Crea un comentario" class="comment-input flex-1 px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" data-post-id="2" />
-                                <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                                <label for="commentFile-2" class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors cursor-pointer">
                                     <i data-lucide="paperclip" class="w-6 h-6 text-gray-700"></i>
-                                </button>
-                                <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                                </label>
+                                <input type="file" id="commentFile-2" class="hidden" />
+
+                                <label for="commentCamera-2" class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors cursor-pointer">
                                     <i data-lucide="camera" class="w-6 h-6 text-gray-700"></i>
-                                </button>
+                                </label>
+                                <input type="file" id="commentCamera-2" accept="image/*" class="hidden" />
                                 <button class="send-comment-btn bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all" data-post-id="2">
                                     <i data-lucide="send" class="w-6 h-6"></i>
                                 </button>
@@ -787,9 +840,90 @@
             }, 50);
         }
 
+        // Helper robusto: intenta inicializar Lucide varias veces hasta que la librería esté lista
+        function ensureLucideInit(retries = 20, delay = 100) {
+            const tryInit = (remaining) => {
+                if (window.lucide) {
+                    try {
+                        lucide.createIcons();
+                    } catch (err) {
+                        // no-op
+                    }
+                } else if (remaining > 0) {
+                    setTimeout(() => tryInit(remaining - 1), delay);
+                }
+            };
+            tryInit(retries);
+        }
+
+            // --- GENERADOR GLOBAL DE HTML DE PUBLICACIÓN ---
+            // Constantes del usuario activo (simulación)
+            const ACTIVE_USER_NAME = "Aprendiz SENA (Tú)";
+            const ACTIVE_USER_TRIMESTER = "3° Trimestre";
+            const ACTIVE_USER_PROGRAM = "Tecnólogo en Análisis y Desarrollo de Software";
+
+            function createNewPostHTML(content, imageUrl) {
+                const imageBlock = imageUrl ?
+                    `<img src="${imageUrl}" alt="Post del usuario" class="w-full rounded-2xl shadow-lg" />` :
+                    '';
+
+                const postId = Date.now();
+
+                return `
+                    <article class="bg-white rounded-3xl shadow-xl overflow-hidden">
+                        <div class="bg-sena-verde-claro p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="bg-sena-verde rounded-full p-3">
+                                    <i data-lucide="user" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-gray-900">${ACTIVE_USER_NAME}</h3>
+                                    <p class="text-gray-800 font-semibold">${ACTIVE_USER_TRIMESTER}</p>
+                                    <p class="text-gray-700 text-sm">${ACTIVE_USER_PROGRAM}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <p class="text-gray-800 text-lg mb-4">${content}</p>
+                            ${imageBlock}
+                        </div>
+
+                        <div class="bg-gray-100 p-6">
+                            <div id="commentsContainer-${postId}" class="comments-section space-y-4 border-b border-gray-300 pb-4 mb-4">
+                                </div>
+                    
+                            <div class="flex items-center gap-4">
+                                <div class="bg-gray-800 rounded-full p-2">
+                                    <i data-lucide="user" class="w-6 h-6 text-white"></i>
+                                </div>
+                                <input type="text" placeholder="Crea un comentario" class="comment-input flex-1 px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" data-post-id="${postId}" />
+                            
+                                <label for="commentFile-${postId}" class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors cursor-pointer">
+                                    <i data-lucide="paperclip" class="w-6 h-6 text-gray-700"></i>
+                                </label>
+                                <input type="file" id="commentFile-${postId}" class="hidden" />
+
+                                <label for="commentCamera-${postId}" class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors cursor-pointer">
+                                    <i data-lucide="camera" class="w-6 h-6 text-gray-700"></i>
+                                </label>
+                                <input type="file" id="commentCamera-${postId}" accept="image/*" class="hidden" />
+
+                                <button class="send-comment-btn bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all" data-post-id="${postId}">
+                                    <i data-lucide="send" class="w-6 h-6"></i>
+                                </button>
+                            </div>
+                        
+                            <p class="comment-count text-gray-600 text-sm mt-3 ml-14">0 comentarios</p>
+                        </div>
+                    </article>
+                `;
+            }
+
         // Inicializar al cargar la página
         document.addEventListener("DOMContentLoaded", function() {
             loadLucideIcons();
+            ensureLucideInit();
             // Inicializar el nav-active en perfil
             const navPersonal = document.getElementById('navPersonal');
             if (navPersonal) navPersonal.classList.add('nav-active');
@@ -1070,11 +1204,9 @@
         const postImageUpload = document.getElementById('postImageUpload');
         const imageFileName = document.getElementById('imageFileName');
 
-        // Abre la modal
-        createPostBtnEl?.addEventListener('click', () => {
-            createPostModal.classList.remove('hidden');
-            loadLucideIcons(); // Recargar iconos para los de la modal (ej. 'x')
-        });
+        // Nota: el comportamiento del botón superior para abrir la creación se gestiona
+        // en un único handler global que prioriza el panel inline si existe. No
+        // añadimos aquí un listener para evitar doble-binding.
 
         // Cierra la modal (botón 'x' y botón 'Cancelar')
         const closeAndCleanModal = () => {
@@ -1096,69 +1228,7 @@
             }
         });
 
-        // Define el nombre del usuario activo (simulado) para el nuevo post
-        const ACTIVE_USER_NAME = "Aprendiz SENA (Tú)";
-        const ACTIVE_USER_TRIMESTER = "3° Trimestre";
-        const ACTIVE_USER_PROGRAM = "Tecnólogo en Análisis y Desarrollo de Software";
-
-        // Función para generar el HTML del nuevo post
-        // Ahora acepta la URL de la imagen (que puede ser la Data URL)
-        function createNewPostHTML(content, imageUrl) {
-            // Bloque de imagen: utiliza la imageUrl dinámica o queda vacío
-            const imageBlock = imageUrl ? 
-                `<img src="${imageUrl}" alt="Post del usuario" class="w-full rounded-2xl shadow-lg" />` : 
-                '';
-
-            // Usamos un ID temporal y simulamos el HTML completo de una publicación
-            const postId = Date.now(); 
-            
-            return `
-                <article class="bg-white rounded-3xl shadow-xl overflow-hidden">
-                    <div class="bg-sena-verde-claro p-6">
-                        <div class="flex items-start gap-4">
-                            <div class="bg-sena-verde rounded-full p-3">
-                                <i data-lucide="user" class="w-8 h-8 text-white"></i>
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="text-xl font-bold text-gray-900">${ACTIVE_USER_NAME}</h3>
-                                <p class="text-gray-800 font-semibold">${ACTIVE_USER_TRIMESTER}</p>
-                                <p class="text-gray-700 text-sm">${ACTIVE_USER_PROGRAM}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="p-6">
-                        <p class="text-gray-800 text-lg mb-4">${content}</p>
-                        ${imageBlock}
-                    </div>
-
-                    <div class="bg-gray-100 p-6">
-                        <div id="commentsContainer-${postId}" class="comments-section space-y-4 border-b border-gray-300 pb-4 mb-4">
-                            </div>
-                    
-                        <div class="flex items-center gap-4">
-                            <div class="bg-gray-800 rounded-full p-2">
-                                <i data-lucide="user" class="w-6 h-6 text-white"></i>
-                            </div>
-                            <input type="text" placeholder="Crea un comentario" class="comment-input flex-1 px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" data-post-id="${postId}" />
-                            
-                            <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
-                                <i data-lucide="paperclip" class="w-6 h-6 text-gray-700"></i>
-                            </button>
-                            <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
-                                <i data-lucide="camera" class="w-6 h-6 text-gray-700"></i>
-                            </button>
-                            
-                            <button class="send-comment-btn bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all" data-post-id="${postId}">
-                                <i data-lucide="send" class="w-6 h-6"></i>
-                            </button>
-                        </div>
-                        
-                        <p class="comment-count text-gray-600 text-sm mt-3 ml-14">0 comentarios</p>
-                    </div>
-                </article>
-            `;
-        }
+        // Usar la función global createNewPostHTML definida fuera para crear el HTML del post
 
         // Encuentra el contenedor donde se insertarán los posts (al inicio del feed)
         const postsFeed = document.getElementById('postsFeed');
@@ -1217,6 +1287,85 @@
     document.addEventListener('DOMContentLoaded', () => {
         // Si la modal ya está en el DOM, configurar handlers
         if (document.getElementById('createPostModal')) setupCreatePostModalHandlers();
+    });
+
+    // Handler global para el botón superior de crear publicación: abre/oculta panel inline o, si no existe, abre la modal
+    document.addEventListener('DOMContentLoaded', () => {
+        const topCreateBtn = document.getElementById('createPostBtn');
+        const quickInline = document.getElementById('quickPostInline');
+        const quickTextarea = document.getElementById('quickPostContent');
+        const createPostModal = document.getElementById('createPostModal');
+
+        topCreateBtn?.addEventListener('click', () => {
+            if (quickInline) {
+                // Toggle collapsed/open classes for animation
+                const isOpen = quickInline.classList.contains('open');
+                if (isOpen) {
+                    quickInline.classList.remove('open');
+                    quickInline.classList.add('collapsed');
+                } else {
+                    quickInline.classList.remove('collapsed');
+                    quickInline.classList.add('open');
+                    // Foco ligero después de la transición de apertura
+                    setTimeout(() => quickTextarea?.focus(), 180);
+                }
+            } else if (createPostModal) {
+                createPostModal.classList.remove('hidden');
+                loadLucideIcons();
+            }
+        });
+    });
+
+    // --- Handlers para el Quick-Post Inline (panel que permite texto + imagen) ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const quickPostForm = document.getElementById('quickPostForm');
+        const quickPostContent = document.getElementById('quickPostContent');
+        const quickPostImage = document.getElementById('quickPostImage');
+        const quickImageFileName = document.getElementById('quickImageFileName');
+        const quickPublishBtn = document.getElementById('quickPublishBtn');
+        const postsFeed = document.getElementById('postsFeed');
+
+        if (!quickPostForm) return; // Si no existe, no hacemos nada
+
+        // Mostrar nombre de archivo cuando se selecciona
+        quickPostImage?.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                quickImageFileName.textContent = e.target.files[0].name;
+            } else {
+                quickImageFileName.textContent = 'Ningún archivo seleccionado';
+            }
+        });
+
+        // Publicar desde el panel rápido
+        quickPublishBtn?.addEventListener('click', () => {
+            const content = quickPostContent.value.trim();
+            const imageFile = quickPostImage.files ? quickPostImage.files[0] : null;
+
+            if (!content && !imageFile) {
+                alert('Por favor, escribe algo o selecciona una imagen para tu publicación.');
+                return;
+            }
+
+            const finalizePost = (imageUrl) => {
+                const newPostHTML = createNewPostHTML(content, imageUrl);
+                postsFeed.insertAdjacentHTML('afterbegin', newPostHTML);
+                loadLucideIcons();
+                // Rebind comment handlers for the new post
+                setupCommentHandling();
+
+                // Reset form
+                quickPostForm.reset();
+                quickImageFileName.textContent = 'Ningún archivo seleccionado';
+            };
+
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = (ev) => finalizePost(ev.target.result);
+                reader.readAsDataURL(imageFile);
+            } else {
+                finalizePost(null);
+            }
+        });
     });
 
   </script>
