@@ -1,13 +1,14 @@
- url=https://github.com/Louis-Du/RedSocialSENA/blob/main/.github/workflows/deploy-gh-pages.yml
 name: Deploy prototipo to gh-pages
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -16,121 +17,16 @@ jobs:
 
       - name: Prepare publish directory
         run: |
+          set -e
           rm -rf public
           mkdir -p public
           cp -a prototipo/. public/
-          # ensure index.html exists
+          # Ensure index.html exists
           if [ ! -f public/index.html ]; then
-            echo "ERROR: prototipo/index.html not found" && exit 1
+            echo "ERROR: prototipo/index.html not found" >&2
+            exit 1
           fi
-          # create .nojekyll to avoid Jekyll processing
-          touch public/.nojekyll
-
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
-          publish_branch: gh-pages
-          user_name: github-actions[bot]
-          user_email: 41898282+github-actions[bot]@users.noreply.github.com
-name: Deploy prototipo to gh-pages
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Prepare publish directory
-        run: |
-          rm -rf public
-          mkdir -p public
-          cp -a prototipo/. public/
-          # ensure index.html exists
-          if [ ! -f public/index.html ]; then
-            echo "ERROR: prototipo/index.html not found" && exit 1
-          fi
-          # create .nojekyll to avoid Jekyll processing
-          touch public/.nojekyll
-
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
-          publish_branch: gh-pages
-          user_name: github-actions[bot]
-          user_email: 41898282+github-actions[bot]@users.noreply.github.com
- url=https://github.com/Louis-Du/RedSocialSENA/blob/main/.github/workflows/deploy-gh-pages.yml
-name: Deploy prototipo to gh-pages
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Prepare publish directory
-        run: |
-          rm -rf public
-          mkdir -p public
-          cp -a prototipo/. public/
-          # ensure index.html exists
-          if [ ! -f public/index.html ]; then
-            echo "ERROR: prototipo/index.html not found" && exit 1
-          fi
-          # create .nojekyll to avoid Jekyll processing
-          touch public/.nojekyll
-
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
-          publish_branch: gh-pages
-          user_name: github-actions[bot]
-          user_email: 41898282+github-actions[bot]@users.noreply.github.com
- url=https://github.com/Louis-Du/RedSocialSENA/blob/main/.github/workflows/deploy-gh-pages.yml
-name: Deploy prototipo to gh-pages
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Prepare publish directory
-        run: |
-          rm -rf public
-          mkdir -p public
-          cp -a prototipo/. public/
-          # ensure index.html exists
-          if [ ! -f public/index.html ]; then
-            echo "ERROR: prototipo/index.html not found" && exit 1
-          fi
-          # create .nojekyll to avoid Jekyll processing
+          # Avoid Jekyll processing on GitHub Pages
           touch public/.nojekyll
 
       - name: Deploy to gh-pages
