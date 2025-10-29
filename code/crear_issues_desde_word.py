@@ -7,10 +7,10 @@ from typing import List, Dict
 
 # ---------- CONFIG ----------
 # Cambia esto por el repo donde quieres crear issues (usuario/repo)
-REPO_NAME = "https://github.com/Louis-Du/RedSocialSENA"  # ej: "lukasdiaz/red-social-sena"
+REPO_NAME = "github.com/Louis-Du/RedSocialSENA"  # ej: "lukasdiaz/red-social-sena"
 
 # Nombre del archivo .docx en el repo (ruta relativa)
-ARCHIVO_WORD = "code/historias_usuario_sena_mejorada.docx"
+ARCHIVO_WORD = "../documents/historias_usuario_sena_mejorada.docx"
 
 # Si quieres forzar dry-run sin tocar GitHub: define DRY_RUN=1 en variables de entorno
 DRY_RUN = os.getenv("DRY_RUN", "0") in ("1", "true", "True")
@@ -148,8 +148,10 @@ def main():
     if not historias:
         return
 
-    g = Github(token)
-    repo = g.get_repo(REPO_NAME)
+    from github import Auth
+    auth = Auth.Token(token)
+    g = Github(auth=auth)
+    repo = g.get_repo(REPO_NAME)  # 👈 ESTA LÍNEA DEBE ESTAR AQUÍ DENTRO DE MAIN()
 
     for h in historias:
         crear_issue(repo, h)
