@@ -7,10 +7,10 @@ from typing import List, Dict
 
 # ---------- CONFIG ----------
 # Cambia esto por el repo donde quieres crear issues (usuario/repo)
-REPO_NAME = "github.com/Louis-Du/RedSocialSENA"  # ej: "lukasdiaz/red-social-sena"
+REPO_NAME = "Louis-Du/RedSocialSENA"  # ej: "lukasdiaz/red-social-sena"
 
 # Nombre del archivo .docx en el repo (ruta relativa)
-ARCHIVO_WORD = "../documents/historias_usuario_sena_mejorada.docx"
+ARCHIVO_WORD = "documents/historias_usuario_sena_mejorada.docx"
 
 # Si quieres forzar dry-run sin tocar GitHub: define DRY_RUN=1 en variables de entorno
 DRY_RUN = os.getenv("DRY_RUN", "0") in ("1", "true", "True")
@@ -36,71 +36,75 @@ def normalizar_criterio(line: str) -> str:
     return re.sub(r"^CA\s*[:\-]\s*", "", line, flags=re.IGNORECASE).strip()
 
 # ---------- PARSER ----------
-def extraer_historias(archivo: str) -> List[Dict]:
-    doc = Document(archivo)
+from docx import Document
+import re
+
+def extraer_historias(ruta_docx):
+    """
+    Extrae historias de usuario y criterios de aceptación de un documento .docx,
+    incluso si los criterios están dentro de celdas de tabla en una sola cadena.
+    """
+    doc = Document(ruta_docx)
     historias = []
-    current = None
-    in_pruebas = False
+    texto_total = []
 
+    # Leer todo el texto del documento (párrafos + tablas)
     for p in doc.paragraphs:
-        t = p.text.strip()
-        if not t:
+        if p.text.strip():
+            texto_total.append(p.text.strip())
+
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                contenido = cell.text.strip()
+                if contenido:
+                    texto_total.append(contenido)
+
+    # Unir todo el texto
+    texto_unido = "\n".join(texto_total)
+
+    # Dividir por cada historia (RF-xx o HU-xx)
+    bloques = re.split(r"(?=(?:RF|HU)-\d{1,3}:)", texto_unido)
+    for bloque in bloques:
+        bloque = bloque.strip()
+        if not bloque:
             continue
 
-        # Si línea inicia una HU
-        if es_inicio_hu(t):
-            # si había una historia en curso, guardarla
-            if current:
-                historias.append(current)
-            hid, rest = extraer_id_nombre_desde_linea(t)
-            current = {"id": hid or "", "descripcion": rest or "", "criterios": []}
-            in_pruebas = False
-            continue
+        match = re.match(r"((?:RF|HU)-\d{1,3}):\s*(.+)", bloque, re.DOTALL)
+        if match:
+            id_hu = match.group(1)
+            descripcion = match.group(2).strip()
 
-        # Si detecta "Historia de Usuario RF-01" como encabezado separado y luego "Nombre de la historia" + linea siguiente
-        if re.search(r"Nombre de la historia", t, re.IGNORECASE):
-            # next paragraph likely contains the name - handled by following iteration
-            in_pruebas = False
-            continue
+            # Buscar criterios: líneas que empiecen con '-' o '•' o contengan 'CA:'
+            criterios = []
+            for linea in descripcion.splitlines():
+                if linea.strip().startswith("-") or linea.strip().startswith("•"):
+                    criterios.append(linea.strip("-• ").strip())
+                elif linea.strip().startswith("CA:"):
+                    criterios.append(linea.replace("CA:", "").strip())
 
-        # Detecta el bloque "Pruebas de aceptación" o "Criterios de aceptación"
-        if re.search(r"(Pruebas de aceptación|Criterios de aceptación)", t, re.IGNORECASE):
-            in_pruebas = True
-            continue
+            # Si no hay criterios, intenta detectar el bloque "Criterios de aceptación:"
+            if not criterios:
+                match_criterios = re.search(
+                    r"Criterios\s+de\s+aceptaci[oó]n[:：]\s*(.+)",
+                    descripcion,
+                    re.IGNORECASE | re.DOTALL,
+                )
+                if match_criterios:
+                    posibles = match_criterios.group(1).split("-")
+                    criterios = [c.strip() for c in posibles if c.strip()]
 
-        # Si la línea empieza con "CA:" (tu formato simple)
-        if re.match(r"^CA\s*[:\-]", t, re.IGNORECASE):
-            if not current:
-                # crea una historia "sin id" si no existe
-                current = {"id": "", "descripcion": "", "criterios": []}
-            current["criterios"].append(normalizar_criterio(t))
-            continue
+            if not criterios:
+                criterios = ["(sin criterios listados)"]
 
-        # Si estamos en el modo de pruebas donde las pruebas vienen con "-" como viñetas
-        if in_pruebas and t.startswith("-"):
-            if not current:
-                current = {"id": "", "descripcion": "", "criterios": []}
-            current["criterios"].append(t.lstrip("-").strip())
-            continue
+            historias.append({
+                "id": id_hu,
+                "descripcion": descripcion.split("Criterios")[0].strip(),
+                "criterios": criterios
+            })
 
-        # Si no es criterio pero pertenece a la descripción (texto largo)
-        if current:
-            # Si description vacía, setear; si ya existe, concatenar
-            if not current["descripcion"]:
-                current["descripcion"] = t
-            else:
-                current["descripcion"] += " " + t
-        else:
-            # Si no hay current, pero encontramos una línea larga que parece ser "HU-XX: ..." sin prefijo
-            # intentamos ver si tiene formato "RF-01" dentro del texto
-            m = re.match(r"(RF-\d+)\s*[:\-]\s*(.+)", t, re.IGNORECASE)
-            if m:
-                current = {"id": m.group(1).strip(), "descripcion": m.group(2).strip(), "criterios": []}
-
-    # añadir la última historia si existe
-    if current:
-        historias.append(current)
     return historias
+
 
 # ---------- CREAR ISSUE ----------
 def crear_issue(repo, h: Dict):
@@ -131,8 +135,41 @@ def crear_issue(repo, h: Dict):
         return None
 
     issue = repo.create_issue(title=title, body=body)
+    agregar_issue_a_proyecto(repo, issue, "Backlog")
     print(f"✅ Issue creado: {issue.title} -> {issue.html_url}")
     return issue
+
+def agregar_issue_a_proyecto(repo, issue, nombre_columna="Backlog"):
+    """
+    Vincula el issue creado con el proyecto del repositorio y lo coloca en la columna especificada.
+    """
+    try:
+        # obtener todos los proyectos del repo
+        proyectos = repo.get_projects()
+        for p in proyectos:
+            if p.name.lower() == "redsocialsena":  # <- nombre exacto de tu tablero
+                proyecto = p
+                break
+        else:
+            print("⚠️ Proyecto 'RedSocialSena' no encontrado en este repo.")
+            return
+
+        # buscar columna Backlog
+        columna = None
+        for c in proyecto.get_columns():
+            if c.name.lower() == nombre_columna.lower():
+                columna = c
+                break
+        if not columna:
+            print(f"⚠️ Columna '{nombre_columna}' no encontrada en el proyecto.")
+            return
+
+        # crear tarjeta en la columna para este issue
+        columna.create_card(content_id=issue.id, content_type="Issue")
+        print(f"✅ Issue agregado al proyecto '{proyecto.name}' en columna '{columna.name}'.")
+    except Exception as e:
+        print(f"⚠️ No se pudo agregar el issue al proyecto: {e}")
+
 
 # ---------- MAIN ----------
 def main():
@@ -148,13 +185,42 @@ def main():
     if not historias:
         return
 
+    # conexión (forma moderna)
     from github import Auth
     auth = Auth.Token(token)
     g = Github(auth=auth)
-    repo = g.get_repo(REPO_NAME)  # 👈 ESTA LÍNEA DEBE ESTAR AQUÍ DENTRO DE MAIN()
 
-    for h in historias:
-        crear_issue(repo, h)
+    try:
+        me = g.get_user()
+        print("Autenticado como:", me.login)
+    except Exception as e:
+        raise SystemExit("ERROR: No se pudo autenticar con GitHub. Revisa el token. " + str(e))
+
+    print("Intentando obtener repo:", REPO_NAME)
+    try:
+        repo = g.get_repo(REPO_NAME)
+    except Exception as e:
+        # imprime info diagnóstica y sale, no rompas con traceback largo
+        print("ERROR: get_repo falló. Detalle:", repr(e))
+        # muestra una lista corta de repos accesibles para ayudar al diagnóstico
+        try:
+            sample = [r.full_name for i, r in enumerate(me.get_repos()) if i < 10]
+            print("Repos accesibles (muestra):", sample)
+        except Exception:
+            pass
+        raise SystemExit("Abortando por fallo al obtener el repositorio. Revisa REPO_NAME y permisos del token.")
+
+    # si llegamos aquí, repo está bien y procedemos
+    for h in historias[:3]: # limitar a las primeras 3 para pruebas
+    # Extraer el número de la HU, por ejemplo "RF-23" → 23
+        numero = int("".join(filter(str.isdigit, h["id"])))
+
+    # Saltar las primeras 22
+        if numero <= 22:
+            print(f"⏭️ Saltando {h['id']} (ya creada)")
+            continue
+
+    crear_issue(repo, h)
 
 if __name__ == "__main__":
     main()
