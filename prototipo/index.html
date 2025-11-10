@@ -31,41 +31,6 @@
     }
   </script>
   
-  <!-- Modal Crear Publicación -->
-  <div id="createPostModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative">
-          <button id="closePostModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
-              <i data-lucide="x" class="w-6 h-6"></i>
-          </button>
-          <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Crear Nueva Publicación</h2>
-
-          <form id="newPostForm" class="space-y-6">
-              <div>
-                  <textarea id="postContent" class="w-full h-32 px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors resize-none" placeholder="¿Qué quieres compartir con los aprendices?"></textarea>
-              </div>
-              
-              <div class="flex items-center gap-3">
-                  <label for="postImageUpload" class="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-xl transition-colors flex items-center gap-2 cursor-pointer">
-                      <i data-lucide="image" class="w-6 h-6"></i>
-                      <span>Subir Imagen</span>
-                  </label>
-                  <input type="file" id="postImageUpload" class="hidden" accept="image/*">
-                  <span id="imageFileName" class="text-gray-600 text-sm flex-1 truncate">Ningún archivo seleccionado</span>
-              </div>
-
-              <div class="flex justify-end gap-4">
-                  <button type="button" id="cancelPostBtn" class="px-6 py-3 bg-gray-200 text-gray-800 rounded-xl font-semibold hover:bg-gray-300 transition-colors">
-                      Cancelar
-                  </button>
-                  <button type="submit" class="px-6 py-3 bg-sena-verde text-white rounded-xl font-bold shadow-lg hover:bg-green-700 transition-colors">
-                      Publicar
-                  </button>
-              </div>
-          </form>
-      </div>
-  </div>
-
-  
 
   <style>
     /* Pequeños ajustes para que el layout sea más fiel en móvil */
@@ -199,8 +164,8 @@
       </div>
     </header>
 
-    <div class="max-w-7xl mx-auto px-4 py-6">
-      <div class="flex gap-6">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row gap-6">
         <div class="flex-1">
           <div class="flex gap-2 mb-6">
             <button id="tabInicio" class="tab-button px-8 py-3 rounded-t-xl font-semibold bg-gray-200 text-gray-900 border-b-4 border-sena-verde">Inicio</button>
@@ -313,7 +278,7 @@
 
                         <div class="p-6">
                             <p class="text-gray-800 font-semibold text-lg mb-4">¡Reunión con mis compañeros!</p>
-                            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80" alt="Post" class="w-full rounded-2xl shadow-lg" />
+                            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80" alt="Post" class="w-full rounded-2xl shadow-lg max-h-64 object-cover" />
                         </div>
 
                         <div class="bg-gray-100 p-6">
@@ -386,7 +351,7 @@
 
                         <div class="p-6">
                             <p class="text-gray-800 font-semibold text-lg mb-4">Proyecto final de trimestre - Sistema de gestión para aprendices 💻</p>
-                            <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80" alt="Post" class="w-full rounded-2xl shadow-lg" />
+                            <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80" alt="Post" class="w-full rounded-2xl shadow-lg max-h-64 object-cover" />
                         </div>
 
                         <div class="bg-gray-100 p-6">
@@ -432,7 +397,7 @@
             <div id="newsFeed" class="space-y-6 hidden">
                 <article class="bg-white rounded-3xl shadow-xl overflow-hidden border-t-4 border-red-600">
                     <div class="p-6">
-                        <div class="flex items-start gap-4 mb-4">
+                        <div class="flex flex-col sm:flex-row items-start gap-4 mb-4">
                             <div class="bg-red-600 rounded-full p-2">
                                 <i data-lucide="megaphone" class="w-6 h-6 text-white"></i>
                             </div>
@@ -446,7 +411,7 @@
                         
                                                 <picture>
                                                     <source srcset="assets/noticias/noticia1.webp" type="image/webp" />
-                                                    <img src="assets/noticias/noticia1.png" alt="Inscripciones" class="w-full rounded-xl shadow-md mb-4" />
+                                                    <img src="assets/noticias/noticia1.png" alt="Inscripciones" class="w-full rounded-xl shadow-md mb-4 max-h-48 object-cover" />
                                                 </picture>
 
                         <div class="mt-4 pt-4 border-t border-gray-200 space-y-3">
@@ -465,7 +430,7 @@
 
                 <article class="bg-white rounded-3xl shadow-xl overflow-hidden border-t-4 border-sena-verde">
                     <div class="p-6">
-                        <div class="flex items-start gap-4 mb-4">
+                        <div class="flex flex-col sm:flex-row items-start gap-4 mb-4">
                             <div class="bg-sena-verde rounded-full p-2">
                                 <i data-lucide="rocket" class="w-6 h-6 text-white"></i>
                             </div>
@@ -479,7 +444,7 @@
 
                                                 <picture>
                                                     <source srcset="assets/noticias/noticia2.webp" type="image/webp" />
-                                                    <img src="assets/noticias/noticia2.png" alt="Simulador de Negocios" class="w-full rounded-xl shadow-md mb-4" />
+                                                    <img src="assets/noticias/noticia2.png" alt="Simulador de Negocios" class="w-full rounded-xl shadow-md mb-4 max-h-48 object-cover" />
                                                 </picture>
                         
                         <a href="https://www.sena.edu.co/noticias/metaverso-sena" target="_blank" class="flex items-center gap-3 text-blue-600 hover:text-blue-800 font-medium transition-colors mt-4">
@@ -492,7 +457,7 @@
           </div>
         </div>
 
-        <aside class="w-32">
+    <aside class="hidden md:block md:w-32">
           <div class="bg-sena-verde-claro rounded-3xl shadow-xl p-4 space-y-6 sticky top-6">
             <button id="goToProfileEditBtn" class="w-full bg-white hover:bg-gray-100 rounded-2xl p-4 transition-all group">
               <i data-lucide="user" class="mx-auto mb-2 text-gray-800 group-hover:text-sena-verde"></i>
@@ -862,9 +827,21 @@
             const ACTIVE_USER_TRIMESTER = "3° Trimestre";
             const ACTIVE_USER_PROGRAM = "Tecnólogo en Análisis y Desarrollo de Software";
 
+            // Pequeña función para escapar texto y evitar inyección al usar templates
+            function escapeHTML(str) {
+                if (!str) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/\"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
             function createNewPostHTML(content, imageUrl) {
+                const escapedContent = escapeHTML(content);
                 const imageBlock = imageUrl ?
-                    `<img src="${imageUrl}" alt="Post del usuario" class="w-full rounded-2xl shadow-lg" />` :
+                    `<img src="${imageUrl}" alt="Post del usuario" class="w-full rounded-2xl shadow-lg max-h-64 object-cover" />` :
                     '';
 
                 const postId = Date.now();
@@ -885,7 +862,7 @@
                         </div>
 
                         <div class="p-6">
-                            <p class="text-gray-800 text-lg mb-4">${content}</p>
+                            <p class="text-gray-800 text-lg mb-4">${escapedContent}</p>
                             ${imageBlock}
                         </div>
 
@@ -1091,57 +1068,71 @@
     });
 
 
-    // Manejo de Comentarios (Simulación)
-    
-    // Función para manejar el envío de comentarios
-    function setupCommentHandling() {
-        document.querySelectorAll('.send-comment-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const postId = this.getAttribute('data-post-id');
-                const input = document.querySelector(`.comment-input[data-post-id="${postId}"]`);
-                const commentText = input.value.trim();
-                
-                if (commentText === "") {
-                    alert("No puedes enviar un comentario vacío.");
-                    return;
-                }
-                
-                const commentsContainer = document.getElementById(`commentsContainer-${postId}`);
-                const commentCountElement = commentsContainer.closest('.bg-gray-100').querySelector('.comment-count');
+    // Manejo de Comentarios (Simulación) - Event delegation establecida sobre #postsFeed
+    // Usamos delegation para evitar re-binding y para crear comentarios de forma segura.
+    document.addEventListener('DOMContentLoaded', () => {
+        const postsFeedEl = document.getElementById('postsFeed');
+        if (!postsFeedEl) return;
 
-                // 1. Crear el HTML del nuevo comentario (simulando que es el usuario activo)
-                const newCommentHTML = `
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 ${activeUserIconClass} rounded-full flex items-center justify-center text-white flex-shrink-0">
-                            <i data-lucide="user" class="w-4 h-4"></i>
-                        </div>
-                        <div class="bubble-self p-3 shadow-sm flex-1">
-                            <p class="text-sm font-semibold text-gray-800">${activeUserName}</p>
-                            <p class="text-gray-700 text-sm">${commentText}</p>
-                            <p class="text-xs text-gray-700 text-right mt-1">Recién publicado</p>
-                        </div>
-                    </div>
-                `;
-                
-                // 2. Insertar el comentario al inicio del contenedor (el más reciente)
-                commentsContainer.insertAdjacentHTML('afterbegin', newCommentHTML);
-                loadLucideIcons(); // Recargar iconos para el nuevo comentario
+        postsFeedEl.addEventListener('click', (e) => {
+            const sendBtn = e.target.closest('.send-comment-btn');
+            if (!sendBtn) return;
 
-                // 3. Limpiar el input
-                input.value = "";
-                
-                // 4. Actualizar el contador
-                const count = commentsContainer.children.length;
-                commentCountElement.textContent = `${count} comentario${count !== 1 ? 's' : ''}`; // Corregido: ya no incluye el nombre de usuario
-                
-                // 5. Desplazar el contenedor para ver el nuevo comentario
-                commentsContainer.scrollTop = 0;
-            });
+            const postId = sendBtn.getAttribute('data-post-id');
+            const input = document.querySelector(`.comment-input[data-post-id="${postId}"]`);
+            if (!input) return alert('Input de comentario no encontrado.');
+
+            const commentText = input.value.trim();
+            if (commentText === '') return alert('No puedes enviar un comentario vacío.');
+
+            const commentsContainer = document.getElementById(`commentsContainer-${postId}`);
+            if (!commentsContainer) return;
+
+            // Crear elementos DOM de forma segura (sin innerHTML con contenido de usuario)
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex items-start gap-3';
+
+            const avatar = document.createElement('div');
+            avatar.className = `w-8 h-8 ${activeUserIconClass} rounded-full flex items-center justify-center text-white flex-shrink-0`;
+            const icon = document.createElement('i');
+            icon.setAttribute('data-lucide', 'user');
+            icon.className = 'w-4 h-4';
+            avatar.appendChild(icon);
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble-self p-3 shadow-sm flex-1';
+
+            const pName = document.createElement('p');
+            pName.className = 'text-sm font-semibold text-gray-800';
+            pName.textContent = activeUserName;
+
+            const pText = document.createElement('p');
+            pText.className = 'text-gray-700 text-sm';
+            pText.textContent = commentText;
+
+            const pTime = document.createElement('p');
+            pTime.className = 'text-xs text-gray-700 text-right mt-1';
+            pTime.textContent = 'Recién publicado';
+
+            bubble.appendChild(pName);
+            bubble.appendChild(pText);
+            bubble.appendChild(pTime);
+
+            wrapper.appendChild(avatar);
+            wrapper.appendChild(bubble);
+
+            // Insertar el comentario al inicio
+            commentsContainer.insertBefore(wrapper, commentsContainer.firstChild);
+            loadLucideIcons();
+
+            // Limpiar input y actualizar contador
+            input.value = '';
+            const commentCountElement = commentsContainer.closest('.bg-gray-100')?.querySelector('.comment-count');
+            const count = commentsContainer.children.length;
+            if (commentCountElement) commentCountElement.textContent = `${count} comentario${count !== 1 ? 's' : ''}`;
+            commentsContainer.scrollTop = 0;
         });
-    }
-
-    // Ejecutar la función para configurar los manejadores de eventos
-    document.addEventListener("DOMContentLoaded", setupCommentHandling);
+    });
 
 
     // Manejo de Chat (Simulación de envío de mensajes)
@@ -1178,20 +1169,7 @@
         });
     }
 
-    // --- Modal Crear Publicación: lógica añadida ---
-    // Define la función para inicializar iconos si no está definida (prevención de errores)
-    if (!window.loadLucideIcons) {
-      window.loadLucideIcons = function() {
-        setTimeout(() => {
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-        }, 50);
-      };
-      // Llama a la función al inicio si es necesario
-      document.addEventListener("DOMContentLoaded", window.loadLucideIcons);
-    }
-    
+        // --- Modal Crear Publicación: lógica añadida ---
     // --- Lógica para la Modal de Crear Publicación ---
     const createPostBtnEl = document.getElementById('createPostBtn');
     const createPostModal = document.getElementById('createPostModal');
@@ -1350,8 +1328,7 @@
                 const newPostHTML = createNewPostHTML(content, imageUrl);
                 postsFeed.insertAdjacentHTML('afterbegin', newPostHTML);
                 loadLucideIcons();
-                // Rebind comment handlers for the new post
-                setupCommentHandling();
+                // Event delegation en #postsFeed gestiona los nuevos botones de comentario
 
                 // Reset form
                 quickPostForm.reset();
@@ -1369,7 +1346,40 @@
     });
 
   </script>
-</script>
+
+  <!-- Modal Crear Publicación (moved from head to end of body) -->
+  <div id="createPostModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative">
+          <button id="closePostModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+              <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+          <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Crear Nueva Publicación</h2>
+
+          <form id="newPostForm" class="space-y-6">
+              <div>
+                  <textarea id="postContent" class="w-full h-32 px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors resize-none" placeholder="¿Qué quieres compartir con los aprendices?"></textarea>
+              </div>
+              
+              <div class="flex items-center gap-3">
+                  <label for="postImageUpload" class="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-xl transition-colors flex items-center gap-2 cursor-pointer">
+                      <i data-lucide="image" class="w-6 h-6"></i>
+                      <span>Subir Imagen</span>
+                  </label>
+                  <input type="file" id="postImageUpload" class="hidden" accept="image/*">
+                  <span id="imageFileName" class="text-gray-600 text-sm flex-1 truncate">Ningún archivo seleccionado</span>
+              </div>
+
+              <div class="flex justify-end gap-4">
+                  <button type="button" id="cancelPostBtn" class="px-6 py-3 bg-gray-200 text-gray-800 rounded-xl font-semibold hover:bg-gray-300 transition-colors">
+                      Cancelar
+                  </button>
+                  <button type="submit" class="px-6 py-3 bg-sena-verde text-white rounded-xl font-bold shadow-lg hover:bg-green-700 transition-colors">
+                      Publicar
+                  </button>
+              </div>
+          </form>
+      </div>
+  </div>
 
 <script src="assets/js/lucide.min.js"></script>
 <script>
