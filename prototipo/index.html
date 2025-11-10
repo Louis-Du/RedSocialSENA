@@ -30,69 +30,7 @@
       }
     }
   </script>
-  
-
-  <style>
-    /* Pequeños ajustes para que el layout sea más fiel en móvil */
-    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
-    .rounded-3xl { border-radius: 24px; }
-    .rounded-2xl { border-radius: 18px; }
-    .rounded-xl  { border-radius: 12px; }
-    
-    /* Estilo para la burbuja de chat del usuario activo (tú) - Alinear con el verde SENA */
-    .bubble-self {
-        background-color: #7BE04D; /* Una variante clara del sena-verde */
-        color: #1f2937; /* gray-800 */
-        border-radius: 12px 12px 0 12px;
-    }
-    /* Estilo para la burbuja de chat del otro usuario */
-    .bubble-other {
-        background-color: #e5e7eb; /* gray-200 */
-        color: #1f2937; /* gray-800 */
-        border-radius: 12px 12px 12px 0;
-    }
-    /* Ajuste para que el feed en el perfil de otros se vea mejor */
-    .other-profile-feed {
-        max-width: 700px;
-        margin: 0 auto;
-    }
-    /* Estilo para el contenedor de comentarios */
-    .comments-section {
-        max-height: 250px; /* Limita la altura de la sección de comentarios */
-        overflow-y: auto; /* Permite desplazamiento */
-        padding-top: 1rem;
-    }
-    /* Estilos utilitarios para el nav activo del perfil */
-    .nav-active {
-        background: white;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-        border-left: 4px solid var(--tw-color-sena-verde, #39A900);
-    }
-
-    /* Animación para el panel de creación rápida */
-    #quickPostInline {
-        transition: max-height 260ms cubic-bezier(0.4,0,0.2,1), opacity 200ms ease, transform 220ms ease;
-        transform-origin: top;
-        overflow: hidden;
-        max-height: 0;
-        opacity: 0;
-        transform: translateY(-6px);
-    }
-
-    /* Estado abierto */
-    #quickPostInline.open {
-        max-height: 640px; /* suficiente para el contenido */
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    /* Estado inicial/cerrado */
-    #quickPostInline.collapsed {
-        max-height: 0;
-        opacity: 0;
-        transform: translateY(-6px);
-    }
-  </style>
+  <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body class="min-h-screen bg-sena-fondo">
   <main id="loginView" class="min-h-screen bg-sena-verde flex flex-col items-center justify-center p-4">
@@ -164,7 +102,7 @@
       </div>
     </header>
 
-        <div class="max-w-7xl mx-auto px-4 py-6">
+    <div class="max-w-7xl mx-auto px-4 py-6 box-border pr-20 md:pr-0">
             <div class="flex flex-col md:flex-row gap-6">
         <div class="flex-1">
           <div class="flex gap-2 mb-6">
@@ -457,24 +395,25 @@
           </div>
         </div>
 
-    <aside class="hidden md:block md:w-32">
-          <div class="bg-sena-verde-claro rounded-3xl shadow-xl p-4 space-y-6 sticky top-6">
-            <button id="goToProfileEditBtn" class="w-full bg-white hover:bg-gray-100 rounded-2xl p-4 transition-all group">
-              <i data-lucide="user" class="mx-auto mb-2 text-gray-800 group-hover:text-sena-verde"></i>
-              <span class="text-sm font-semibold text-gray-800">Perfil</span>
-            </button>
+        <aside class="block md:block md:w-32 w-14 fixed md:static right-4 top-1/3 z-40">
+                    <div class="bg-sena-verde-claro rounded-3xl shadow-xl p-2 md:p-4 space-y-3 md:space-y-6 md:sticky md:top-6 flex flex-col items-center">
+                        <!-- Mobile: icon-only small buttons. Desktop: full-width buttons with labels -->
+                        <button id="goToProfileEditBtn" class="w-10 h-10 md:w-full md:p-4 bg-white hover:bg-gray-100 rounded-2xl flex items-center justify-center md:justify-start transition-all group" aria-label="Perfil">
+                            <i data-lucide="user" class="w-5 h-5 text-gray-800 group-hover:text-sena-verde"></i>
+                            <span class="hidden md:inline-block ml-3 text-sm font-semibold text-gray-800">Perfil</span>
+                        </button>
 
-            <button id="goToChatBtn" class="w-full bg-white hover:bg-gray-100 rounded-2xl p-4 transition-all group">
-              <i data-lucide="message-circle" class="mx-auto mb-2 text-gray-800 group-hover:text-sena-verde"></i>
-              <span class="text-sm font-semibold text-gray-800">Chats</span>
-            </button>
+                        <button id="goToChatBtn" class="w-10 h-10 md:w-full md:p-4 bg-white hover:bg-gray-100 rounded-2xl flex items-center justify-center md:justify-start transition-all group" aria-label="Chats">
+                            <i data-lucide="message-circle" class="w-5 h-5 text-gray-800 group-hover:text-sena-verde"></i>
+                            <span class="hidden md:inline-block ml-3 text-sm font-semibold text-gray-800">Chats</span>
+                        </button>
 
-            <button class="w-full bg-white hover:bg-gray-100 rounded-2xl p-4 transition-all group">
-              <i data-lucide="settings" class="mx-auto mb-2 text-gray-800 group-hover:text-sena-verde"></i>
-              <span class="text-sm font-semibold text-gray-800">Config</span>
-            </button>
-          </div>
-        </aside>
+                        <button id="goToConfigBtn" class="w-10 h-10 md:w-full md:p-4 bg-white hover:bg-gray-100 rounded-2xl flex items-center justify-center md:justify-start transition-all group" aria-label="Configuración">
+                            <i data-lucide="settings" class="w-5 h-5 text-gray-800 group-hover:text-sena-verde"></i>
+                            <span class="hidden md:inline-block ml-3 text-sm font-semibold text-gray-800">Config</span>
+                        </button>
+                    </div>
+                </aside>
       </div>
     </div>
   </div>
@@ -490,32 +429,28 @@
       </div>
     </header>
 
-    <div class="max-w-4xl mx-auto px-4 py-6 relative"> <div class="bg-gray-300 h-48 rounded-t-3xl overflow-hidden shadow-xl">
+    <div class="max-w-4xl mx-auto px-4 py-6 box-border pr-20 md:pr-0 relative"> <div class="bg-gray-300 h-48 rounded-t-3xl overflow-hidden shadow-xl">
             <img src="https://images.unsplash.com/photo-1510511459019-5be77da821fb?q=80&w=1961&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Banner" class="w-full h-full object-cover" />
         </div>
         
-        <div class="absolute top-32 left-6"> 
-            <div class="w-32 h-32 bg-white rounded-full p-1 border-4 border-sena-verde shadow-xl flex items-center justify-center">
-                <div class="w-full h-full bg-gray-500 rounded-full flex items-center justify-center text-white">
-                    <i data-lucide="user" class="w-12 h-12"></i>
-                </div>
+        <div class="relative px-5 pb-5 pt-3">
+            <div class="w-32 h-32 rounded-full bg-white border-4 border-white absolute -top-16 left-4 sm:left-8 overflow-hidden">
+                <img src="https://louis-du.github.io/RedSocialSENA/assets/img/perfil.jpg" alt="Foto de Perfil" class="w-full h-full object-cover">
             </div>
-        </div>
-
-        <div class="bg-white p-6 pt-16 rounded-b-3xl shadow-xl"> <div class="flex justify-between items-start mb-6">
-                <div class="pl-36"> 
-                    <h2 id="otherProfileName" class="text-4xl font-bold text-gray-900">María Fernanda Castro</h2>
-                    <p class="text-xl font-semibold text-gray-700">@MariaF_ADS</p>
-                    <p class="text-sena-verde text-lg font-bold mt-1">
-                        <i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i> Bogotá D.C.
-                    </p>
-                </div>
-                
-                <button class="bg-sena-verde text-white font-bold py-3 px-6 rounded-xl shadow-md hover:bg-green-700 transition-colors flex items-center gap-2">
-                    <i data-lucide="message-square" class="w-5 h-5"></i>
-                    Enviar Mensaje
+            
+            <div class="flex justify-end items-center space-x-3 mt-4">
+                <button class="flex items-center space-x-2 px-4 py-2 bg-sena-verde text-white font-semibold rounded-full hover:bg-sena-azul-oscuro transition duration-150 text-sm">
+                    <i data-lucide="edit" class="w-4 h-4"></i>
+                    <span>Editar Perfil</span>
                 </button>
             </div>
+            
+            <div class="mt-4 pt-10 pl-32 sm:pl-0">
+                <h2 class="text-2xl font-bold text-sena-azul-oscuro">Luis Alberto Dueñas Franco</h2>
+                <p class="text-md text-gray-600">Aprendiz - Análisis y Desarrollo de Software</p>
+                <p class="text-sm text-sena-verde font-semibold mt-1 bg-sena-verde-claro px-2 py-0.5 rounded-full inline-block">5to Trimestre - Centro para la Industria Petroquímica</p>
+            </div>
+        </div>
 
             <div class="border-t border-gray-200 pt-6 space-y-4">
                 <h3 class="text-2xl font-bold text-gray-800">Biografía</h3>
@@ -556,131 +491,135 @@
   </div>
 
 
-  <div id="editProfileView" class="hidden min-h-screen">
-    <header class="bg-sena-verde shadow-lg">
-      <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-        <h1 class="text-white text-3xl font-bold">Editar Perfil</h1>
-        <button id="returnToAppBtnProfile" class="text-white bg-transparent border border-white/30 px-3 py-2 rounded-xl flex items-center gap-2 hover:bg-white/10">
-            <i data-lucide="arrow-left" class="w-5 h-5"></i> Volver al Menú
-        </button>
-      </div>
-    </header>
+    <div id="editProfileView" class="hidden min-h-screen">
+        <header class="bg-sena-verde shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+                <h1 class="text-white text-3xl font-bold">Editar Perfil</h1>
+                <button id="returnToAppBtnProfile" class="text-white bg-transparent border border-white/30 px-3 py-2 rounded-xl flex items-center gap-2 hover:bg-white/10">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i> Volver al Menú
+                </button>
+            </div>
+        </header>
 
-    <div class="max-w-7xl mx-auto px-4 py-6">
-      <div class="flex gap-6">
+        <div class="max-w-7xl mx-auto px-4 py-6 box-border pr-6 md:pr-0">
+            <div class="flex flex-col md:flex-row gap-6">
 
-        <aside class="w-64">
-          <div class="bg-sena-verde-claro rounded-3xl shadow-xl p-4 space-y-2 sticky top-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-3">Editar:</h3>
+                <!-- Desktop lateral nav (visible en sm and up) -->
+                <aside class="hidden sm:block w-full md:w-64">
+                    <div class="bg-sena-verde-claro rounded-3xl shadow-xl p-4 flex flex-col gap-3 sticky top-6">
+                        <h3 class="text-lg font-bold text-gray-900 mb-3">Editar</h3>
 
-            <a href="#" id="navPersonal" class="nav-link flex items-center gap-3 p-3 rounded-2xl text-gray-800 hover:bg-white/70 transition-colors nav-active">
-                <i data-lucide="user-circle" class="w-6 h-6"></i>
-                Información Personal
-            </a>
+                        <a href="#" data-tab="content1" class="profile-nav-link nav-active flex items-center gap-3 p-3 rounded-2xl text-gray-800 hover:bg-white/70 transition-colors">
+                            <i data-lucide="user-circle" class="w-6 h-6"></i>
+                            Información General
+                        </a>
 
-            <a href="#" id="navContact" class="nav-link flex items-center gap-3 p-3 rounded-2xl text-gray-800 hover:bg-white/70 transition-colors">
-                <i data-lucide="contact" class="w-6 h-6"></i>
-                Contacto y Formación
-            </a>
+                        <a href="#" data-tab="content2" class="profile-nav-link flex items-center gap-3 p-3 rounded-2xl text-gray-800 hover:bg-white/70 transition-colors">
+                            <i data-lucide="phone" class="w-6 h-6"></i>
+                            Contacto
+                        </a>
 
-            <a href="#" id="navPassword" class="nav-link flex items-center gap-3 p-3 rounded-2xl text-gray-800 hover:bg-white/70 transition-colors">
-                <i data-lucide="lock" class="w-6 h-6"></i>
-                Cambiar Contraseña
-            </a>
-          </div>
-        </aside>
+                        <a href="#" data-tab="content3" class="profile-nav-link flex items-center gap-3 p-3 rounded-2xl text-gray-800 hover:bg-white/70 transition-colors">
+                            <i data-lucide="book-open" class="w-6 h-6"></i>
+                            Formación
+                        </a>
 
-        <div class="flex-1" id="profileContent">
-            <div id="contentPersonal" class="profile-content bg-white p-8 rounded-3xl shadow-xl">
-                <h2 class="text-3xl font-bold text-gray-800 mb-6">Información Personal (Simulación)</h2>
-                <div class="text-center mb-8">
-                    <div class="w-32 h-32 bg-gray-300 rounded-full mx-auto flex items-center justify-center text-gray-600 mb-4">
-                        <i data-lucide="image" class="w-10 h-10"></i>
+                        <a href="#" data-tab="content4" class="profile-nav-link flex items-center gap-3 p-3 rounded-2xl text-gray-800 hover:bg-white/70 transition-colors">
+                            <i data-lucide="lock" class="w-6 h-6"></i>
+                            Seguridad
+                        </a>
                     </div>
-                    <button class="px-4 py-2 bg-sena-verde text-white rounded-xl font-semibold hover:bg-green-700 transition-colors">
-                        Cambiar Foto de Perfil
-                    </button>
+                </aside>
+
+                <div class="flex-1">
+                    <!-- Mobile tabs header (visible only on small screens) -->
+                    <div id="mobileTabsHeader" class="sm:hidden bg-white rounded-2xl shadow-md p-3 mb-4 flex items-center gap-3 overflow-x-auto">
+                        <button data-tab="content1" class="tab-button px-4 py-2 rounded-xl font-semibold text-sena-azul-oscuro bg-white">Información</button>
+                        <button data-tab="content2" class="tab-button px-4 py-2 rounded-xl font-semibold text-sena-azul-oscuro bg-white">Contacto</button>
+                        <button data-tab="content3" class="tab-button px-4 py-2 rounded-xl font-semibold text-sena-azul-oscuro bg-white">Formación</button>
+                        <button data-tab="content4" class="tab-button px-4 py-2 rounded-xl font-semibold text-sena-azul-oscuro bg-white">Seguridad</button>
+                    </div>
+
+                    <!-- Container de contenido (scroll target en móvil) -->
+                    <div id="profileContentArea" class="space-y-6">
+                        <div id="content1" class="tab-content bg-white p-8 rounded-3xl shadow-xl">
+                            <h2 class="text-3xl font-bold text-gray-800 mb-4">Información General</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nombre completo</label>
+                                    <input type="text" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none" value="Daniel Esteban" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de usuario</label>
+                                    <input type="text" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none" value="DanielEsteban98" />
+                                </div>
+                            </div>
+                            <div class="mt-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Biografía</label>
+                                <textarea rows="4" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none">Aprendiz del SENA apasionado por el desarrollo de software y la contabilidad.</textarea>
+                            </div>
+                            <div class="mt-6 flex justify-end">
+                                <button class="px-6 py-3 bg-sena-verde text-white rounded-xl font-bold">Guardar</button>
+                            </div>
+                        </div>
+
+                        <div id="content2" class="tab-content hidden bg-white p-8 rounded-3xl shadow-xl">
+                            <h2 class="text-3xl font-bold text-gray-800 mb-4">Contacto</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Correo electrónico</label>
+                                    <input type="email" class="w-full px-4 py-3 rounded-xl bg-gray-100 border-2 border-gray-300" value="danielesteban@soy.sena.edu.co" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                                    <input type="text" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300" value="+57 300 0000000" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="content3" class="tab-content hidden bg-white p-8 rounded-3xl shadow-xl">
+                            <h2 class="text-3xl font-bold text-gray-800 mb-4">Formación</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Programa</label>
+                                    <input type="text" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300" value="Tecnólogo en Análisis y Desarrollo de Software" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Etapa</label>
+                                    <select class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300">
+                                        <option>Lectiva</option>
+                                        <option>Productiva</option>
+                                        <option>Egresado</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="content4" class="tab-content hidden bg-white p-8 rounded-3xl shadow-xl">
+                            <h2 class="text-3xl font-bold text-gray-800 mb-4">Seguridad</h2>
+                            <form class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
+                                    <input type="password" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
+                                    <input type="password" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
+                                    <input type="password" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none" />
+                                </div>
+                                <div class="flex justify-end">
+                                    <button type="submit" class="px-6 py-3 bg-red-600 text-white rounded-xl font-bold">Actualizar Contraseña</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-
-                <form class="space-y-6">
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-800 mb-2">Nombre de Usuario</label>
-                        <input type="text" value="DanielEsteban98" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
-                    </div>
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-800 mb-2">Ciudad de Residencia</label>
-                        <input type="text" value="Bogotá D.C." class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
-                    </div>
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-800 mb-2">Biografía / Presentación</label>
-                        <textarea rows="4" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors">Aprendiz del SENA apasionado por el desarrollo de software y la contabilidad. Buscando oportunidades de práctica.</textarea>
-                    </div>
-                    
-                    <button type="submit" class="w-full bg-sena-azul-oscuro text-white font-bold py-3 rounded-xl shadow-md hover:bg-sena-verde transition-all duration-200">
-                        Guardar Cambios Personales
-                    </button>
-                </form>
-            </div>
-
-            <div id="contentContact" class="profile-content bg-white p-8 rounded-3xl shadow-xl hidden">
-                <h2 class="text-3xl font-bold text-gray-800 mb-6">Contacto y Formación</h2>
-                <form class="space-y-6">
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-800 mb-2">Correo Electrónico (Soy SENA)</label>
-                        <input type="email" value="danielesteban@soy.sena.edu.co" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-2 border-gray-300 transition-colors" />
-                        <p class="text-sm text-gray-500 mt-1">Este campo no puede ser modificado.</p>
-                    </div>
-
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-800 mb-2">Regional SENA</label>
-                        <select class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none">
-                            <option>Distrito Capital</option>
-                            <option>Antioquia</option>
-                            <option>Valle del Cauca</option>
-                            </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-800 mb-2">Trimestre Cursando</label>
-                        <select class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none">
-                            <option>2°</option>
-                            <option>1°</option>
-                            <option>3°</option>
-                            <option>4° o superior</option>
-                        </select>
-                    </div>
-                    
-                    <button type="submit" class="w-full bg-sena-azul-oscuro text-white font-bold py-3 rounded-xl shadow-md hover:bg-sena-verde transition-all duration-200">
-                        Guardar Contacto y Formación
-                    </button>
-                </form>
-            </div>
-
-            <div id="contentPassword" class="profile-content bg-white p-8 rounded-3xl shadow-xl hidden">
-                <h2 class="text-3xl font-bold text-gray-800 mb-6">Cambiar Contraseña</h2>
-                <form class="space-y-6">
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-800 mb-2">Contraseña Actual</label>
-                        <input type="password" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
-                    </div>
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-800 mb-2">Nueva Contraseña</label>
-                        <input type="password" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
-                    </div>
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-800 mb-2">Confirmar Nueva Contraseña</label>
-                        <input type="password" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
-                    </div>
-                    
-                    <button type="submit" class="w-full bg-red-600 text-white font-bold py-3 rounded-xl shadow-md hover:bg-red-700 transition-all duration-200">
-                        Actualizar Contraseña
-                    </button>
-                </form>
             </div>
         </div>
-      </div>
     </div>
-  </div>
 
 
   <div id="chatView" class="hidden min-h-screen">
@@ -690,9 +629,9 @@
         </div>
     </header>
 
-    <div class="max-w-7xl mx-auto px-4 py-6">
+    <div class="max-w-7xl mx-auto px-4 py-6 box-border pr-20 md:pr-0">
         <div class="flex gap-6 min-h-[80vh]">
-            <aside class="w-64 bg-sena-verde-claro rounded-3xl shadow-xl p-4 space-y-3 sticky top-6 self-start">
+            <aside id="chatListAside" class="w-full md:w-64 bg-sena-verde-claro rounded-3xl shadow-xl p-4 space-y-3 sticky top-6 self-start">
                 <button id="returnToAppBtnChat" class="w-full flex items-center justify-center gap-2 bg-sena-verde hover:bg-green-700 text-white rounded-2xl p-3 mb-4 transition-all group shadow-md">
                     <i data-lucide="arrow-left" class="w-5 h-5"></i>
                     <span class="text-sm font-semibold">Volver</span>
@@ -700,7 +639,7 @@
                 
                 <h3 class="text-xl font-bold text-gray-900 mb-3">Chats:</h3>
 
-                <button class="w-full flex items-center gap-3 bg-white rounded-2xl p-3 transition-colors shadow-md border-2 border-sena-verde">
+                <button class="chat-list-item w-full flex items-center gap-3 bg-white rounded-2xl p-3 transition-colors shadow-md border-2 border-sena-verde">
                     <div class="bg-sena-azul-oscuro rounded-full p-2">
                         <i data-lucide="user" class="w-5 h-5 text-white"></i>
                     </div>
@@ -710,7 +649,7 @@
                     </div>
                 </button>
 
-                <button class="w-full flex items-center gap-3 bg-white/70 hover:bg-white rounded-2xl p-3 transition-colors">
+                <button class="chat-list-item w-full flex items-center gap-3 bg-white/70 hover:bg-white rounded-2xl p-3 transition-colors">
                     <div class="bg-sena-azul-oscuro rounded-full p-2">
                         <i data-lucide="users" class="w-5 h-5 text-white"></i>
                     </div>
@@ -720,7 +659,7 @@
                     </div>
                 </button>
 
-                <button class="w-full flex items-center gap-3 bg-white/70 hover:bg-white rounded-2xl p-3 transition-colors">
+                <button class="chat-list-item w-full flex items-center gap-3 bg-white/70 hover:bg-white rounded-2xl p-3 transition-colors">
                     <div class="bg-sena-azul-oscuro rounded-full p-2">
                         <i data-lucide="user" class="w-5 h-5 text-white"></i>
                     </div>
@@ -731,7 +670,7 @@
                 </button>
             </aside>
 
-            <div id="activeChatArea" class="flex-1 bg-white rounded-3xl shadow-xl flex flex-col overflow-hidden">
+            <div id="activeChatArea" class="flex-1 bg-white rounded-3xl shadow-xl flex flex-col overflow-hidden hidden md:flex">
                 
                 <div class="bg-gray-100 p-4 border-b border-gray-200 flex items-center gap-4">
                     <div class="bg-sena-azul-oscuro rounded-full p-3">
@@ -774,6 +713,36 @@
                     </div>
 
                 </div>
+
+                <!-- Mobile-only conversation view (empty until a chat is selected on mobile) -->
+            <div id="mobileConversationView" class="md:hidden hidden flex-1 bg-white rounded-3xl shadow-xl flex flex-col overflow-hidden">
+                <div class="bg-gray-100 p-4 border-b border-gray-200 flex items-center gap-4">
+                    <button id="mobileConversationBackBtn" class="text-gray-600 hover:text-sena-verde p-2 rounded-full transition-colors">
+                        <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                    </button>
+                    <div class="bg-sena-azul-oscuro rounded-full p-3">
+                        <i data-lucide="user" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <h2 id="mobileConversationTitle" class="text-2xl font-bold text-gray-900 flex-1">Conversación</h2>
+                    <button class="text-gray-600 hover:text-sena-verde p-2 rounded-full transition-colors">
+                        <i data-lucide="info" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+                <div id="messagesContainerMobile" class="flex-1 p-6 space-y-4 overflow-y-auto">
+                    <!-- Mensajes se clonarán aquí en mobile -->
+                </div>
+
+                <div class="bg-gray-100 p-4 border-t border-gray-200 flex items-center gap-3">
+                    <input type="text" id="chatInputMobile" placeholder="Escribe tu mensaje..." class="flex-1 px-4 py-3 rounded-2xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
+                    <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                        <i data-lucide="image" class="w-6 h-6 text-gray-700"></i>
+                    </button>
+                    <button id="sendChatBtnMobile" class="bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all">
+                        <i data-lucide="send" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
 
                 <div class="bg-gray-100 p-4 border-t border-gray-200 flex items-center gap-3">
                     <input type="text" id="chatInput" placeholder="Escribe tu mensaje..." class="flex-1 px-4 py-3 rounded-2xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
@@ -1041,30 +1010,63 @@
         }
     });
 
-    // Manejo de Navegación de Perfil de Edición
-    const navLinks = document.querySelectorAll('.nav-link');
-    const profileContents = document.querySelectorAll('.profile-content');
+    // Manejo de pestañas del Perfil (desktop nav + mobile tab buttons)
+    function setActiveTab(tabId) {
+        // ocultar todos los contenidos con la clase .tab-content
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
 
-    navLinks.forEach(link => {
+        // mostrar el contenido seleccionado
+        const target = document.getElementById(tabId);
+        if (target) target.classList.remove('hidden');
+
+        // actualizar estado activo en nav lateral (desktop)
+        document.querySelectorAll('.profile-nav-link').forEach(link => {
+            if (link.getAttribute('data-tab') === tabId) link.classList.add('nav-active'); else link.classList.remove('nav-active');
+        });
+
+        // actualizar estado activo en botones móviles
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            if (btn.getAttribute('data-tab') === tabId) {
+                btn.classList.add('bg-sena-verde', 'text-white');
+                btn.classList.remove('text-sena-azul-oscuro');
+            } else {
+                btn.classList.remove('bg-sena-verde', 'text-white');
+                btn.classList.add('text-sena-azul-oscuro');
+            }
+        });
+
+        // ensure icons refreshed
+        loadLucideIcons();
+    }
+
+    // Exponer globalmente por si se necesita cambiar la pestaña desde otros scripts
+    window.setActiveTab = setActiveTab;
+
+    // Wire up click handlers for desktop nav links and mobile tab buttons
+    document.querySelectorAll('.profile-nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            const targetId = e.currentTarget.id.replace('nav', 'content');
-            
-            // 1. Desactivar todos los enlaces y ocultar todos los contenidos
-            navLinks.forEach(nav => nav.classList.remove('nav-active'));
-            profileContents.forEach(content => content.classList.add('hidden'));
-
-            // 2. Activar el enlace clickeado
-            e.currentTarget.classList.add('nav-active');
-
-            // 3. Mostrar el contenido correspondiente
-            const targetContent = document.getElementById(targetId);
-            if (targetContent) {
-                targetContent.classList.remove('hidden');
-            }
-
-            loadLucideIcons();
+            const tabId = link.getAttribute('data-tab');
+            setActiveTab(tabId);
         });
+    });
+
+    document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const tabId = btn.getAttribute('data-tab');
+            setActiveTab(tabId);
+            const contentArea = document.getElementById('profileContentArea');
+            if (contentArea && window.innerWidth < 640) contentArea.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // Inicializar la primera pestaña al cargar
+    document.addEventListener('DOMContentLoaded', () => {
+        if (document.querySelector('.tab-button')) {
+            const first = document.querySelector('.tab-button').getAttribute('data-tab');
+            setActiveTab(first);
+        }
     });
 
 
@@ -1382,9 +1384,65 @@
   </div>
 
 <script src="assets/js/lucide.min.js"></script>
+
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         if (window.lucide) lucide.createIcons();
+    });
+</script>
+<script>
+    // Mobile chat behavior: when tapping a chat on small screens, show the conversation view
+    document.addEventListener('DOMContentLoaded', () => {
+        const chatItems = document.querySelectorAll('.chat-list-item');
+        const chatAside = document.getElementById('chatListAside');
+        const mobileConv = document.getElementById('mobileConversationView');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messagesContainerMobile = document.getElementById('messagesContainerMobile');
+        const mobileTitle = document.getElementById('mobileConversationTitle');
+        const backBtn = document.getElementById('mobileConversationBackBtn');
+
+        chatItems.forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth < 768) {
+                    const titleEl = item.querySelector('.font-semibold') || item.querySelector('p');
+                    const title = titleEl ? titleEl.textContent.trim() : 'Conversación';
+                    if (mobileTitle) mobileTitle.textContent = title;
+
+                    // clone existing messages into mobile container if available
+                    if (messagesContainer && messagesContainerMobile) {
+                        messagesContainerMobile.innerHTML = messagesContainer.innerHTML;
+                    }
+
+                    // show mobile conversation and hide the list
+                    chatAside?.classList.add('hidden');
+                    mobileConv?.classList.remove('hidden');
+                    loadLucideIcons();
+                } else {
+                    // On desktop, update the active chat title
+                    const h2 = document.querySelector('#activeChatArea h2');
+                    const titleEl = item.querySelector('.font-semibold') || item.querySelector('p');
+                    if (h2 && titleEl) h2.textContent = titleEl.textContent.trim();
+                }
+            });
+        });
+
+        backBtn?.addEventListener('click', () => {
+            mobileConv?.classList.add('hidden');
+            chatAside?.classList.remove('hidden');
+        });
+
+        // Mobile send button (adds message to mobile container)
+        const sendMobile = document.getElementById('sendChatBtnMobile');
+        const chatInputMobile = document.getElementById('chatInputMobile');
+        sendMobile?.addEventListener('click', () => {
+            const text = chatInputMobile.value.trim();
+            if (!text) return alert('No puedes enviar un mensaje vacío.');
+            const msgHtml = `\n                <div class="flex justify-end">\n                    <div class="bubble-self p-3 max-w-xs md:max-w-md shadow-md">\n                        <p class="text-sm">${escapeHTML(text)}</p>\n                        <p class="text-xs text-gray-700 text-right mt-1">${new Date().toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'})}</p>\n                    </div>\n                </div>\n            `;
+            messagesContainerMobile.insertAdjacentHTML('beforeend', msgHtml);
+            loadLucideIcons();
+            chatInputMobile.value = '';
+            messagesContainerMobile.scrollTop = messagesContainerMobile.scrollHeight;
+        });
     });
 </script>
 </body>
