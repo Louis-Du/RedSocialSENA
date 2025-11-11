@@ -1,4 +1,4 @@
-name: Deploy prototipo to gh-pages
+name: Deploy prototipo to GitHub Pages
 
 on:
   push:
@@ -6,35 +6,39 @@ on:
       - main
 
 permissions:
-  contents: write   # opcional aquí si también dejas GITHUB_TOKEN
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          persist-credentials: false  # important when using a custom token
 
-      - name: Prepare publish directory
+      - name: Prepare public folder
         run: |
           set -e
           rm -rf public
           mkdir -p public
-          cp -a prototipo/. public/
+          if [ -d prototipo ]; then
+            cp -a prototipo/. public/ || true
+          fi
           if [ ! -f public/index.html ]; then
             echo "ERROR: prototipo/index.html not found" >&2
+            ls -la prototipo || true
             exit 1
           fi
           touch public/.nojekyll
 
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          github_token: ${{ secrets.GH_PAGES_TOKEN }}   # usa el PAT guardado como secret
-          publish_dir: ./public
-          publish_branch: gh-pages
-          user_name: github-actions[bot]
-          user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          path: public
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v1
