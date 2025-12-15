@@ -42,6 +42,46 @@ Contenido clave:
 
 ---
 
+## Estructura sugerida del repositorio
+
+```
+RedSocialSENA/
+├── README.md                           # Este archivo
+├── documents/                          # Documentación del proyecto
+│   ├── academico/                      # Documentos académicos
+│   │   ├── PosterTecnova2025.pdf
+│   │   └── Proyecto Red Social para Aprendices del SENA (justificación).pdf
+│   ├── requisitos/                     # Requisitos y especificaciones
+│   │   └── historias_usuario_sena_mejorada.docx
+│   ├── sqa/                            # Aseguramiento de calidad del software
+│   │   ├── Evaluación del comportamiento... - Listas de chequeo correccion.pdf
+│   │   ├── Informe sobre la lista de chequeo y evaluación.pdf
+│   │   ├── Plan de SQA.pdf
+│   │   └── README.md
+│   └── pruebas/                        # Documentación de pruebas
+│       └── README.md
+└── prototipo/                          # Prototipo visual del proyecto
+    ├── README.md
+    ├── index.html                      # Página principal del prototipo
+    ├── assets/                         # Recursos estáticos
+    │   ├── css/                        # Estilos CSS
+    │   │   └── styles.css
+    │   ├── js/                         # Scripts JavaScript
+    │   │   └── lucide.min.js
+    │   ├── noticias/                   # Imágenes de noticias
+    │   │   ├── noticia1.png
+    │   │   ├── noticia1.webp
+    │   │   ├── noticia2.png
+    │   │   └── noticia2.webp
+    │   ├── logo-sena-blanco.png
+    │   ├── logo-sena-verde.png
+    │   └── firma-digital-sena.png
+    └── scripts/                        # Scripts de utilidad
+        └── convert_images.py
+```
+
+---
+
 ## Contribuir
 
 1. Haz fork del repositorio.  
@@ -64,7 +104,8 @@ Equipo:
 - Luis Alberto Dueñas Franco  
 - Lukas Alejandro Díaz C.  
 - Javier Medrano Hernández  
-- Cristal Luna Argumedo Sánchez
+- Jhon Freyman Torrez  
+- Yani Luna Vigoya
 
 Repositorio: https://github.com/Louis-Du/RedSocialSENA  
 Contacto: https://github.com/Louis-Du
