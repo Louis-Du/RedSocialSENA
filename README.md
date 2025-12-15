@@ -16,7 +16,7 @@ Sitio público (prototipo): https://louis-du.github.io/RedSocialSENA/
 - [Cómo ver el prototipo localmente](#cómo-ver-el-prototipo-localmente)  
 - [Despliegue (GitHub Pages)](#despliegue-github-pages)  
 - [Contribuir](#contribuir)  
-- [Estructura sugerida del repositorio](#estructura-sugerida-del-repositorio)  
+- [Documentación y recursos](#documentación-y-recursos)  
 - [Autores y contacto](#autores-y-contacto)  
 - [Licencia](#licencia)
 
@@ -38,47 +38,29 @@ El repositorio incluye un prototipo visual estático (HTML + CSS + JS) con panta
 Contenido clave:
 - Diseño responsive con Tailwind.
 - Recursos en `prototipo/assets/`.
-- Script para convertir imágenes: `prototipo/scripts/convert_images.py`.
+- Script para convertir imágenes: `prototipo/scripts/convert_images.py`.
 
 ---
 
-## Estructura sugerida del repositorio
+## Documentación y recursos
 
-```
-RedSocialSENA/
-├── README.md                           # Este archivo
-├── documents/                          # Documentación del proyecto
-│   ├── academico/                      # Documentos académicos
-│   │   ├── PosterTecnova2025.pdf
-│   │   └── Proyecto Red Social para Aprendices del SENA (justificación).pdf
-│   ├── requisitos/                     # Requisitos y especificaciones
-│   │   └── historias_usuario_sena_mejorada.docx
-│   ├── sqa/                            # Aseguramiento de calidad del software
-│   │   ├── Evaluación del comportamiento... - Listas de chequeo correccion.pdf
-│   │   ├── Informe sobre la lista de chequeo y evaluación.pdf
-│   │   ├── Plan de SQA.pdf
-│   │   └── README.md
-│   └── pruebas/                        # Documentación de pruebas
-│       └── README.md
-└── prototipo/                          # Prototipo visual del proyecto
-    ├── README.md
-    ├── index.html                      # Página principal del prototipo
-    ├── assets/                         # Recursos estáticos
-    │   ├── css/                        # Estilos CSS
-    │   │   └── styles.css
-    │   ├── js/                         # Scripts JavaScript
-    │   │   └── lucide.min.js
-    │   ├── noticias/                   # Imágenes de noticias
-    │   │   ├── noticia1.png
-    │   │   ├── noticia1.webp
-    │   │   ├── noticia2.png
-    │   │   └── noticia2.webp
-    │   ├── logo-sena-blanco.png
-    │   ├── logo-sena-verde.png
-    │   └── firma-digital-sena.png
-    └── scripts/                        # Scripts de utilidad
-        └── convert_images.py
-```
+### 📂 [documents/](https://github.com/Louis-Du/RedSocialSENA/tree/main/documents)
+Documentación completa del proyecto organizada en las siguientes carpetas:
+
+- **[academico/](https://github.com/Louis-Du/RedSocialSENA/tree/main/documents/academico)** - Documentos académicos incluyendo el póster para Tecnova 2025 y la justificación del proyecto.
+
+- **[requisitos/](https://github.com/Louis-Du/RedSocialSENA/tree/main/documents/requisitos)** - Especificaciones y requisitos del sistema, incluyendo historias de usuario mejoradas.
+
+- **[sqa/](https://github.com/Louis-Du/RedSocialSENA/tree/main/documents/sqa)** - Aseguramiento de calidad del software (Software Quality Assurance) con planes de evaluación, listas de chequeo e informes de calidad.
+
+- **[pruebas/](https://github.com/Louis-Du/RedSocialSENA/tree/main/documents/pruebas)** - Documentación relacionada con las pruebas del sistema.
+
+### 🎨 [prototipo/](https://github.com/Louis-Du/RedSocialSENA/tree/main/prototipo)
+Prototipo visual del proyecto con diseño responsive:
+
+- **[assets/](https://github.com/Louis-Du/RedSocialSENA/tree/main/prototipo/assets)** - Recursos estáticos que incluyen estilos CSS, scripts JavaScript, imágenes de noticias en formato PNG y WebP, además de los logos y firma digital del SENA.
+
+- **[scripts/](https://github.com/Louis-Du/RedSocialSENA/tree/main/prototipo/scripts)** - Scripts de utilidad como el convertidor de imágenes (convert_images.py).
 
 ---
 
@@ -113,5 +95,3 @@ Contacto: https://github.com/Louis-Du
 ---
 
 ## Licencia
-
-
