@@ -1,136 +1,136 @@
-# Testing Documentation - RedSocialSENA
+# Documentación de Pruebas
 
-## Purpose
+## Propósito
 
-This directory contains comprehensive testing documentation for the RedSocialSENA project. The purpose of this documentation is to ensure quality assurance, track testing progress, document test cases, and maintain a systematic approach to validating all aspects of the social network platform.
+Esta carpeta centraliza toda la documentación relacionada con las pruebas del sistema Red Social para Aprendices del SENA. El objetivo es verificar y validar que la aplicación funcione correctamente, cumpla con los requisitos especificados y ofrezca una experiencia de usuario óptima.
 
-## Types of Tests Planned
+## Tipos de pruebas planificadas
 
-### 1. Functional Tests
-Functional tests verify that the application features work as expected according to the requirements and specifications.
+### 1. Pruebas Funcionales
+Las pruebas funcionales verifican que las características de la aplicación funcionen según lo esperado de acuerdo con los requisitos y especificaciones.
 
-**Areas to be covered:**
-- User authentication (registration, login, logout, password recovery)
-- Profile management (create, update, view profiles)
-- Post creation and management (create, edit, delete posts)
-- Social interactions (likes, comments, shares)
-- Friend/connection management
-- Messaging system
-- Notifications
-- Search functionality
-- Content filtering and moderation
+**Áreas a cubrir:**
+- Autenticación de usuarios (registro, inicio de sesión, cierre de sesión, recuperación de contraseña)
+- Gestión de perfiles (crear, actualizar, ver perfiles)
+- Creación y gestión de publicaciones (crear, editar, eliminar publicaciones)
+- Interacciones sociales (me gusta, comentarios, compartir)
+- Gestión de amigos/conexiones
+- Sistema de mensajería
+- Notificaciones
+- Funcionalidad de búsqueda
+- Filtrado y moderación de contenido
 
-### 2. Non-Functional Requirements Tests
-These tests evaluate the quality attributes and performance characteristics of the system.
+### 2. Pruebas de Requisitos No Funcionales (RNF)
+Estas pruebas evalúan los atributos de calidad y las características de rendimiento del sistema.
 
-**Areas to be covered:**
-- **Performance Testing**: Response times, load handling, database query optimization
-- **Security Testing**: Authentication vulnerabilities, data encryption, SQL injection prevention, XSS protection
-- **Usability Testing**: User experience, navigation flow, accessibility compliance
-- **Scalability Testing**: System behavior under increased load
-- **Reliability Testing**: System uptime, error recovery, data integrity
-- **Compatibility Testing**: Cross-browser compatibility, different operating systems
+**Áreas a cubrir:**
+- **Pruebas de Rendimiento**: Tiempos de respuesta, manejo de carga, optimización de consultas a la base de datos
+- **Pruebas de Seguridad**: Vulnerabilidades de autenticación, cifrado de datos, prevención de inyección SQL, protección XSS
+- **Pruebas de Usabilidad**: Experiencia de usuario, flujo de navegación, cumplimiento de accesibilidad
+- **Pruebas de Escalabilidad**: Comportamiento del sistema bajo carga aumentada
+- **Pruebas de Confiabilidad**: Tiempo de actividad del sistema, recuperación de errores, integridad de datos
+- **Pruebas de Compatibilidad**: Compatibilidad entre navegadores, diferentes sistemas operativos
 
-### 3. Responsive Design Tests
-Ensuring the application provides an optimal viewing experience across various devices and screen sizes.
+### 3. Pruebas de Diseño Responsive
+Garantizar que la aplicación proporcione una experiencia de visualización óptima en varios dispositivos y tamaños de pantalla.
 
-**Areas to be covered:**
-- Mobile devices (smartphones, various screen sizes)
-- Tablets (portrait and landscape orientations)
-- Desktop computers (various resolutions)
-- Large displays
-- Touch interface functionality
-- Responsive navigation menus
-- Image and media scaling
-- Form usability on different devices
-- Performance on mobile networks
+**Áreas a cubrir:**
+- Dispositivos móviles (smartphones, varios tamaños de pantalla)
+- Tablets (orientaciones vertical y horizontal)
+- Computadoras de escritorio (varias resoluciones)
+- Pantallas grandes
+- Funcionalidad de interfaz táctil
+- Menús de navegación responsive
+- Escalado de imágenes y medios
+- Usabilidad de formularios en diferentes dispositivos
+- Rendimiento en redes móviles
 
-### 4. Integration Tests
-Testing the interaction between different components, modules, and external services.
+### 4. Pruebas de Integración
+Probar la interacción entre diferentes componentes, módulos y servicios externos.
 
-**Areas to be covered:**
-- Frontend-Backend API integration
-- Database operations and transactions
-- Third-party service integrations
-- File upload and storage systems
-- Email notification services
-- Authentication providers (if using OAuth/SSO)
-- Payment gateways (if applicable)
-- Content delivery networks (CDN)
-- Caching mechanisms
+**Áreas a cubrir:**
+- Integración de API Frontend-Backend
+- Operaciones y transacciones de base de datos
+- Integraciones de servicios de terceros
+- Sistemas de carga y almacenamiento de archivos
+- Servicios de notificación por correo electrónico
+- Proveedores de autenticación (si se usa OAuth/SSO)
+- Pasarelas de pago (si aplica)
+- Redes de distribución de contenido (CDN)
+- Mecanismos de caché
 
-## Future Content
+## Contenido futuro
 
-This directory will be populated with the following documentation and resources:
+Este directorio se poblará con la siguiente documentación y recursos:
 
-### Test Plans
-- Detailed test plans for each testing phase
-- Test schedules and milestones
-- Resource allocation and responsibilities
+### Planes de Prueba
+- Planes de prueba detallados para cada fase de testing
+- Cronogramas y metas de pruebas
+- Asignación de recursos y responsabilidades
 
-### Test Cases
-- Comprehensive test case documentation
-- Step-by-step test procedures
-- Expected results and validation criteria
-- Test data requirements
+### Casos de Prueba
+- Documentación completa de casos de prueba
+- Procedimientos de prueba paso a paso
+- Resultados esperados y criterios de validación
+- Requisitos de datos de prueba
 
-### Test Results
-- Execution reports
-- Bug reports and issue tracking
-- Performance metrics and benchmarks
-- Test coverage reports
+### Resultados de Pruebas
+- Informes de ejecución
+- Reportes de bugs y seguimiento de incidencias
+- Métricas de rendimiento y benchmarks
+- Reportes de cobertura de pruebas
 
-### Automation Scripts
-- Automated test scripts
-- Continuous integration/deployment test configurations
-- Load testing scripts
-- Security testing tools configuration
+### Scripts de Automatización
+- Scripts de pruebas automatizadas
+- Configuraciones de pruebas de integración/despliegue continuo
+- Scripts de pruebas de carga
+- Configuración de herramientas de pruebas de seguridad
 
-### Test Environments
-- Environment setup documentation
-- Configuration specifications
-- Test data management procedures
+### Entornos de Prueba
+- Documentación de configuración de entornos
+- Especificaciones de configuración
+- Procedimientos de gestión de datos de prueba
 
-## Current Status
+## Estado actual
 
-**Last Updated:** 2025-12-15
+**Última actualización:** 2025-12-15
 
-### Progress Overview
-- ✅ Testing documentation structure established
-- 🔄 Test plans in development
-- ⏳ Test cases being defined
-- ⏳ Test environment setup pending
-- ⏳ Automation framework selection in progress
+### Resumen de progreso
+- ✅ Estructura de documentación de pruebas establecida
+- 🔄 Planes de prueba en desarrollo
+- ⏳ Casos de prueba en definición
+- ⏳ Configuración de entorno de pruebas pendiente
+- ⏳ Selección de framework de automatización en progreso
 
-### Upcoming Activities
-1. Define detailed test cases for each functional area
-2. Set up test environments (development, staging, production-like)
-3. Select and configure testing tools and frameworks
-4. Establish testing metrics and KPIs
-5. Create automated test suite foundation
-6. Begin functional testing implementation
+### Actividades próximas
+1. Definir casos de prueba detallados para cada área funcional
+2. Configurar entornos de prueba (desarrollo, staging, similar a producción)
+3. Seleccionar y configurar herramientas y frameworks de pruebas
+4. Establecer métricas de pruebas y KPIs
+5. Crear la base de la suite de pruebas automatizadas
+6. Comenzar la implementación de pruebas funcionales
 
-### Testing Tools Under Consideration
-- **Unit Testing**: Jest, PHPUnit, PyTest (depending on tech stack)
-- **E2E Testing**: Selenium, Cypress, Playwright
-- **API Testing**: Postman, REST Assured
-- **Performance Testing**: JMeter, K6, Gatling
-- **Security Testing**: OWASP ZAP, Burp Suite
-- **Mobile Testing**: BrowserStack, Appium
+### Herramientas de prueba bajo consideración
+- **Pruebas Unitarias**: Jest, PHPUnit, PyTest (dependiendo del stack tecnológico)
+- **Pruebas E2E**: Selenium, Cypress, Playwright
+- **Pruebas de API**: Postman, REST Assured
+- **Pruebas de Rendimiento**: JMeter, K6, Gatling
+- **Pruebas de Seguridad**: OWASP ZAP, Burp Suite
+- **Pruebas Móviles**: BrowserStack, Appium
 
-## Contributing to Testing
+## Contribuir a las pruebas
 
-Team members contributing to testing should:
-1. Follow the established test case format
-2. Document all test results thoroughly
-3. Report bugs using the standard issue template
-4. Update test documentation after significant changes
-5. Participate in test review sessions
+Los miembros del equipo que contribuyan a las pruebas deben:
+1. Seguir el formato establecido de casos de prueba
+2. Documentar todos los resultados de pruebas exhaustivamente
+3. Reportar bugs usando la plantilla estándar de issues
+4. Actualizar la documentación de pruebas después de cambios significativos
+5. Participar en sesiones de revisión de pruebas
 
-## Contact
+## Contacto
 
-For questions or suggestions regarding testing procedures, please contact the QA team lead or project maintainers.
+Para preguntas o sugerencias sobre los procedimientos de pruebas, por favor contacta al líder del equipo de QA o a los maintainers del proyecto.
 
 ---
 
-**Note:** This is a living document and will be updated regularly as the testing process evolves.
+**Nota:** Este es un documento vivo y se actualizará regularmente conforme evolucione el proceso de pruebas.
