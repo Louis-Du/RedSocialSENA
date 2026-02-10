@@ -17,50 +17,59 @@ class TabManager {
         window.addEventListener('editProfileShown', () => {
             this.reinitializeTabs();
         });
+
+        // Reconfigurar tabs del feed cuando se muestre la vista principal
+        window.addEventListener('navigationChanged', (event) => {
+            if (event?.detail?.viewName === 'app') {
+                this.setupFeedTabs();
+            }
+        });
     }
 
     /**
      * Configura los handlers de tabs de feed (Inicio/Noticias)
      */
     setupFeedTabs() {
-        const tabInicio = document.getElementById('tabInicio');
-        const tabNoticias = document.getElementById('tabNoticias');
-        const homeFeed = document.getElementById('homeFeed');
-        const newsFeed = document.getElementById('newsFeed');
+        if (this.feedTabsDelegatedHandler) {
+            return;
+        }
 
-        if (tabInicio) {
-            tabInicio.addEventListener('click', () => {
-                // Mostrar feed de inicio, ocultar noticias
-                if (homeFeed) homeFeed.classList.remove('hidden');
-                if (newsFeed) newsFeed.classList.add('hidden');
-                
-                // Actualizar estilos de tabs
+        this.feedTabsDelegatedHandler = (event) => {
+            const target = event.target.closest('#tabInicio, #tabNoticias');
+            if (!target) return;
+
+            const tabInicio = document.getElementById('tabInicio');
+            const tabNoticias = document.getElementById('tabNoticias');
+            const homeFeed = document.getElementById('homeFeed');
+            const newsFeed = document.getElementById('newsFeed');
+
+            if (!tabInicio || !tabNoticias || !homeFeed || !newsFeed) {
+                return;
+            }
+
+            if (target.id === 'tabInicio') {
+                homeFeed.classList.remove('hidden');
+                newsFeed.classList.add('hidden');
+
                 tabInicio.classList.remove('bg-gray-300', 'text-gray-600', 'border-transparent');
                 tabInicio.classList.add('bg-gray-200', 'text-gray-900', 'border-sena-verde');
-                
-                if (tabNoticias) {
-                    tabNoticias.classList.remove('bg-gray-200', 'text-gray-900', 'border-sena-verde');
-                    tabNoticias.classList.add('bg-gray-300', 'text-gray-600', 'border-transparent');
-                }
-            });
-        }
 
-        if (tabNoticias) {
-            tabNoticias.addEventListener('click', () => {
-                // Mostrar noticias, ocultar feed de inicio
-                if (homeFeed) homeFeed.classList.add('hidden');
-                if (newsFeed) newsFeed.classList.remove('hidden');
-                
-                // Actualizar estilos de tabs
+                tabNoticias.classList.remove('bg-gray-200', 'text-gray-900', 'border-sena-verde');
+                tabNoticias.classList.add('bg-gray-300', 'text-gray-600', 'border-transparent');
+            } else {
+                homeFeed.classList.add('hidden');
+                newsFeed.classList.remove('hidden');
+
                 tabNoticias.classList.remove('bg-gray-300', 'text-gray-600', 'border-transparent');
                 tabNoticias.classList.add('bg-gray-200', 'text-gray-900', 'border-sena-verde');
-                
-                if (tabInicio) {
-                    tabInicio.classList.remove('bg-gray-200', 'text-gray-900', 'border-sena-verde');
-                    tabInicio.classList.add('bg-gray-300', 'text-gray-600', 'border-transparent');
-                }
-            });
-        }
+
+                tabInicio.classList.remove('bg-gray-200', 'text-gray-900', 'border-sena-verde');
+                tabInicio.classList.add('bg-gray-300', 'text-gray-600', 'border-transparent');
+            }
+        };
+
+        document.addEventListener('click', this.feedTabsDelegatedHandler);
+        document.__feedTabsDelegatedHandler = this.feedTabsDelegatedHandler;
     }
 
     /**

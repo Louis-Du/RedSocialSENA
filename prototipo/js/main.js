@@ -23,6 +23,7 @@ import { postManager } from './ui/PostManager.js';
 import { chatManager } from './ui/ChatManager.js';
 import { tabManager } from './ui/TabManager.js';
 import { feedRenderer } from './ui/FeedRenderer.js';
+import { profileManager } from './ui/ProfileManager.js';
 
 // Importar utils
 import { debug } from './utils.js';

@@ -10,6 +10,7 @@
 import { appState } from '../AppState.js';
 import { isValidText, isValidImageFile, readFileAsDataURL } from '../utils.js';
 import { userService } from './UserService.js';
+import { getOtherUsers } from '../data/MockUsers.js';
 
 class ChatService {
     /**
@@ -98,9 +99,13 @@ class ChatService {
      */
     getAllConversations() {
         // En el futuro: await fetch('/api/chats');
-        
+        const currentUser = userService.getCurrentUser();
+        const otherUsers = currentUser?.id
+            ? getOtherUsers(currentUser.id)
+            : [];
+
         // Por ahora, retorna los usuarios simulados con info de conversación
-        return userService.users.map(user => {
+        return otherUsers.map(user => {
             const conversation = this.getConversationState(user.id);
             return {
                 user,

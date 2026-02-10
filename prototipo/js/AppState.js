@@ -36,6 +36,8 @@ class AppState {
         this.users = [
             {
                 id: 'user_2',
+                tipoDoc: 'CC',
+                documento: '9876543210',
                 nombre: 'María García',
                 apodo: 'María',
                 trimestre: '2° Trimestre',
@@ -45,6 +47,8 @@ class AppState {
             },
             {
                 id: 'user_3',
+                tipoDoc: 'CC',
+                documento: '5555555555',
                 nombre: 'Carlos López',
                 apodo: 'Carlos',
                 trimestre: '1° Trimestre',
@@ -123,9 +127,32 @@ class AppState {
     loginUser(tipoDoc, documento, password) {
         // Simulación básica - en backend sería validación real
         if (tipoDoc && documento && password) {
-            this.currentUser.tipoDoc = tipoDoc;
-            this.currentUser.documento = documento;
-            this.currentUser.isLoggedIn = true;
+            // Buscar el usuario en la lista de usuarios simulados
+            let foundUser = null;
+            
+            // Verificar si es el usuario actual (user_1)
+            if (documento === this.currentUser.documento) {
+                foundUser = this.currentUser;
+            } else {
+                // Buscar en otros usuarios
+                foundUser = this.users.find(u => u.documento === documento);
+            }
+
+            // Si encontramos el usuario, cargar todos sus datos
+            if (foundUser) {
+                // Actualizar currentUser con los datos encontrados
+                this.currentUser = {
+                    ...foundUser,
+                    tipoDoc,
+                    isLoggedIn: true
+                };
+            } else {
+                // Si no encontramos, solo actualizar el documento (modo fallback)
+                this.currentUser.tipoDoc = tipoDoc;
+                this.currentUser.documento = documento;
+                this.currentUser.isLoggedIn = true;
+            }
+
             saveToStorage('userSession', { tipoDoc, documento });
             this.notifySubscribers('currentUser');
             this.saveToStorage();
