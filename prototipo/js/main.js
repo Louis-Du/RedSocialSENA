@@ -32,70 +32,37 @@ import { debug } from './utils.js';
  * Inicializa la aplicación
  */
 async function initializeApp() {
-    console.log('🚀 Inicializando aplicación de red social SENA...');
-
     try {
         // 1. Verificar sesión existente
         const isLoggedIn = userService.isLoggedIn();
-        console.log('✓ Estado de sesión verificado:', isLoggedIn);
 
         // 2. Suscribirse a cambios de posts
         appState.subscribe('posts', async () => {
-            console.log('📰 Posts actualizados');
             const posts = await postService.getFeed();
             feedRenderer.renderFeed(posts);
         });
 
         // 3. Suscribirse a cambios de comentarios
         appState.subscribe('comments', () => {
-            console.log('💬 Comentarios actualizados');
             // Los comentarios se renderizarán cuando se abra un post
         });
 
         // 4. Suscribirse a cambios de usuario
         appState.subscribe('currentUser', () => {
-            console.log('👤 Usuario actualizado');
         });
 
         // 5. Suscribirse a cambios de chats
         appState.subscribe('chats', () => {
-            console.log('💬 Chats actualizados');
             chatManager.loadConversationsList();
         });
 
         // 6. Cargar y renderizar feed inicial si está logueado
         if (isLoggedIn) {
             const posts = await postService.getFeed();
-            console.log(`✓ ${posts.length} posts cargados`);
             feedRenderer.renderFeed(posts);
         }
-
-        // 7. Habilitar modo debug si está en development
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            window.__DEBUG_MODE = true;
-            console.log('🐛 Modo debug habilitado');
-            
-            // Exponer objetos globales para debugging
-            window.__APP__ = {
-                appState,
-                userService,
-                postService,
-                commentService,
-                chatService,
-                navigationManager,
-                modalManager,
-                authManager,
-                postManager,
-                chatManager,
-                feedRenderer
-            };
-            console.log('📦 Objetos disponibles en window.__APP__');
-        }
-
-        console.log('✅ Aplicación inicializada correctamente');
-
     } catch (error) {
-        console.error('❌ Error al inicializar aplicación:', error);
+        void error;
     }
 }
 
@@ -111,5 +78,3 @@ window.reloadFeed = async () => {
     const posts = await postService.getFeed();
     feedRenderer.renderFeed(posts);
 };
-
-console.log('📝 Red Social SENA cargada. Use window.reloadFeed() para actualizar feed.');

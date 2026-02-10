@@ -62,7 +62,6 @@ class PostService {
             // En el futuro: await fetch('/api/posts');
             return appState.getPosts();
         } catch (error) {
-            console.error('Error al obtener posts:', error);
             return [];
         }
     }
@@ -198,7 +197,6 @@ class PostService {
 
             return posts;
         } catch (error) {
-            console.error('Error al obtener feed:', error);
             return [];
         }
     }

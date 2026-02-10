@@ -115,7 +115,6 @@ export function getFromStorage(key, defaultValue = null) {
         const item = localStorage.getItem(key);
         return item ? JSON.parse(item) : defaultValue;
     } catch (e) {
-        console.error(`Error al leer ${key} de localStorage:`, e);
         return defaultValue;
     }
 }
@@ -131,7 +130,6 @@ export function saveToStorage(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
         return true;
     } catch (e) {
-        console.error(`Error al guardar ${key} en localStorage:`, e);
         return false;
     }
 }
@@ -144,7 +142,6 @@ export function removeFromStorage(key) {
     try {
         localStorage.removeItem(key);
     } catch (e) {
-        console.error(`Error al eliminar ${key} de localStorage:`, e);
     }
 }
 
@@ -181,19 +178,9 @@ export function isValidImageFile(file) {
  * @param {number} duration - Duración en ms
  */
 export function showNotification(message, type = 'info', duration = 3000) {
-    // Esta función se puede mejorar con un sistema de notificaciones más robusto
-    // Por ahora, usa alert() o puede extenderse para mostrar toasts
-    const prefix = {
-        success: '✓',
-        error: '✗',
-        warning: '⚠',
-        info: 'ℹ'
-    }[type] || '';
-    
-    console.log(`[${type.toUpperCase()}] ${message}`);
-    
-    // En el futuro, aquí se podría crear un elemento visual en el DOM
-    // Para ahora, los console.log son suficientes para debugging
+    void message;
+    void type;
+    void duration;
 }
 
 // === DEBUG ===
@@ -202,7 +189,5 @@ export function showNotification(message, type = 'info', duration = 3000) {
  * @param {*} args - Argumentos a loguear
  */
 export function debug(...args) {
-    if (window.__DEBUG_MODE) {
-        console.log(...args);
-    }
+    void args;
 }

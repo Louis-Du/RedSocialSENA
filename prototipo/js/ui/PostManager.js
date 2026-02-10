@@ -11,6 +11,7 @@
 import { postService } from '../services/PostService.js';
 import { modalManager } from './ModalManager.js';
 import { feedRenderer } from './FeedRenderer.js';
+import { messageManager } from './MessageManager.js';
 
 class PostManager {
     constructor() {
@@ -107,7 +108,7 @@ class PostManager {
             modalManager.showSuccess(result.message);
 
         } catch (error) {
-            modalManager.showError('Error al crear publicación: ' + error.message);
+            modalManager.showError('No fue posible crear la publicacion: ' + error.message);
         }
     }
 
@@ -117,7 +118,7 @@ class PostManager {
      */
     async handleEditPost(postId) {
         // TODO: Implementar edición de posts
-        console.warn('Edición de posts no implementada aún');
+        messageManager.info('La edición de publicaciones se habilitara en la siguiente fase.');
     }
 }
 

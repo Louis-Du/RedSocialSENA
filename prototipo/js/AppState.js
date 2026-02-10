@@ -24,11 +24,12 @@ class AppState {
             tipoDoc: 'CC',
             documento: '1234567890',
             nombre: 'Daniel Esteban',
-            apodo: 'Aprendiz SENA (Tú)',
+            apodo: 'Daniel Esteban',
             trimestre: '3° Trimestre',
             programa: 'Tecnólogo en Análisis y Desarrollo de Software',
-            profilePicture: null,
+            profilePicture: 'assets/placeholders/avatar-placeholder.svg',
             bio: 'Aprendiz apasionado por la tecnología',
+            email: 'daniel.esteban@sena.edu.co',
             isLoggedIn: false
         };
 
@@ -43,7 +44,8 @@ class AppState {
                 trimestre: '2° Trimestre',
                 programa: 'Técnica en Administración de Sistemas',
                 bio: 'Especialista en redes',
-                profilePicture: null
+                profilePicture: 'assets/placeholders/avatar-placeholder.svg',
+                email: 'maria.garcia@sena.edu.co'
             },
             {
                 id: 'user_3',
@@ -54,7 +56,20 @@ class AppState {
                 trimestre: '1° Trimestre',
                 programa: 'Técnica en Programación',
                 bio: 'Frontend developer en formación',
-                profilePicture: null
+                profilePicture: 'assets/placeholders/avatar-placeholder.svg',
+                email: 'carlos.lopez@sena.edu.co'
+            },
+            {
+                id: 'user_4',
+                tipoDoc: 'TI',
+                documento: '11223344',
+                nombre: 'Ana Martínez',
+                apodo: 'Ana',
+                trimestre: '4° Trimestre',
+                programa: 'Marketing Digital',
+                bio: 'Especialista en marketing digital y redes sociales',
+                profilePicture: 'assets/placeholders/avatar-placeholder.svg',
+                email: 'ana.martinez@sena.edu.co'
             }
         ];
 
@@ -445,11 +460,7 @@ class AppState {
     notifySubscribers(dataType) {
         if (this.subscribers[dataType]) {
             this.subscribers[dataType].forEach(callback => {
-                try {
-                    callback();
-                } catch (e) {
-                    console.error(`Error en suscriptor de ${dataType}:`, e);
-                }
+                callback();
             });
         }
     }

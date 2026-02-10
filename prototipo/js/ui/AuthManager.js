@@ -117,7 +117,7 @@ class AuthManager {
             const password = document.getElementById('password')?.value;
 
             if (!tipoDoc || !documento || !password) {
-                messageManager.error('Por favor completa todos los campos');
+                messageManager.error('Por favor completa todos los campos para continuar.');
                 return;
             }
 
@@ -141,7 +141,7 @@ class AuthManager {
             }
 
             // Éxito
-            messageManager.success('¡Bienvenido a la red social SENA!');
+            messageManager.success('Acceso confirmado. Bienvenido(a) a la Red Social SENA.');
 
             // Limpiar formulario
             document.getElementById('loginForm')?.reset();
@@ -162,8 +162,7 @@ class AuthManager {
             }
 
         } catch (error) {
-            messageManager.error('Error al intentar login. Intenta de nuevo.');
-            console.error('Login error:', error);
+            messageManager.error('No fue posible iniciar sesión. Intenta de nuevo.');
             
             // Re-habilitar botón
             const submitBtn = document.querySelector('#loginForm button[type="submit"]');
@@ -204,8 +203,7 @@ class AuthManager {
                 }
             );
         } catch (error) {
-            messageManager.error('Error al cerrar sesión');
-            console.error('Logout error:', error);
+            messageManager.error('No fue posible cerrar sesión. Intenta de nuevo.');
         }
     }
 }

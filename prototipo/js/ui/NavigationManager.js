@@ -73,7 +73,6 @@ class NavigationManager {
      */
     showView(viewName) {
         if (!this.views[viewName]) {
-            console.error(`Vista desconocida: ${viewName}`);
             return;
         }
 

@@ -7,6 +7,8 @@
  * - Manejar confirmaciones de eliminación
  */
 
+import { messageManager } from './MessageManager.js';
+
 class ModalManager {
     constructor() {
         this.modals = {
@@ -140,8 +142,7 @@ class ModalManager {
      * @param {string} message - Mensaje de error
      */
     showError(message) {
-        alert('❌ ' + message);
-        console.error(message);
+        messageManager.error(message);
     }
 
     /**
@@ -149,8 +150,7 @@ class ModalManager {
      * @param {string} message - Mensaje de éxito
      */
     showSuccess(message) {
-        console.log('✓ ' + message);
-        // En el futuro, mostrar toast visual
+        messageManager.success(message);
     }
 }
 

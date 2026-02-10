@@ -9,6 +9,7 @@
  */
 
 import { appState } from '../AppState.js';
+import { messageManager } from './MessageManager.js';
 
 class ProfileManager {
     constructor() {
@@ -79,7 +80,6 @@ class ProfileManager {
         // === FORMACIÓN ===
         this.loadEducationInfo(currentUser);
 
-        console.log('✅ Datos de perfil cargados desde AppState');
     }
 
     /**
@@ -92,9 +92,11 @@ class ProfileManager {
             
             // Email (solo lectura)
             if (inputs[0]) {
-                inputs[0].value = currentUser.documento 
-                    ? `${currentUser.documento}@soy.sena.edu.co` 
-                    : 'correo@soy.sena.edu.co';
+                inputs[0].value = currentUser.email
+                    ? currentUser.email
+                    : currentUser.documento
+                        ? `${currentUser.documento}@soy.sena.edu.co`
+                        : 'correo@soy.sena.edu.co';
                 inputs[0].setAttribute('readonly', 'readonly');
             }
 
@@ -150,7 +152,7 @@ class ProfileManager {
 
         // Validaciones básicas
         if (!nombre || !apodo) {
-            this.showErrorMessage('Nombre y usuario son requeridos');
+            this.showErrorMessage('Por favor completa el nombre y el usuario antes de guardar.');
             return;
         }
 
@@ -161,8 +163,7 @@ class ProfileManager {
             bio
         });
 
-        console.log('✅ Perfil general guardado');
-        this.showSuccessMessage('Información guardada correctamente');
+        this.showSuccessMessage('Información general actualizada correctamente.');
     }
 
     /**
@@ -182,23 +183,22 @@ class ProfileManager {
 
         // Validaciones básicas
         if (!currentPassword || !newPassword || !confirmPassword) {
-            this.showErrorMessage('Todos los campos de contraseña son requeridos');
+            this.showErrorMessage('Completa los tres campos de contraseña para continuar.');
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            this.showErrorMessage('Las nuevas contraseñas no coinciden');
+            this.showErrorMessage('Las contraseñas nuevas no coinciden.');
             return;
         }
 
         if (newPassword.length < 6) {
-            this.showErrorMessage('La contraseña debe tener al menos 6 caracteres');
+            this.showErrorMessage('La contraseña debe tener al menos 6 caracteres.');
             return;
         }
 
         // En producción, aquí se enviaría a un backend
-        console.log('✅ Contraseña actualizada (simulado)');
-        this.showSuccessMessage('Contraseña actualizada correctamente');
+        this.showSuccessMessage('Contraseña actualizada correctamente.');
 
         // Limpiar campos
         currentPasswordInput.value = '';
@@ -210,14 +210,14 @@ class ProfileManager {
      * Muestra un mensaje de éxito
      */
     showSuccessMessage(message) {
-        alert(message); // Simplificado; en producción usar un toast
+        messageManager.success(message);
     }
 
     /**
      * Muestra un mensaje de error
      */
     showErrorMessage(message) {
-        alert('Error: ' + message); // Simplificado; en producción usar un toast
+        messageManager.error(message);
     }
 }
 

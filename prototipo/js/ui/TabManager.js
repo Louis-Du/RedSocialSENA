@@ -130,8 +130,6 @@ class TabManager {
      * @param {string} tabId - ID de la pestaña
      */
     setActiveTab(tabId) {
-        console.log(`🔵 setActiveTab llamado con tabId: ${tabId}`);
-        
         // Ocultar todos los contenidos
         document.querySelectorAll('.tab-content').forEach(content => {
             content.classList.add('hidden');
@@ -141,9 +139,6 @@ class TabManager {
         const target = document.getElementById(tabId);
         if (target) {
             target.classList.remove('hidden');
-            console.log(`✅ Mostrando contenido: ${tabId}`);
-        } else {
-            console.error(`❌ No se encontró el elemento con id: ${tabId}`);
         }
 
         // Actualizar nav desktop
@@ -190,12 +185,10 @@ class TabManager {
      * Reinicializa las tabs cuando se muestra una vista
      */
     reinitializeTabs() {
-        console.log('🔄 Reinicializando tabs...');
         // Re-configurar los event listeners (por si los elementos se cargaron después)
         this.setupTabHandlers();
         // Inicializar la primera tab
         this.initializeFirstTab();
-        console.log('✅ Tabs reinicializadas');
     }
 
     /**

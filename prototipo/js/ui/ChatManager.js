@@ -64,10 +64,18 @@ class ChatManager {
 
         if (!chatList) return;
 
-        chatList.innerHTML = '';
-        conversations.forEach(conv => {
-            chatList.insertAdjacentHTML('beforeend', this.generateChatListItemHTML(conv));
-        });
+        if (conversations.length === 0) {
+            chatList.innerHTML = `
+                <li class="p-6 text-center text-gray-500">
+                    No hay conversaciones activas. Inicia un mensaje para comenzar.
+                </li>
+            `;
+        } else {
+            chatList.innerHTML = '';
+            conversations.forEach(conv => {
+                chatList.insertAdjacentHTML('beforeend', this.generateChatListItemHTML(conv));
+            });
+        }
 
         // Re-attach event listeners
         this.attachChatListListeners();
@@ -119,7 +127,7 @@ class ChatManager {
         const user = userService.getUserById(userId);
 
         if (!user) {
-            modalManager.showError('Usuario no encontrado');
+            modalManager.showError('No se encontro el usuario solicitado.');
             return;
         }
 
@@ -152,7 +160,15 @@ class ChatManager {
         if (title && user) title.textContent = user.apodo || user.nombre;
         if (container) {
             const messages = chatService.getMessages(userId);
-            container.innerHTML = messages.map(msg => this.generateMessageHTML(msg, userId)).join('');
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        Aun no hay mensajes en esta conversacion.
+                    </div>
+                `;
+            } else {
+                container.innerHTML = messages.map(msg => this.generateMessageHTML(msg, userId)).join('');
+            }
             if (window.loadLucideIcons) loadLucideIcons();
         }
 
@@ -170,7 +186,15 @@ class ChatManager {
 
         if (!container) return;
 
-        container.innerHTML = messages.map(msg => this.generateMessageHTML(msg, userId)).join('');
+        if (messages.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-gray-500 py-8">
+                    Aun no hay mensajes en esta conversacion.
+                </div>
+            `;
+        } else {
+            container.innerHTML = messages.map(msg => this.generateMessageHTML(msg, userId)).join('');
+        }
         container.scrollTop = container.scrollHeight;
         if (window.loadLucideIcons) loadLucideIcons();
     }
@@ -208,7 +232,7 @@ class ChatManager {
     async sendMessage(source) {
         try {
             if (!this.currentChatUserId) {
-                modalManager.showError('Por favor selecciona una conversación');
+                modalManager.showError('Selecciona una conversacion para continuar.');
                 return;
             }
 
@@ -217,7 +241,7 @@ class ChatManager {
             const content = input?.value.trim();
 
             if (!content) {
-                modalManager.showError('El mensaje no puede estar vacío');
+                modalManager.showError('El mensaje no puede estar vacio.');
                 return;
             }
 

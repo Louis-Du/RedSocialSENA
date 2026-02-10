@@ -12,6 +12,7 @@ import { escapeHTML, formatTime } from '../utils.js';
 import { postService } from '../services/PostService.js';
 import { commentService } from '../services/CommentService.js';
 import { userService } from '../services/UserService.js';
+import { messageManager } from './MessageManager.js';
 
 class FeedRenderer {
     constructor() {
@@ -96,8 +97,8 @@ class FeedRenderer {
             this.feedContainer.innerHTML = `
                 <div class="text-center py-12 text-gray-500">
                     <i data-lucide="inbox" class="w-16 h-16 mx-auto mb-4 opacity-50"></i>
-                    <p class="text-lg">No hay publicaciones aún</p>
-                    <p class="text-sm">¡Sé el primero en compartir algo!</p>
+                    <p class="text-lg">No hay publicaciones registradas</p>
+                    <p class="text-sm">Comparte un aporte para iniciar el intercambio academico.</p>
                 </div>
             `;
             if (window.loadLucideIcons) loadLucideIcons();
@@ -191,10 +192,18 @@ class FeedRenderer {
         const container = document.getElementById(`commentsContainer-${postId}`);
         if (!container) return;
 
-        container.innerHTML = '';
-        comments.forEach(comment => {
-            container.insertAdjacentHTML('beforeend', this.generateCommentHTML(comment, postId));
-        });
+        if (comments.length === 0) {
+            container.innerHTML = `
+                <div class="text-sm text-gray-500 text-center py-4">
+                    Aun no hay comentarios. Tu aporte puede iniciar la conversacion.
+                </div>
+            `;
+        } else {
+            container.innerHTML = '';
+            comments.forEach(comment => {
+                container.insertAdjacentHTML('beforeend', this.generateCommentHTML(comment, postId));
+            });
+        }
 
         if (window.loadLucideIcons) loadLucideIcons();
     }
@@ -241,7 +250,7 @@ class FeedRenderer {
         const commentText = input?.value.trim();
 
         if (!commentText) {
-            alert('El comentario no puede estar vacío');
+            messageManager.error('El comentario no puede estar vacio. Por favor redacta tu aporte.');
             return;
         }
 
@@ -249,7 +258,7 @@ class FeedRenderer {
         const result = await commentService.addComment(postId, commentText);
         
         if (!result.success) {
-            alert('Error: ' + result.error);
+            messageManager.error(`No fue posible registrar el comentario: ${result.error}`);
             return;
         }
 
@@ -270,12 +279,19 @@ class FeedRenderer {
      * @param {string} postId - ID del post
      */
     async handleDeletePost(postId) {
-        const confirmed = confirm('¿Estás seguro de que quieres eliminar esta publicación?');
+        const confirmed = await new Promise(resolve => {
+            messageManager.confirm(
+                'Eliminar publicacion',
+                'Esta accion eliminara la publicacion y sus comentarios asociados. ¿Deseas continuar?',
+                () => resolve(true),
+                () => resolve(false)
+            );
+        });
         if (!confirmed) return;
 
         const result = await postService.deletePost(postId);
         if (!result.success) {
-            alert('Error: ' + result.error);
+            messageManager.error(`No fue posible eliminar la publicacion: ${result.error}`);
             return;
         }
 
@@ -290,12 +306,19 @@ class FeedRenderer {
      * @param {string} commentId - ID del comentario
      */
     async handleDeleteComment(postId, commentId) {
-        const confirmed = confirm('¿Estás seguro de que quieres eliminar este comentario?');
+        const confirmed = await new Promise(resolve => {
+            messageManager.confirm(
+                'Eliminar comentario',
+                'Esta accion eliminara el comentario seleccionado. ¿Deseas continuar?',
+                () => resolve(true),
+                () => resolve(false)
+            );
+        });
         if (!confirmed) return;
 
         const result = await commentService.deleteComment(postId, commentId);
         if (!result.success) {
-            alert('Error: ' + result.error);
+            messageManager.error(`No fue posible eliminar el comentario: ${result.error}`);
             return;
         }
 
