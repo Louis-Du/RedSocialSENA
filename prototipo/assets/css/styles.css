@@ -60,6 +60,115 @@ body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", 
     transform: translateY(-6px);
 }
 
+/* === ESTILOS PARA MESSAGEMANAGER === */
+
+/* Contenedor de mensajes */
+#messageContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    max-width: 500px;
+}
+
+/* Estilo base de alert */
+.messageAlert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    pointer-events: all;
+    animation: slideInDown 0.3s ease-out forwards;
+}
+
+/* Animaciones de entrada y salida */
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideOutUp {
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+.messageAlert--exit {
+    animation: slideOutUp 0.3s ease-in forwards !important;
+}
+
+/* Variantes de tipo de mensaje */
+.messageAlert--success {
+    background-color: #DEF7EC;
+    color: #03543F;
+    border-left: 4px solid #10B981;
+}
+
+.messageAlert--error {
+    background-color: #FEE2E2;
+    color: #7F1D1D;
+    border-left: 4px solid #EF4444;
+}
+
+.messageAlert--warning {
+    background-color: #FEF3C7;
+    color: #78350F;
+    border-left: 4px solid #FBBF24;
+}
+
+.messageAlert--info {
+    background-color: #DBEAFE;
+    color: #082F49;
+    border-left: 4px solid #3B82F6;
+}
+
+/* === ESTILOS PARA DIÁLOGOS DE CONFIRMACIÓN === */
+
+.messageDialog__overlay {
+    animation: fadeIn 0.2s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.messageDialog {
+    animation: scaleIn 0.3s ease-out forwards;
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.messageDialog button:hover {
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+.messageDialog button:active {
+    transform: translateY(0);
+}
+
 /* Fin de styles.css */
 
 /* Ajuste de robustez para prevenir scroll horizontal causado por imágenes */
