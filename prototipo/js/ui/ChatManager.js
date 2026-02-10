@@ -12,6 +12,7 @@ import { chatService } from '../services/ChatService.js';
 import { userService } from '../services/UserService.js';
 import { escapeHTML, formatTime } from '../utils.js';
 import { modalManager } from './ModalManager.js';
+import { uiComponents } from '../utils/UIComponents.js';
 
 class ChatManager {
     constructor() {

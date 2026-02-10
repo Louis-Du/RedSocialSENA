@@ -13,6 +13,7 @@ import { postService } from '../services/PostService.js';
 import { commentService } from '../services/CommentService.js';
 import { userService } from '../services/UserService.js';
 import { messageManager } from './MessageManager.js';
+import { uiComponents } from '../utils/UIComponents.js';
 
 class FeedRenderer {
     constructor() {
@@ -346,6 +347,39 @@ class FeedRenderer {
         
         if (fileNameEl) {
             fileNameEl.textContent = file.name;
+        }
+    }
+
+    /**
+     * Muestra estado vacío en el feed
+     */
+    showEmptyState() {
+        if (!this.feedContainer) return;
+
+        const emptyHTML = uiComponents.emptyState({
+            icon: 'post',
+            title: 'Aún no hay publicaciones',
+            message: 'Sé el primero en compartir algo con la comunidad. ¡Crea tu primera publicación!',
+            actionText: 'Crear Publicación',
+            actionId: 'emptyCreatePostBtn',
+            actionCallback: () => {
+                const createBtn = document.getElementById('createPostBtn');
+                if (createBtn) createBtn.click();
+            }
+        });
+
+        this.feedContainer.innerHTML = emptyHTML;
+    }
+
+    /**
+     * Verifica si el feed está vacío y muestra el estado correspondiente
+     */
+    checkEmptyFeed() {
+        if (!this.feedContainer) return;
+
+        const posts = this.feedContainer.querySelectorAll('.post-card');
+        if (posts.length === 0) {
+            this.showEmptyState();
         }
     }
 }

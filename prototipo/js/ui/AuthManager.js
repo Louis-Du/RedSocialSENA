@@ -12,6 +12,8 @@
 import { userService } from '../services/UserService.js';
 import { navigationManager } from './NavigationManager.js';
 import { messageManager } from './MessageManager.js';
+import { formValidator } from '../utils/FormValidator.js';
+import { buttonHelper } from '../utils/ButtonHelper.js';
 
 class AuthManager {
     constructor() {
@@ -38,26 +40,18 @@ class AuthManager {
      * Configura validación en tiempo real de inputs
      */
     setupInputValidation() {
-        const tipoDoc = document.getElementById('tipoDoc');
-        const documento = document.getElementById('documento');
-        const password = document.getElementById('password');
-        const submitBtn = document.querySelector('#loginForm button[type="submit"]');
+        const form = document.getElementById('loginForm');
+        if (!form) return;
 
-        if (!tipoDoc || !documento || !password || !submitBtn) return;
-
-        const validateForm = () => {
-            const isValid = tipoDoc.value && documento.value && password.value;
-            submitBtn.disabled = !isValid;
-            submitBtn.classList.toggle('opacity-50', !isValid);
-            submitBtn.classList.toggle('cursor-not-allowed', !isValid);
-        };
-
-        tipoDoc.addEventListener('change', validateForm);
-        documento.addEventListener('input', validateForm);
-        password.addEventListener('input', validateForm);
-
-        // Validación inicial
-        validateForm();
+        // Configurar validación con FormValidator
+        formValidator.setupFormValidation(form, {
+            tipoDoc: ['required'],
+            documento: ['required', 'documento'],
+            password: ['required', 'password']
+        }, {
+            validateOn: 'blur',
+            submitButtonId: 'loginSubmitBtn'
+        });
     }
 
     /**
@@ -111,64 +105,57 @@ class AuthManager {
      * Maneja el login del usuario
      */
     async handleLogin() {
+        const tipoDoc = document.getElementById('tipoDoc')?.value;
+        const documento = document.getElementById('documento')?.value;
+        const password = document.getElementById('password')?.value;
+
+        if (!tipoDoc || !documento || !password) {
+            messageManager.error('Por favor completa todos los campos para continuar.');
+            return;
+        }
+
+        const submitBtn = document.querySelector('#loginForm button[type="submit"]') || document.getElementById('loginSubmitBtn');
+        if (!submitBtn) return;
+
+        // Mostrar estado global de carga
+        const loadingBanner = messageManager.showLoading('Validando credenciales...');
+
         try {
-            const tipoDoc = document.getElementById('tipoDoc')?.value;
-            const documento = document.getElementById('documento')?.value;
-            const password = document.getElementById('password')?.value;
+            // Usar buttonHelper para manejar estado del botón
+            await buttonHelper.withLoading(submitBtn, async () => {
+                const result = await userService.login(tipoDoc, documento, password);
 
-            if (!tipoDoc || !documento || !password) {
-                messageManager.error('Por favor completa todos los campos para continuar.');
-                return;
-            }
-
-            // Deshabilitar botón durante el login
-            const submitBtn = document.querySelector('#loginForm button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Validando...';
-            }
-
-            const result = await userService.login(tipoDoc, documento, password);
-
-            if (!result.success) {
-                messageManager.error(result.error);
-                // Re-habilitar botón
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Ingresar';
+                if (!result.success) {
+                    loadingBanner.dismiss();
+                    messageManager.error(result.error);
+                    throw new Error(result.error);
                 }
-                return;
-            }
 
-            // Éxito
-            messageManager.success('Acceso confirmado. Bienvenido(a) a la Red Social SENA.');
+                // Éxito - actualizar banner
+                loadingBanner.update('Acceso confirmado. Bienvenido(a) a la Red Social SENA.', 'success');
 
-            // Limpiar formulario
-            document.getElementById('loginForm')?.reset();
+                // Limpiar formulario
+                document.getElementById('loginForm')?.reset();
 
-            // Actualizar indicador de sesión
-            this.updateSessionIndicator();
+                // Actualizar indicador de sesión
+                this.updateSessionIndicator();
 
-            // Esperar un poco para que se vea el mensaje de éxito
-            await new Promise(resolve => setTimeout(resolve, 1500));
+                // Esperar antes de cambiar vista
+                await new Promise(resolve => setTimeout(resolve, 1500));
 
-            // Cambiar a vista de app
-            navigationManager.showView('app');
+                // Cambiar a vista de app
+                navigationManager.showView('app');
 
-            // Re-habilitar botón
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Ingresar';
-            }
+                // Cerrar banner
+                loadingBanner.dismiss();
+            }, {
+                loadingText: 'Validando...'
+            });
 
         } catch (error) {
-            messageManager.error('No fue posible iniciar sesión. Intenta de nuevo.');
-            
-            // Re-habilitar botón
-            const submitBtn = document.querySelector('#loginForm button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Ingresar';
+            loadingBanner.dismiss();
+            if (error.message !== 'Credenciales inválidas' && error.message !== 'Usuario no encontrado') {
+                messageManager.error('No fue posible iniciar sesión. Intenta de nuevo.');
             }
         }
     }
