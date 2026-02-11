@@ -14,6 +14,7 @@ import { commentService } from '../services/CommentService.js';
 import { userService } from '../services/UserService.js';
 import { messageManager } from './MessageManager.js';
 import { uiComponents } from '../utils/UIComponents.js';
+import { navigationManager } from './NavigationManager.js';
 
 class FeedRenderer {
     constructor() {
@@ -30,6 +31,21 @@ class FeedRenderer {
 
         // Event delegation para botones de comentarios y eliminación
         this.feedContainer.addEventListener('click', (e) => {
+            console.log('[FeedRenderer] Click detectado en:', e.target);
+            
+            // Click en perfil de autor
+            if (e.target.closest('.view-other-profile')) {
+                const profileDiv = e.target.closest('.view-other-profile');
+                const userId = profileDiv.getAttribute('data-user-id');
+                console.log('[FeedRenderer] Click en view-other-profile, userId:', userId);
+                if (userId) {
+                    this.handleViewProfile(userId);
+                } else {
+                    console.error('[FeedRenderer] No se encontró data-user-id en el div');
+                }
+                return; // Evitar que se ejecuten otros handlers
+            }
+
             // Botón de enviar comentario
             if (e.target.closest('.send-comment-btn')) {
                 const btn = e.target.closest('.send-comment-btn');
@@ -138,7 +154,7 @@ class FeedRenderer {
                             <div class="bg-sena-verde rounded-full p-3">
                                 <i data-lucide="user" class="w-8 h-8 text-white"></i>
                             </div>
-                            <div class="flex-1 view-other-profile cursor-pointer hover:opacity-80">
+                            <div class="flex-1 view-other-profile cursor-pointer hover:opacity-80" data-user-id="${post.userId || ''}">
                                 <h3 class="text-xl font-bold text-gray-900">${escapeHTML(author.apodo || 'Usuario')}</h3>
                                 <p class="text-gray-800 font-semibold">${escapeHTML(author.trimestre || '')}</p>
                                 <p class="text-gray-700 text-sm">${escapeHTML(author.programa || '')}</p>
@@ -273,6 +289,19 @@ class FeedRenderer {
             const count = commentService.getCommentCount(postId);
             countEl.textContent = `${count} comentario${count !== 1 ? 's' : ''}`;
         }
+    }
+
+    /**
+     * Maneja la visualización del perfil de un usuario
+     * @param {string} userId - ID del usuario a visualizar
+     */
+    handleViewProfile(userId) {
+        console.log('[FeedRenderer] handleViewProfile called with userId:', userId);
+        if (!userId) {
+            console.error('[FeedRenderer] No userId provided to handleViewProfile');
+            return;
+        }
+        navigationManager.navigateToProfile(userId);
     }
 
     /**

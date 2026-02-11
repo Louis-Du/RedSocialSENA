@@ -24,6 +24,7 @@ import { chatManager } from './ui/ChatManager.js';
 import { tabManager } from './ui/TabManager.js';
 import { feedRenderer } from './ui/FeedRenderer.js';
 import { profileManager } from './ui/ProfileManager.js';
+import { otherProfileManager } from './ui/OtherProfileManager.js';
 
 // Importar utils
 import { debug } from './utils.js';
