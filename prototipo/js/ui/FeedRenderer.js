@@ -290,7 +290,11 @@ class FeedRenderer {
      * @param {string} userId - ID del usuario a visualizar
      */
     handleViewProfile(userId) {
-        if (!userId) return;
+        console.log('[FeedRenderer] handleViewProfile called with userId:', userId);
+        if (!userId) {
+            console.error('[FeedRenderer] No userId provided to handleViewProfile');
+            return;
+        }
         navigationManager.navigateToProfile(userId);
     }
 

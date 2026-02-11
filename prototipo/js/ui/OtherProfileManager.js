@@ -19,7 +19,10 @@ class OtherProfileManager {
         
         // Escuchar cuando se muestre la vista
         window.addEventListener('otherProfileShown', (e) => {
+            console.log('[OtherProfileManager] Event otherProfileShown received:', e.detail);
             const params = e.detail?.params || {};
+            console.log('[OtherProfileManager] Extracted params:', params);
+            console.log('[OtherProfileManager] userId from params:', params.userId);
             this.loadUserProfile(params.userId);
         });
         
