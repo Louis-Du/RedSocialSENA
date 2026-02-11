@@ -223,6 +223,12 @@ class NavigationManager {
      */
     showView(viewName, options = {}) {
         const { updateHash = true, force = false, params = {} } = options;
+        
+        console.log(`[NavigationManager] showView called: ${viewName}, updateHash: ${updateHash}`);
+        if (viewName === 'otherProfile' && !params.userId) {
+            console.warn('[NavigationManager] WARNING: otherProfile called without userId!');
+            console.trace();
+        }
 
         if (!this.views[viewName]) {
             console.warn(`Vista no encontrada: ${viewName}`);
