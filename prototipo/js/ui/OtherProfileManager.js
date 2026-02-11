@@ -23,6 +23,13 @@ class OtherProfileManager {
             const params = e.detail?.params || {};
             console.log('[OtherProfileManager] Extracted params:', params);
             console.log('[OtherProfileManager] userId from params:', params.userId);
+            
+            // Si no hay userId, ignorar el evento (puede ser un evento duplicado o error)
+            if (!params.userId) {
+                console.log('[OtherProfileManager] Ignoring event without userId');
+                return;
+            }
+            
             this.loadUserProfile(params.userId);
         });
         

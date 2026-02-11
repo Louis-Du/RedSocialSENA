@@ -277,6 +277,7 @@ class NavigationManager {
         // Si mostramos otherProfile, inicializar con userId
         if (viewName === 'otherProfile') {
             setTimeout(() => {
+                console.log('[NavigationManager] Dispatching otherProfileShown with params:', params);
                 window.dispatchEvent(new CustomEvent('otherProfileShown', { detail: { params } }));
             }, 50);
         }
