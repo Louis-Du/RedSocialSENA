@@ -278,7 +278,10 @@ class NavigationManager {
         if (viewName === 'otherProfile') {
             setTimeout(() => {
                 console.log('[NavigationManager] Dispatching otherProfileShown with params:', params);
-                window.dispatchEvent(new CustomEvent('otherProfileShown', { detail: { params } }));
+                // Solo disparar si hay userId en params
+                if (params.userId) {
+                    window.dispatchEvent(new CustomEvent('otherProfileShown', { detail: { params } }));
+                }
             }, 50);
         }
 
