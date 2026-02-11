@@ -12,12 +12,45 @@ import { postService } from '../services/PostService.js';
 import { modalManager } from './ModalManager.js';
 import { feedRenderer } from './FeedRenderer.js';
 import { messageManager } from './MessageManager.js';
+import { formValidator } from '../utils/FormValidator.js';
+import { buttonHelper } from '../utils/ButtonHelper.js';
 
 class PostManager {
     constructor() {
         this.setupCreatePostModal();
         this.setupQuickPostForm();
         this.setupCreateButton();
+        this.setupValidation();
+    }
+
+    /**
+     * Configura validación de formularios de publicaciones
+     */
+    setupValidation() {
+        // Modal de crear publicación
+        const modalForm = document.getElementById('newPostForm');
+        if (modalForm) {
+            formValidator.setupFormValidation(modalForm, {
+                postContent: ['required', ['minLength', 1], ['maxLength', 500]]
+            }, {
+                validateOn: 'blur'
+            });
+        }
+
+        // Formulario rápido
+        const quickForm = document.getElementById('quickPostForm');
+        if (quickForm) {
+            const quickContent = document.getElementById('quickPostContent');
+            if (quickContent) {
+                formValidator.setupRealTimeValidation(quickContent, [
+                    'required',
+                    ['minLength', 1],
+                    ['maxLength', 500]
+                ], {
+                    validateOn: 'input'
+                });
+            }
+        }
     }
 
     /**
@@ -69,46 +102,65 @@ class PostManager {
      * @param {string} source - 'modal' o 'quick'
      */
     async handleCreatePost(source) {
+        let content, imageFile, button;
+
+        if (source === 'modal') {
+            content = document.getElementById('postContent')?.value || '';
+            imageFile = document.getElementById('postImageUpload')?.files[0] || null;
+            button = document.querySelector('#newPostForm button[type="submit"]');
+        } else if (source === 'quick') {
+            content = document.getElementById('quickPostContent')?.value || '';
+            imageFile = document.getElementById('quickPostImage')?.files[0] || null;
+            button = document.getElementById('quickPublishBtn');
+        }
+
+        if (!button) return;
+
+        const loadingBanner = messageManager.showLoading('Creando publicación...');
+
         try {
-            let content, imageFile;
+            await buttonHelper.withLoading(button, async () => {
+                const result = await postService.createPost(content, imageFile);
 
-            if (source === 'modal') {
-                content = document.getElementById('postContent')?.value || '';
-                imageFile = document.getElementById('postImageUpload')?.files[0] || null;
-            } else if (source === 'quick') {
-                content = document.getElementById('quickPostContent')?.value || '';
-                imageFile = document.getElementById('quickPostImage')?.files[0] || null;
-            }
+                if (!result.success) {
+                    loadingBanner.dismiss();
+                    modalManager.showError(result.error);
+                    throw new Error(result.error);
+                }
 
-            const result = await postService.createPost(content, imageFile);
+                // Renderizar el nuevo post
+                feedRenderer.renderPost(result.post, 'top');
 
-            if (!result.success) {
-                modalManager.showError(result.error);
-                return;
-            }
+                // Limpiar formulario y cerrar modal
+                if (source === 'modal') {
+                    const form = document.getElementById('newPostForm');
+                    form?.reset();
+                    const fileName = document.getElementById('imageFileName');
+                    if (fileName) fileName.textContent = 'Ningún archivo seleccionado';
+                    modalManager.closeCreatePostModal();
+                } else if (source === 'quick') {
+                    const form = document.getElementById('quickPostForm');
+                    form?.reset();
+                    const fileName = document.getElementById('quickImageFileName');
+                    if (fileName) fileName.textContent = 'Ningún archivo seleccionado';
+                    modalManager.closeQuickPostPanel();
+                }
 
-            // Renderizar el nuevo post
-            feedRenderer.renderPost(result.post, 'top');
+                loadingBanner.update('Publicación creada exitosamente', 'success');
+                setTimeout(() => loadingBanner.dismiss(), 2000);
 
-            // Limpiar formulario y cerrar modal
-            if (source === 'modal') {
-                const form = document.getElementById('newPostForm');
-                form?.reset();
-                const fileName = document.getElementById('imageFileName');
-                if (fileName) fileName.textContent = 'Ningún archivo seleccionado';
-                modalManager.closeCreatePostModal();
-            } else if (source === 'quick') {
-                const form = document.getElementById('quickPostForm');
-                form?.reset();
-                const fileName = document.getElementById('quickImageFileName');
-                if (fileName) fileName.textContent = 'Ningún archivo seleccionado';
-                modalManager.closeQuickPostPanel();
-            }
-
-            modalManager.showSuccess(result.message);
+                modalManager.showSuccess(result.message);
+            }, {
+                loadingText: 'Publicando...',
+                successText: '✓ Publicado'
+            });
 
         } catch (error) {
-            modalManager.showError('No fue posible crear la publicacion: ' + error.message);
+            loadingBanner.dismiss();
+            if (error.message !== 'El contenido es obligatorio' && 
+                error.message !== 'El contenido no puede exceder los 500 caracteres') {
+                modalManager.showError('No fue posible crear la publicación: ' + error.message);
+            }
         }
     }
 

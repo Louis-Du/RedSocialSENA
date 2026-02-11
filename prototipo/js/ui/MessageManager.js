@@ -116,6 +116,76 @@ class MessageManager {
     }
 
     /**
+     * Muestra un banner de estado global (loading, success, error)
+     * @param {string} message - Texto del estado
+     * @param {string} type - 'loading', 'success', 'error'
+     * @returns {Object} - Objeto con método dismiss()
+     */
+    showGlobalStatus(message, type = 'loading') {
+        // Limpiar banners previos
+        const existingBanner = document.getElementById('globalStatusBanner');
+        if (existingBanner) existingBanner.remove();
+
+        const banner = document.createElement('div');
+        banner.id = 'globalStatusBanner';
+        banner.className = 'fixed top-0 left-0 right-0 z-50 pointer-events-auto';
+
+        const bgColorMap = {
+            loading: 'bg-blue-50 border-blue-200',
+            success: 'bg-green-50 border-green-200',
+            error: 'bg-red-50 border-red-200'
+        };
+
+        const iconMap = {
+            loading: '<svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>',
+            success: '<svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>',
+            error: '<svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>'
+        };
+
+        banner.innerHTML = `
+            <div class="${bgColorMap[type]} border-b-2 px-4 py-3">
+                <div class="flex items-center justify-center gap-3 max-w-4xl mx-auto">
+                    ${iconMap[type]}
+                    <span class="text-sm font-medium text-gray-800">${message}</span>
+                </div>
+            </div>
+        `;
+
+        document.body.insertBefore(banner, document.body.firstChild);
+
+        // Retornar objeto con método dismiss
+        return {
+            dismiss: () => {
+                banner.style.transition = 'opacity 0.3s';
+                banner.style.opacity = '0';
+                setTimeout(() => banner.remove(), 300);
+            },
+            update: (newMessage, newType) => {
+                const messageSpan = banner.querySelector('span');
+                if (messageSpan) messageSpan.textContent = newMessage;
+                if (newType) {
+                    banner.className = `fixed top-0 left-0 right-0 z-50 pointer-events-auto`;
+                    const innerDiv = banner.querySelector('div');
+                    innerDiv.className = `${bgColorMap[newType]} border-b-2 px-4 py-3`;
+                    const iconContainer = banner.querySelector('div > div');
+                    iconContainer.innerHTML = `
+                        ${iconMap[newType]}
+                        <span class="text-sm font-medium text-gray-800">${newMessage}</span>
+                    `;
+                }
+            }
+        };
+    }
+
+    /**
+     * Banner de carga
+     * @param {string} message - Mensaje de carga
+     */
+    showLoading(message = 'Cargando...') {
+        return this.showGlobalStatus(message, 'loading');
+    }
+
+    /**
      * Muestra un mensaje de confirmación
      * @param {string} title - Título de la confirmación
      * @param {string} message - Mensaje
