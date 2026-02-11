@@ -268,6 +268,7 @@ class NavigationManager {
         if (viewName === 'editProfile') {
             // Esperar un tick para que el DOM se actualice
             setTimeout(() => {
+                console.log('[NavigationManager] Dispatching editProfileShown with params:', params);
                 // Disparar evento para reinicializar tabs con params
                 window.dispatchEvent(new CustomEvent('editProfileShown', { detail: { params } }));
             }, 50);

@@ -34,11 +34,16 @@ class ProfileManager {
      * @param {string} userId - ID del usuario (null para perfil propio)
      */
     loadProfile(userId = null) {
+        console.log('[ProfileManager] loadProfile called with userId:', userId);
+        
         const currentUser = userService.getCurrentUser();
+        console.log('[ProfileManager] currentUser:', currentUser.id, currentUser.nombre);
         
         // Determinar si es perfil propio o de otro usuario
         this.isOwnProfile = !userId || userId === currentUser.id;
         this.viewedUserId = this.isOwnProfile ? currentUser.id : userId;
+        
+        console.log('[ProfileManager] isOwnProfile:', this.isOwnProfile, 'viewedUserId:', this.viewedUserId);
         
         // Obtener datos del usuario a mostrar
         const viewedUser = this.isOwnProfile 
@@ -46,10 +51,13 @@ class ProfileManager {
             : userService.getUserById(userId);
         
         if (!viewedUser) {
+            console.error('[ProfileManager] Usuario no encontrado:', userId);
             messageManager.error('Usuario no encontrado');
             navigationManager.showView('app');
             return;
         }
+        
+        console.log('[ProfileManager] viewedUser:', viewedUser.id, viewedUser.nombre);
         
         // Cargar datos en el formulario
         this.loadProfileData(viewedUser);
