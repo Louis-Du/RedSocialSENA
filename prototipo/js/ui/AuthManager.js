@@ -71,10 +71,11 @@ class AuthManager {
      */
     checkExistingSession() {
         if (userService.isLoggedIn()) {
-            navigationManager.showView('app');
+            // NavigationManager ahora maneja la restauración de vista
+            // navigationManager.showView('app');
             this.updateSessionIndicator();
         } else {
-            navigationManager.showView('login');
+            navigationManager.redirectToLogin();
         }
     }
 
@@ -180,13 +181,16 @@ class AuthManager {
                     // Limpiar formulario
                     document.getElementById('loginForm')?.reset();
 
+                    // Limpiar estado de navegación
+                    navigationManager.clearSavedView();
+
                     messageManager.success('Sesión cerrada correctamente');
 
                     // Esperar antes de cambiar vista
                     await new Promise(resolve => setTimeout(resolve, 1000));
 
-                    // Cambiar a vista de login
-                    navigationManager.showView('login');
+                    // Redirigir a login
+                    navigationManager.redirectToLogin();
                 }
             );
         } catch (error) {
