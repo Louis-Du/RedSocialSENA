@@ -31,13 +31,19 @@ class FeedRenderer {
 
         // Event delegation para botones de comentarios y eliminación
         this.feedContainer.addEventListener('click', (e) => {
+            console.log('[FeedRenderer] Click detectado en:', e.target);
+            
             // Click en perfil de autor
             if (e.target.closest('.view-other-profile')) {
                 const profileDiv = e.target.closest('.view-other-profile');
                 const userId = profileDiv.getAttribute('data-user-id');
+                console.log('[FeedRenderer] Click en view-other-profile, userId:', userId);
                 if (userId) {
                     this.handleViewProfile(userId);
+                } else {
+                    console.error('[FeedRenderer] No se encontró data-user-id en el div');
                 }
+                return; // Evitar que se ejecuten otros handlers
             }
 
             // Botón de enviar comentario
