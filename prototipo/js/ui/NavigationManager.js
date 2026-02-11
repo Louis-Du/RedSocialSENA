@@ -45,11 +45,48 @@ class NavigationManager {
             'messages': 'chat',
             'otherProfile': 'otherProfile'
         };
+        
+        // Estado de navegación (para query params)
+        this.navigationParams = {};
 
         // Inicializar
         this.setupListeners();
         this.setupHashRouting();
         this.restoreLastView();
+    }
+
+    /**
+     * Extrae query params del hash
+     * @param {string} hash - Hash completo (ej: "profile?userId=123")
+     * @returns {Object} - { view: string, params: Object }
+     */
+    parseHash(hash) {
+        const [view, queryString] = hash.split('?');
+        const params = {};
+        
+        if (queryString) {
+            queryString.split('&').forEach(param => {
+                const [key, value] = param.split('=');
+                params[decodeURIComponent(key)] = decodeURIComponent(value);
+            });
+        }
+        
+        return { view, params };
+    }
+
+    /**
+     * Construye hash con query params
+     * @param {string} view - Nombre de la vista
+     * @param {Object} params - Parámetros adicionales
+     * @returns {string} - Hash completo
+     */
+    buildHash(view, params = {}) {
+        const hash = this.getHashForView(view);
+        const queryString = Object.entries(params)
+            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+            .join('&');
+        
+        return queryString ? `${hash}?${queryString}` : hash;
     }
 
     /**
@@ -69,11 +106,15 @@ class NavigationManager {
      * Maneja cambios en el hash de la URL
      */
     handleHashChange() {
-        const hash = window.location.hash.slice(1); // Remover el #
-        const viewName = this.hashToView[hash] || 'login';
+        const hashFull = window.location.hash.slice(1); // Remover el #
+        const { view: hashView, params } = this.parseHash(hashFull);
+        const viewName = this.hashToView[hashView] || 'login';
+        
+        // Guardar params para acceso posterior
+        this.navigationParams = params;
         
         // Intentar navegar a la vista
-        this.showView(viewName, { updateHash: false });
+        this.showView(viewName, { updateHash: false, params });
     }
 
     /**
@@ -178,9 +219,10 @@ class NavigationManager {
      * @param {Object} options - Opciones adicionales
      * @param {boolean} options.updateHash - Si se debe actualizar el hash de la URL (default: true)
      * @param {boolean} options.force - Forzar navegación aunque no tenga permisos (default: false)
+     * @param {Object} options.params - Parámetros adicionales para la navegación
      */
     showView(viewName, options = {}) {
-        const { updateHash = true, force = false } = options;
+        const { updateHash = true, force = false, params = {} } = options;
 
         if (!this.views[viewName]) {
             console.warn(`Vista no encontrada: ${viewName}`);
@@ -203,9 +245,12 @@ class NavigationManager {
         this.views[viewName]?.classList.remove('hidden');
         this.currentView = viewName;
 
+        // Guardar params para acceso posterior
+        this.navigationParams = params;
+
         // ACTUALIZAR HASH (si está habilitado)
         if (updateHash) {
-            const hash = this.getHashForView(viewName);
+            const hash = this.buildHash(viewName, params);
             if (window.location.hash !== `#${hash}`) {
                 window.location.hash = hash;
             }
@@ -223,8 +268,15 @@ class NavigationManager {
         if (viewName === 'editProfile') {
             // Esperar un tick para que el DOM se actualice
             setTimeout(() => {
-                // Disparar evento para reinicializar tabs
-                window.dispatchEvent(new CustomEvent('editProfileShown'));
+                // Disparar evento para reinicializar tabs con params
+                window.dispatchEvent(new CustomEvent('editProfileShown', { detail: { params } }));
+            }, 50);
+        }
+
+        // Si mostramos otherProfile, inicializar con userId
+        if (viewName === 'otherProfile') {
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('otherProfileShown', { detail: { params } }));
             }, 50);
         }
 
@@ -232,7 +284,8 @@ class NavigationManager {
         window.dispatchEvent(new CustomEvent('navigationChanged', { 
             detail: { 
                 viewName,
-                previousView: this.currentView
+                previousView: this.currentView,
+                params
             } 
         }));
     }
@@ -281,14 +334,37 @@ class NavigationManager {
     /**
      * Navega a una vista con validación de permisos
      * @param {string} viewName - Nombre de la vista
+     * @param {Object} params - Parámetros adicionales
      * @returns {boolean} - true si la navegación fue exitosa
      */
-    navigateTo(viewName) {
+    navigateTo(viewName, params = {}) {
         if (this.canAccessView(viewName)) {
-            this.showView(viewName);
+            this.showView(viewName, { params });
             return true;
         }
         return false;
+    }
+
+    /**
+     * Navega al perfil de un usuario
+     * @param {string} userId - ID del usuario (null para perfil propio)
+     */
+    navigateToProfile(userId = null) {
+        if (!userId || userId === userService.getCurrentUser().id) {
+            // Perfil propio: #profile
+            this.navigateTo('editProfile');
+        } else {
+            // Perfil de otro: #profile?userId=ID
+            this.navigateTo('editProfile', { userId });
+        }
+    }
+
+    /**
+     * Obtiene los parámetros de navegación actuales
+     * @returns {Object}
+     */
+    getNavigationParams() {
+        return { ...this.navigationParams };
     }
 
     /**
