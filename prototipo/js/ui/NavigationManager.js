@@ -189,29 +189,15 @@ class NavigationManager {
         returnToAppBtnOtherProfile?.addEventListener('click', () => this.showView('app'));
         logoutBtn?.addEventListener('click', () => this.showView('login'));
 
-        // Navegación a perfil de otro usuario (delegado en el renderizador)
-        this.setupOtherProfileNavigation();
+        // NOTA: La navegación a perfil de otros se maneja en FeedRenderer.js
+        // this.setupOtherProfileNavigation(); // ELIMINADO - causaba conflicto
     }
 
     /**
-     * Configura la navegación a perfiles de otros usuarios
+     * MÉTODO LEGACY ELIMINADO - setupOtherProfileNavigation
+     * La navegación a perfiles ahora se maneja en FeedRenderer.js
+     * con handleViewProfile(userId) que llama a navigateToProfile(userId)
      */
-    setupOtherProfileNavigation() {
-        document.addEventListener('click', (e) => {
-            const link = e.target.closest('.view-other-profile');
-            if (link) {
-                const profileElement = link.querySelector('h3') || link;
-                const profileName = profileElement.textContent.trim();
-                
-                const nameElement = document.getElementById('otherProfileName');
-                if (nameElement) {
-                    nameElement.textContent = profileName;
-                }
-
-                this.showView('otherProfile');
-            }
-        });
-    }
 
     /**
      * Muestra una vista específica
