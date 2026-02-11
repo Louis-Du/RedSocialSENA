@@ -351,12 +351,16 @@ class NavigationManager {
      * @param {string} userId - ID del usuario (null para perfil propio)
      */
     navigateToProfile(userId = null) {
-        if (!userId || userId === userService.getCurrentUser().id) {
-            // Perfil propio: #profile
+        const currentUser = userService.getCurrentUser();
+        
+        if (!userId || userId === currentUser.id) {
+            // Perfil propio: usar editProfile
+            console.log('[NavigationManager] navigateToProfile - perfil propio');
             this.navigateTo('editProfile');
         } else {
-            // Perfil de otro: #profile?userId=ID
-            this.navigateTo('editProfile', { userId });
+            // Perfil de otro: usar otherProfile
+            console.log('[NavigationManager] navigateToProfile - perfil de otro:', userId);
+            this.navigateTo('otherProfile', { userId });
         }
     }
 
