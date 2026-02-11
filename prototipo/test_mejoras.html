@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Mejoras - Red Social SENA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto space-y-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">🧪 Test de Mejoras Implementadas</h1>
+        
+        <!-- Test 1: Estado de Carga -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">1. Banner de Estado Global</h2>
+            <div class="space-x-2">
+                <button onclick="testLoading()" class="px-4 py-2 bg-blue-500 text-white rounded">Mostrar Loading</button>
+                <button onclick="testSuccess()" class="px-4 py-2 bg-green-500 text-white rounded">Mostrar Success</button>
+                <button onclick="testError()" class="px-4 py-2 bg-red-500 text-white rounded">Mostrar Error</button>
+            </div>
+        </div>
+
+        <!-- Test 2: Validación de Formularios -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">2. Validación en Tiempo Real</h2>
+            <form id="testForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Documento (6-12 dígitos)</label>
+                    <input type="text" id="testDocumento" class="w-full px-3 py-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Contraseña (mínimo 6 caracteres)</label>
+                    <input type="password" id="testPassword" class="w-full px-3 py-2 border rounded">
+                </div>
+                <button type="submit" id="testSubmit" class="px-6 py-2 bg-green-600 text-white rounded">
+                    Enviar
+                </button>
+            </form>
+        </div>
+
+        <!-- Test 3: Estados Vacíos -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">3. Estados Vacíos</h2>
+            <div class="space-x-2 mb-4">
+                <button onclick="testEmptyPost()" class="px-4 py-2 bg-purple-500 text-white rounded">Estado Vacío - Posts</button>
+                <button onclick="testEmptyChat()" class="px-4 py-2 bg-indigo-500 text-white rounded">Estado Vacío - Chat</button>
+            </div>
+            <div id="emptyStateContainer" class="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-[200px]"></div>
+        </div>
+
+        <!-- Test 4: Bloques de Error -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">4. Bloques de Error</h2>
+            <div class="space-x-2 mb-4">
+                <button onclick="testErrorBlock()" class="px-4 py-2 bg-red-500 text-white rounded">Error</button>
+                <button onclick="testWarningBlock()" class="px-4 py-2 bg-yellow-500 text-white rounded">Warning</button>
+                <button onclick="testInfoBlock()" class="px-4 py-2 bg-blue-500 text-white rounded">Info</button>
+            </div>
+            <div id="errorBlockContainer"></div>
+        </div>
+
+        <!-- Test 5: Botones con Loading -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">5. Botones con Feedback</h2>
+            <button id="testButtonLoading" onclick="testButtonLoading()" class="px-6 py-2 bg-green-600 text-white rounded">
+                Probar Loading
+            </button>
+        </div>
+
+        <!-- Test 6: Placeholders -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">6. Placeholders y Skeletons</h2>
+            <div class="space-x-2 mb-4">
+                <button onclick="testPlaceholders()" class="px-4 py-2 bg-gray-500 text-white rounded">Mostrar Placeholders</button>
+                <button onclick="testSkeletons()" class="px-4 py-2 bg-gray-600 text-white rounded">Mostrar Skeletons</button>
+            </div>
+            <div id="placeholderContainer" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { messageManager } from './js/ui/MessageManager.js';
+        import { formValidator } from './js/utils/FormValidator.js';
+        import { buttonHelper } from './js/utils/ButtonHelper.js';
+        import { uiComponents } from './js/utils/UIComponents.js';
+
+        // Hacer disponibles globalmente para onclick
+        window.messageManager = messageManager;
+        window.formValidator = formValidator;
+        window.buttonHelper = buttonHelper;
+        window.uiComponents = uiComponents;
+
+        // Test 1: Banners de estado
+        window.testLoading = () => {
+            const banner = messageManager.showLoading('Cargando datos...');
+            setTimeout(() => banner.dismiss(), 3000);
+        };
+
+        window.testSuccess = () => {
+            messageManager.showGlobalStatus('Operación completada exitosamente', 'success');
+            setTimeout(() => {
+                const banner = document.getElementById('globalStatusBanner');
+                if (banner) banner.remove();
+            }, 3000);
+        };
+
+        window.testError = () => {
+            messageManager.showGlobalStatus('Ocurrió un error al procesar la solicitud', 'error');
+            setTimeout(() => {
+                const banner = document.getElementById('globalStatusBanner');
+                if (banner) banner.remove();
+            }, 3000);
+        };
+
+        // Test 2: Validación
+        const testForm = document.getElementById('testForm');
+        formValidator.setupFormValidation(testForm, {
+            testDocumento: ['required', 'documento'],
+            testPassword: ['required', 'password']
+        }, {
+            validateOn: 'blur',
+            submitButtonId: 'testSubmit'
+        });
+
+        testForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            messageManager.success('Formulario válido! ✓');
+        });
+
+        // Test 3: Estados vacíos
+        window.testEmptyPost = () => {
+            const container = document.getElementById('emptyStateContainer');
+            container.innerHTML = uiComponents.emptyState({
+                icon: 'post',
+                title: 'No hay publicaciones',
+                message: 'Aún no hay publicaciones para mostrar',
+                actionText: 'Crear Publicación'
+            });
+        };
+
+        window.testEmptyChat = () => {
+            const container = document.getElementById('emptyStateContainer');
+            container.innerHTML = uiComponents.emptyState({
+                icon: 'chat',
+                title: 'No hay conversaciones',
+                message: 'No tienes conversaciones activas',
+                actionText: 'Iniciar Conversación'
+            });
+        };
+
+        // Test 4: Bloques de error
+        window.testErrorBlock = () => {
+            const container = document.getElementById('errorBlockContainer');
+            container.innerHTML = uiComponents.errorBlock({
+                type: 'error',
+                title: 'Error al cargar datos',
+                message: 'No fue posible completar la operación. Por favor, intenta nuevamente.',
+                actionText: 'Reintentar'
+            });
+        };
+
+        window.testWarningBlock = () => {
+            const container = document.getElementById('errorBlockContainer');
+            container.innerHTML = uiComponents.errorBlock({
+                type: 'warning',
+                title: 'Advertencia',
+                message: 'Algunos datos pueden estar desactualizados.',
+                actionText: 'Actualizar'
+            });
+        };
+
+        window.testInfoBlock = () => {
+            const container = document.getElementById('errorBlockContainer');
+            container.innerHTML = uiComponents.errorBlock({
+                type: 'info',
+                title: 'Información',
+                message: 'Esta funcionalidad estará disponible próximamente.',
+                actionText: 'Entendido'
+            });
+        };
+
+        // Test 5: Botón con loading
+        window.testButtonLoading = async () => {
+            const btn = document.getElementById('testButtonLoading');
+            await buttonHelper.withLoading(btn, async () => {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }, {
+                loadingText: 'Procesando...',
+                successText: 'Completado!',
+                successDuration: 2000
+            });
+        };
+
+        // Test 6: Placeholders
+        window.testPlaceholders = () => {
+            const container = document.getElementById('placeholderContainer');
+            container.innerHTML = `
+                <div>
+                    <h3 class="text-sm font-medium mb-2">Avatar Placeholder:</h3>
+                    ${uiComponents.imagePlaceholder({ type: 'avatar' })}
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium mb-2">Post Placeholder:</h3>
+                    ${uiComponents.imagePlaceholder({ type: 'post' })}
+                </div>
+            `;
+        };
+
+        window.testSkeletons = () => {
+            const container = document.getElementById('placeholderContainer');
+            container.innerHTML = `
+                <div>
+                    <h3 class="text-sm font-medium mb-2">Post Skeleton:</h3>
+                    ${uiComponents.skeleton('post')}
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium mb-2">Comment Skeleton:</h3>
+                    ${uiComponents.skeleton('comment')}
+                </div>
+            `;
+        };
+
+        console.log('✅ Tests cargados correctamente');
+    </script>
+</body>
+</html>
