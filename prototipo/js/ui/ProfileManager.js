@@ -96,9 +96,11 @@ class ProfileManager {
      */
     loadProfileData(user) {
         if (!user) {
-            console.error('No se proporcionó usuario para cargar perfil');
+            console.error('[ProfileManager] No se proporcionó usuario para cargar perfil');
             return;
         }
+        
+        console.log('[ProfileManager] loadProfileData - user:', user);
         
         // === INFORMACIÓN GENERAL ===
         const content1 = document.querySelector('#content1');
@@ -106,11 +108,14 @@ class ProfileManager {
             const inputs = content1.querySelectorAll('input');
             const textarea = content1.querySelector('textarea');
             
+            console.log('[ProfileManager] Encontrados inputs:', inputs.length, 'textarea:', !!textarea);
+            
             // Primer input: nombre
             if (inputs[0]) {
                 inputs[0].value = user.nombre || 'Aprendiz Sin Nombre';
                 inputs[0].setAttribute('data-field', 'nombre');
                 inputs[0].readOnly = !this.isOwnProfile;
+                console.log('[ProfileManager] Input[0] (nombre) actualizado a:', inputs[0].value);
             }
 
             // Segundo input: apodo/usuario
@@ -118,6 +123,7 @@ class ProfileManager {
                 inputs[1].value = user.apodo || 'usuario_' + user.id;
                 inputs[1].setAttribute('data-field', 'apodo');
                 inputs[1].readOnly = !this.isOwnProfile;
+                console.log('[ProfileManager] Input[1] (apodo) actualizado a:', inputs[1].value);
             }
 
             // Textarea: bio
@@ -125,7 +131,10 @@ class ProfileManager {
                 textarea.value = user.bio || 'Sin biografía';
                 textarea.setAttribute('data-field', 'bio');
                 textarea.readOnly = !this.isOwnProfile;
+                console.log('[ProfileManager] Textarea (bio) actualizado a:', textarea.value);
             }
+        } else {
+            console.error('[ProfileManager] No se encontró #content1');
         }
 
         // === CONTACTO ===
