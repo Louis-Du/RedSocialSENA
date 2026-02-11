@@ -252,6 +252,7 @@ class NavigationManager {
         if (updateHash) {
             const hash = this.buildHash(viewName, params);
             if (window.location.hash !== `#${hash}`) {
+                console.log('[NavigationManager] Updating hash from', window.location.hash, 'to', `#${hash}`);
                 window.location.hash = hash;
             }
         }
@@ -266,6 +267,7 @@ class NavigationManager {
 
         // Si mostramos la vista de editProfile, inicializar las tabs
         if (viewName === 'editProfile') {
+            console.log('[NavigationManager] Showing editProfile view');
             // Esperar un tick para que el DOM se actualice
             setTimeout(() => {
                 console.log('[NavigationManager] Dispatching editProfileShown with params:', params);
@@ -276,11 +278,14 @@ class NavigationManager {
 
         // Si mostramos otherProfile, inicializar con userId
         if (viewName === 'otherProfile') {
+            console.log('[NavigationManager] Showing otherProfile view');
             setTimeout(() => {
                 console.log('[NavigationManager] Dispatching otherProfileShown with params:', params);
                 // Solo disparar si hay userId en params
                 if (params.userId) {
                     window.dispatchEvent(new CustomEvent('otherProfileShown', { detail: { params } }));
+                } else {
+                    console.warn('[NavigationManager] otherProfile view shown but no userId in params');
                 }
             }, 50);
         }
