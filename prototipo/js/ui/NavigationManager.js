@@ -354,6 +354,10 @@ class NavigationManager {
     navigateToProfile(userId = null) {
         const currentUser = userService.getCurrentUser();
         
+        console.log('[NavigationManager] navigateToProfile - userId:', userId);
+        console.log('[NavigationManager] navigateToProfile - currentUser.id:', currentUser.id);
+        console.log('[NavigationManager] navigateToProfile - comparison:', userId === currentUser.id);
+        
         if (!userId || userId === currentUser.id) {
             // Perfil propio: usar editProfile
             console.log('[NavigationManager] navigateToProfile - perfil propio');

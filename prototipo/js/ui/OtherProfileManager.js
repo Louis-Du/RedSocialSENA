@@ -53,15 +53,6 @@ class OtherProfileManager {
             return;
         }
         
-        const currentUser = userService.getCurrentUser();
-        
-        // Si es el perfil propio, redirigir a editProfile
-        if (userId === currentUser.id) {
-            console.log('[OtherProfileManager] Es perfil propio, redirigiendo a editProfile');
-            navigationManager.showView('editProfile');
-            return;
-        }
-        
         // Obtener usuario
         const user = userService.getUserById(userId);
         
