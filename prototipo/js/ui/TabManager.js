@@ -7,6 +7,9 @@
  * - Sincronizar estado visual entre desktop y mobile
  */
 
+import { feedRenderer } from './FeedRenderer.js';
+import { newsManager } from './NewsManager.js';
+
 class TabManager {
     constructor() {
         this.handlersInitialized = false;
@@ -41,15 +44,16 @@ class TabManager {
             const tabInicio = document.getElementById('tabInicio');
             const tabNoticias = document.getElementById('tabNoticias');
             const homeFeed = document.getElementById('homeFeed');
-            const newsFeed = document.getElementById('newsFeed');
+            const newsContainer = document.getElementById('newsContainer');
 
-            if (!tabInicio || !tabNoticias || !homeFeed || !newsFeed) {
+            if (!tabInicio || !tabNoticias) {
                 return;
             }
 
             if (target.id === 'tabInicio') {
-                homeFeed.classList.remove('hidden');
-                newsFeed.classList.add('hidden');
+                // Mostrar feed de inicio
+                if (homeFeed) homeFeed.classList.remove('hidden');
+                if (newsContainer) newsContainer.classList.add('hidden');
 
                 tabInicio.classList.remove('bg-gray-300', 'text-gray-600', 'border-transparent');
                 tabInicio.classList.add('bg-gray-200', 'text-gray-900', 'border-sena-verde');
@@ -57,14 +61,18 @@ class TabManager {
                 tabNoticias.classList.remove('bg-gray-200', 'text-gray-900', 'border-sena-verde');
                 tabNoticias.classList.add('bg-gray-300', 'text-gray-600', 'border-transparent');
             } else {
-                homeFeed.classList.add('hidden');
-                newsFeed.classList.remove('hidden');
+                // Mostrar noticias
+                if (homeFeed) homeFeed.classList.add('hidden');
+                if (newsContainer) newsContainer.classList.remove('hidden');
 
                 tabNoticias.classList.remove('bg-gray-300', 'text-gray-600', 'border-transparent');
                 tabNoticias.classList.add('bg-gray-200', 'text-gray-900', 'border-sena-verde');
 
                 tabInicio.classList.remove('bg-gray-200', 'text-gray-900', 'border-sena-verde');
                 tabInicio.classList.add('bg-gray-300', 'text-gray-600', 'border-transparent');
+
+                // Renderizar noticias si aún no están mostradas
+                newsManager.showNewsList();
             }
         };
 

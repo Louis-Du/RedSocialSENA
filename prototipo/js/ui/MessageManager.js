@@ -8,6 +8,8 @@
  * - Proporcionar feedback visual al usuario
  */
 
+import { escapeHTML } from '../utils.js';
+
 class MessageManager {
     constructor() {
         this.messageContainer = null;
@@ -51,7 +53,7 @@ class MessageManager {
         messageEl.innerHTML = `
             <div class="flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg">
                 <span class="text-xl font-bold">${iconMap[type]}</span>
-                <span class="text-sm font-medium">${message}</span>
+                <span class="text-sm font-medium">${escapeHTML(message)}</span>
                 <button class="messageAlert__close ml-2 text-lg leading-none">×</button>
             </div>
         `;
@@ -146,7 +148,7 @@ class MessageManager {
             <div class="${bgColorMap[type]} border-b-2 px-4 py-3">
                 <div class="flex items-center justify-center gap-3 max-w-4xl mx-auto">
                     ${iconMap[type]}
-                    <span class="text-sm font-medium text-gray-800">${message}</span>
+                    <span class="text-sm font-medium text-gray-800">${escapeHTML(message)}</span>
                 </div>
             </div>
         `;
@@ -170,7 +172,7 @@ class MessageManager {
                     const iconContainer = banner.querySelector('div > div');
                     iconContainer.innerHTML = `
                         ${iconMap[newType]}
-                        <span class="text-sm font-medium text-gray-800">${newMessage}</span>
+                        <span class="text-sm font-medium text-gray-800">${escapeHTML(newMessage)}</span>
                     `;
                 }
             }

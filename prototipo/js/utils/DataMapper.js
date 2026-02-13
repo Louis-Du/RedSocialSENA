@@ -316,7 +316,7 @@ class DataMapper {
 
         const mapper = mapperMap[type];
         if (!mapper) {
-            console.warn(`No mapper found for type: ${type}`);
+            // Tipo no reconocido - devolver items sin mapear
             return items;
         }
 

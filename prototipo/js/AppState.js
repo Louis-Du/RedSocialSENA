@@ -14,7 +14,7 @@
  * 3. La UI no cambiará
  */
 
-import { getFromStorage, saveToStorage, removeFromStorage, generateId } from './utils.js';
+import { getFromStorage, saveToStorage, removeFromStorage, generateId, isValidText } from './utils.js';
 
 class AppState {
     constructor() {
@@ -30,6 +30,11 @@ class AppState {
             profilePicture: 'assets/placeholders/avatar-placeholder.svg',
             bio: 'Aprendiz apasionado por la tecnología',
             email: 'daniel.esteban@sena.edu.co',
+            ciudad: 'Barrancabermeja',
+            regional: 'Centro para la Industria Petroquímica',
+            centro: 'Barrancabermeja',
+            etapa: 'Lectiva',
+            modalidad: 'Presencial',
             isLoggedIn: false
         };
 
@@ -45,7 +50,12 @@ class AppState {
                 programa: 'Técnica en Administración de Sistemas',
                 bio: 'Especialista en redes',
                 profilePicture: 'assets/placeholders/avatar-placeholder.svg',
-                email: 'maria.garcia@sena.edu.co'
+                email: 'maria.garcia@sena.edu.co',
+                ciudad: 'Bogotá',
+                regional: 'Centro de Gestión Administrativa',
+                centro: 'Bogotá',
+                etapa: 'Lectiva',
+                modalidad: 'Virtual'
             },
             {
                 id: 'user_3',
@@ -57,7 +67,12 @@ class AppState {
                 programa: 'Técnica en Programación',
                 bio: 'Frontend developer en formación',
                 profilePicture: 'assets/placeholders/avatar-placeholder.svg',
-                email: 'carlos.lopez@sena.edu.co'
+                email: 'carlos.lopez@sena.edu.co',
+                ciudad: 'Cali',
+                regional: 'Centro de Tecnologías de la Información',
+                centro: 'Cali',
+                etapa: 'Lectiva',
+                modalidad: 'Presencial'
             },
             {
                 id: 'user_4',
@@ -69,7 +84,12 @@ class AppState {
                 programa: 'Marketing Digital',
                 bio: 'Especialista en marketing digital y redes sociales',
                 profilePicture: 'assets/placeholders/avatar-placeholder.svg',
-                email: 'ana.martinez@sena.edu.co'
+                email: 'ana.martinez@sena.edu.co',
+                ciudad: 'Barranquilla',
+                regional: 'Centro de Comercio y Servicios',
+                centro: 'Barranquilla',
+                etapa: 'Productiva',
+                modalidad: 'Mixta'
             }
         ];
 
@@ -82,12 +102,21 @@ class AppState {
         // === CHATS ===
         this.chats = {}; // { userId: [messages...] }
 
+        // === FILTROS ===
+        this.filters = {
+            centro: '',
+            regional: '',
+            etapa: '',
+            modalidad: ''
+        };
+
         // === SUSCRIPTORES PARA CAMBIOS ===
         this.subscribers = {
             posts: [],
             comments: [],
             currentUser: [],
-            chats: []
+            chats: [],
+            filters: []
         };
 
         // Cargar datos desde localStorage
@@ -103,7 +132,8 @@ class AppState {
     loadFromStorage() {
         const stored = getFromStorage('appState', null);
         if (stored) {
-            this.posts = stored.posts || [];
+            const storedPosts = stored.posts || [];
+            this.posts = storedPosts.filter(post => isValidText(post.content) || post.imageUrl);
             this.comments = stored.comments || {};
             this.chats = stored.chats || {};
             this.currentUser = { ...this.currentUser, ...stored.currentUser };
@@ -230,8 +260,13 @@ class AppState {
         const post = {
             id: generateId(),
             userId: this.currentUser.id,
-            content,
-            imageUrl,
+            content: content,
+            imageUrl: imageUrl,
+            votes: {
+                upvotes: 0,
+                downvotes: 0,
+                usersVoted: {}  // { userId: 'up' | 'down' }
+            },
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             likes: 0,
@@ -304,6 +339,76 @@ class AppState {
         this.posts.splice(index, 1);
         // Eliminar también comentarios asociados
         delete this.comments[postId];
+        
+        this.notifySubscribers('posts');
+        this.saveToStorage();
+        return true;
+    }
+
+    /**
+     * Alterna un voto positivo en una publicación
+     * @param {string} postId - ID del post
+     * @param {string} userId - ID del usuario votando
+     */
+    toggleUpvote(postId, userId) {
+        const post = this.posts.find(p => p.id === postId);
+        if (!post) return false;
+        
+        if (!post.votes) {
+            post.votes = { upvotes: 0, downvotes: 0, usersVoted: {} };
+        }
+        
+        const currentVote = post.votes.usersVoted[userId];
+        
+        if (currentVote === 'up') {
+            // Remover voto positivo
+            delete post.votes.usersVoted[userId];
+            post.votes.upvotes--;
+        } else if (currentVote === 'down') {
+            // Cambiar de negativo a positivo
+            post.votes.downvotes--;
+            post.votes.upvotes++;
+            post.votes.usersVoted[userId] = 'up';
+        } else {
+            // Agregar voto positivo
+            post.votes.upvotes++;
+            post.votes.usersVoted[userId] = 'up';
+        }
+        
+        this.notifySubscribers('posts');
+        this.saveToStorage();
+        return true;
+    }
+
+    /**
+     * Alterna un voto negativo en una publicación
+     * @param {string} postId - ID del post
+     * @param {string} userId - ID del usuario votand
+     */
+    toggleDownvote(postId, userId) {
+        const post = this.posts.find(p => p.id === postId);
+        if (!post) return false;
+        
+        if (!post.votes) {
+            post.votes = { upvotes: 0, downvotes: 0, usersVoted: {} };
+        }
+        
+        const currentVote = post.votes.usersVoted[userId];
+        
+        if (currentVote === 'down') {
+            // Remover voto negativo
+            delete post.votes.usersVoted[userId];
+            post.votes.downvotes--;
+        } else if (currentVote === 'up') {
+            // Cambiar de positivo a negativo
+            post.votes.upvotes--;
+            post.votes.downvotes++;
+            post.votes.usersVoted[userId] = 'down';
+        } else {
+            // Agregar voto negativo
+            post.votes.downvotes++;
+            post.votes.usersVoted[userId] = 'down';
+        }
         
         this.notifySubscribers('posts');
         this.saveToStorage();
@@ -463,6 +568,53 @@ class AppState {
                 callback();
             });
         }
+    }
+
+    // ==================== FILTROS ====================
+
+    /**
+     * Establece los filtros activos
+     * @param {Object} filters - Objeto con los filtros { centro, regional, etapa, modalidad }
+     */
+    setFilters(filters) {
+        this.filters = {
+            centro: filters.centro || '',
+            regional: filters.regional || '',
+            etapa: filters.etapa || '',
+            modalidad: filters.modalidad || ''
+        };
+        this.notifySubscribers('filters');
+        this.saveToStorage();
+    }
+
+    /**
+     * Obtiene los filtros actuales
+     * @returns {Object}
+     */
+    getFilters() {
+        return { ...this.filters };
+    }
+
+    /**
+     * Limpia todos los filtros
+     */
+    clearFilters() {
+        this.filters = {
+            centro: '',
+            regional: '',
+            etapa: '',
+            modalidad: ''
+        };
+        this.notifySubscribers('filters');
+        this.saveToStorage();
+    }
+
+    /**
+     * Suscribe una función a cambios en los filtros
+     * @param {Function} callback - Función a ejecutar cuando cambien los filtros
+     */
+    subscribeFilters(callback) {
+        this.subscribers.filters.push(callback);
     }
 
     // ==================== RESETEO Y DEBUG ====================

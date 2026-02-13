@@ -1,22 +1,148 @@
 /* Pequeños ajustes para que el layout sea más fiel en móvil */
 /* Evitar scroll horizontal inesperado en móviles cuando usamos padding a la derecha para el dock */
-body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; overflow-x: hidden; }
+body { 
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; 
+    overflow-x: hidden;
+    background-color: #f9fafb;
+}
+
 .rounded-3xl { border-radius: 24px; }
 .rounded-2xl { border-radius: 18px; }
 .rounded-xl  { border-radius: 12px; }
+
+/* VOTACIONES */
+.upvote-btn, .downvote-btn {
+    transition: all 0.2s ease;
+    border-radius: 8px;
+}
+
+.upvote-btn:hover, .downvote-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.upvote-btn:active, .downvote-btn:active {
+    transform: translateY(0);
+}
+
+/* Botón de upvote activo */
+.upvote-btn.bg-green-200 {
+    animation: voteClick 0.3s ease;
+}
+
+/* Botón de downvote activo */
+.downvote-btn.bg-red-200 {
+    animation: voteClick 0.3s ease;
+}
+
+@keyframes voteClick {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* BUSCADOR */
+#searchInput {
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+#searchInput:focus {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+#searchResults {
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.search-post:hover,
+.search-user:hover,
+.search-news:hover {
+    background-color: #f3f4f6;
+    cursor: pointer;
+}
+
+/* NEWS */
+.news-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.news-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* FILTROS */
+#filterPanel {
+    animation: slideDown 0.3s ease;
+    border: 2px solid #e5e7eb;
+}
+
+.category-filter {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.category-filter:hover {
+    transform: translateY(-1px);
+}
+
+.category-filter.bg-sena-verde {
+    box-shadow: 0 4px 12px rgba(57, 169, 0, 0.3);
+}
+
+.sort-btn {
+    transition: all 0.2s ease;
+}
+
+.sort-btn:hover {
+    transform: scale(1.05);
+}
+
+/* CHATS Y BURBUJAS */
+ 
+/* CHATS Y BURBUJAS */ 
  
 /* Estilo para la burbuja de chat del usuario activo (tú) - Alinear con el verde SENA */
 .bubble-self {
     background-color: #7BE04D; /* Una variante clara del sena-verde */
     color: #1f2937; /* gray-800 */
     border-radius: 12px 12px 0 12px;
+    animation: messageSlideIn 0.3s ease;
 }
+
 /* Estilo para la burbuja de chat del otro usuario */
 .bubble-other {
     background-color: #e5e7eb; /* gray-200 */
     color: #1f2937; /* gray-800 */
     border-radius: 12px 12px 12px 0;
+    animation: messageSlideIn 0.3s ease;
 }
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Ajuste para que el feed en el perfil de otros se vea mejor */
 .other-profile-feed {
     max-width: 700px;
@@ -27,30 +153,124 @@ body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", 
     max-height: 250px; /* Limita la altura de la sección de comentarios */
     overflow-y: auto; /* Permite desplazamiento */
     padding-top: 1rem;
+    animation: fadeIn 0.3s ease;
 }
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 /* Estilos utilitarios para el nav activo del perfil */
 .nav-active {
     background: white;
     box-shadow: 0 4px 10px rgba(0,0,0,0.06);
     /* Borde izquierdo con color institucional SENA */
     border-left: 4px solid #39A900;
+    transition: all 0.2s ease;
+}
+
+.nav-active:hover {
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
 }
 
 /* Animación para el panel de creación rápida */
 #quickPostInline {
-    transition: max-height 260ms cubic-bezier(0.4,0,0.2,1), opacity 200ms ease, transform 220ms ease;
+    transition: all 0.26s cubic-bezier(0.4,0,0.2,1);
     transform-origin: top;
     overflow: hidden;
     max-height: 0;
     opacity: 0;
     transform: translateY(-6px);
+    pointer-events: none;
 }
 
 /* Estado abierto */
-#quickPostInline.open {
-    max-height: 640px; /* suficiente para el contenido */
+#quickPostInline.expanded {
+    max-height: 300px;
     opacity: 1;
     transform: translateY(0);
+    pointer-events: auto;
+}
+
+#quickPostInline.collapsed {
+    max-height: 0;
+    opacity: 0;
+}
+
+/* Estilos para tabs */
+.tab-button {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.tab-button.active {
+    background-color: #e8f5e9;
+    border-bottom: 3px solid #39A900;
+}
+
+/* FORMULARIOS */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+    transition: all 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+    box-shadow: 0 0 0 3px rgba(57, 169, 0, 0.1);
+    border-color: #39A900;
+}
+
+/* BOTONES */
+button {
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.bg-sena-verde,
+.bg-green-700 {
+    box-shadow: 0 4px 12px rgba(57, 169, 0, 0.2);
+}
+
+.bg-sena-verde:hover,
+.bg-green-700:hover {
+    box-shadow: 0 6px 16px rgba(57, 169, 0, 0.3);
+}
+
+/* ARTICLES/POSTS */
+article {
+    animation: cardFadeIn 0.4s ease;
+    transition: all 0.3s ease;
+}
+
+@keyframes cardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+article:hover {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12) !important;
+}
 }
 
 /* Estado inicial/cerrado */

@@ -182,7 +182,7 @@ class NavigationManager {
         const returnToAppBtnOtherProfile = document.getElementById('returnToAppBtnOtherProfile');
         const logoutBtn = document.getElementById('logoutBtn');
 
-        goToProfileEditBtn?.addEventListener('click', () => this.showView('editProfile'));
+        goToProfileEditBtn?.addEventListener('click', () => this.navigateToProfile()); // Ver perfil propio
         goToChatBtn?.addEventListener('click', () => this.showView('chat'));
         returnToAppBtnProfile?.addEventListener('click', () => this.showView('app'));
         returnToAppBtnChat?.addEventListener('click', () => this.showView('app'));
@@ -210,20 +210,12 @@ class NavigationManager {
     showView(viewName, options = {}) {
         const { updateHash = true, force = false, params = {} } = options;
         
-        console.log(`[NavigationManager] showView called: ${viewName}, updateHash: ${updateHash}`);
-        if (viewName === 'otherProfile' && !params.userId) {
-            console.warn('[NavigationManager] WARNING: otherProfile called without userId!');
-            console.trace();
-        }
-
         if (!this.views[viewName]) {
-            console.warn(`Vista no encontrada: ${viewName}`);
             return;
         }
 
         // GUARDA DE NAVEGACIÓN: Verificar permisos
         if (!force && !this.canAccessView(viewName)) {
-            console.warn(`Acceso denegado a vista: ${viewName}. Sesión requerida.`);
             this.showView('login', { force: true });
             return;
         }
@@ -244,7 +236,6 @@ class NavigationManager {
         if (updateHash) {
             const hash = this.buildHash(viewName, params);
             if (window.location.hash !== `#${hash}`) {
-                console.log('[NavigationManager] Updating hash from', window.location.hash, 'to', `#${hash}`);
                 window.location.hash = hash;
             }
         }
@@ -259,10 +250,8 @@ class NavigationManager {
 
         // Si mostramos la vista de editProfile, inicializar las tabs
         if (viewName === 'editProfile') {
-            console.log('[NavigationManager] Showing editProfile view');
             // Esperar un tick para que el DOM se actualice
             setTimeout(() => {
-                console.log('[NavigationManager] Dispatching editProfileShown with params:', params);
                 // Disparar evento para reinicializar tabs con params
                 window.dispatchEvent(new CustomEvent('editProfileShown', { detail: { params } }));
             }, 50);
@@ -270,14 +259,10 @@ class NavigationManager {
 
         // Si mostramos otherProfile, inicializar con userId
         if (viewName === 'otherProfile') {
-            console.log('[NavigationManager] Showing otherProfile view');
             setTimeout(() => {
-                console.log('[NavigationManager] Dispatching otherProfileShown with params:', params);
                 // Solo disparar si hay userId en params
                 if (params.userId) {
                     window.dispatchEvent(new CustomEvent('otherProfileShown', { detail: { params } }));
-                } else {
-                    console.warn('[NavigationManager] otherProfile view shown but no userId in params');
                 }
             }, 50);
         }
@@ -354,19 +339,11 @@ class NavigationManager {
     navigateToProfile(userId = null) {
         const currentUser = userService.getCurrentUser();
         
-        console.log('[NavigationManager] navigateToProfile - userId:', userId);
-        console.log('[NavigationManager] navigateToProfile - currentUser.id:', currentUser.id);
-        console.log('[NavigationManager] navigateToProfile - comparison:', userId === currentUser.id);
+        // Si no se proporciona userId, usar el del usuario actual
+        const targetUserId = userId || currentUser.id;
         
-        if (!userId || userId === currentUser.id) {
-            // Perfil propio: usar editProfile
-            console.log('[NavigationManager] navigateToProfile - perfil propio');
-            this.navigateTo('editProfile');
-        } else {
-            // Perfil de otro: usar otherProfile
-            console.log('[NavigationManager] navigateToProfile - perfil de otro:', userId);
-            this.navigateTo('otherProfile', { userId });
-        }
+        // Siempre usar otherProfile para ver perfiles (propio o ajenos)
+        this.navigateTo('otherProfile', { userId: targetUserId });
     }
 
     /**

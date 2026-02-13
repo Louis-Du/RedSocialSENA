@@ -5,44 +5,22 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Aprendices SENA - Red Social</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/tailwind.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
 
-  <script>
-    // === CONFIGURACIÓN DE IDENTIDAD CORPORATIVA SENA (2024) ===
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            // Verde Institucional (Principal y para el logosímbolo)
-            'sena-verde': '#39A900', // HEX: 39A900
-            // Azul Oscuro (Color Secundario para contraste formal)
-            'sena-azul-oscuro': '#00304D', // HEX: 00304D
-            // Gris Claro (Fondo Dominante)
-            'sena-fondo': '#F6F6F6', // HEX: F6F6F6
-            // Colores de acento (si se necesitan) - Usamos una variante del verde para acentos claros
-            'sena-verde-claro': '#EAF7E2', 
-          },
-          fontFamily: {
-            // Se usa una sans-serif limpia como Inter o la del sistema.
-            'sans': ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
-          }
-        },
-      }
-    }
+    <script>
+        // === FUNCIONES GLOBALES AUXILIARES ===
+        // Estos helpers se usan antes de que los módulos carguen
+        function loadLucideIcons() {
+                setTimeout(() => {
+                        if (window.lucide) {
+                                lucide.createIcons();
+                        }
+                }, 50);
+        }
 
-    // === FUNCIONES GLOBALES AUXILIARES ===
-    // Estos helpers se usan antes de que los módulos carguen
-    function loadLucideIcons() {
-        setTimeout(() => {
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-        }, 50);
-    }
-
-    window.loadLucideIcons = loadLucideIcons;
-  </script>
-  <link rel="stylesheet" href="assets/css/styles.css">
+        window.loadLucideIcons = loadLucideIcons;
+    </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 </head>
 <body class="min-h-screen bg-sena-fondo">
@@ -105,14 +83,14 @@
         </form>
 
                 <div class="mt-6 rounded-2xl bg-white/80 p-4 text-sm text-gray-700">
-                    <p class="font-semibold text-gray-800 mb-2">Usuarios de demostracion</p>
+                    <p class="font-semibold text-gray-800 mb-2">Usuarios de demostración</p>
                     <ul class="space-y-1">
                         <li><span class="font-semibold">CC 1234567890</span> — Daniel Esteban</li>
                         <li><span class="font-semibold">CC 9876543210</span> — Maria Garcia</li>
                         <li><span class="font-semibold">CC 5555555555</span> — Carlos Lopez</li>
                         <li><span class="font-semibold">TI 11223344</span> — Ana Martinez</li>
                     </ul>
-                    <p class="mt-2 text-xs text-gray-600">Contrasena para todos: sena123</p>
+                    <p class="mt-2 text-xs text-gray-600">Contraseña para todos: sena123</p>
                 </div>
       </div>
     </div>
@@ -124,17 +102,31 @@
 
   <div id="appView" class="hidden min-h-screen">
     <header class="bg-sena-verde shadow-lg">
-      <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
         <div class="flex items-center gap-3">
             <img src="assets/logo-sena-verde.png" alt="Logo SENA" class="w-10 h-auto bg-white rounded-lg p-1" />
           <span class="text-white font-bold text-2xl tracking-wide">Aprendices</span>
         </div>
-        <button id="logoutBtn" class="text-white bg-transparent border border-white/30 px-3 py-2 rounded-xl hover:bg-white/10">Cerrar sesión</button>
+        
+        <!-- Search Bar -->
+        <div class="relative flex-1 max-w-md">
+            <div class="relative">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Buscar posts, usuarios, noticias..." 
+                    class="w-full px-4 py-2 rounded-xl bg-white/20 text-white placeholder-white/70 focus:bg-white focus:text-gray-900 focus:placeholder-gray-400 focus:outline-none transition-colors"
+                />
+                <i data-lucide="search" class="w-5 h-5 text-white/70 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"></i>
+            </div>
+        </div>
+        
+        <button id="logoutBtn" class="text-white bg-transparent border border-white/30 px-3 py-2 rounded-xl hover:bg-white/10 transition-colors">Cerrar sesión</button>
       </div>
     </header>
 
     <div class="max-w-7xl mx-auto px-4 py-6 box-border pr-20 md:pr-0">
-            <div class="flex flex-col md:flex-row gap-6">
+        <div class="flex flex-col md:flex-row gap-6">
         <div class="flex-1">
           <div class="flex gap-2 mb-6">
             <button id="tabInicio" class="tab-button px-8 py-3 rounded-t-xl font-semibold bg-gray-200 text-gray-900 border-b-4 border-sena-verde">Inicio</button>
@@ -142,309 +134,38 @@
           </div>
 
           <div id="feedContentContainer">
-            
-            <div id="homeFeed">
-                <div class="mb-6">
-                    <div class="bg-sena-azul-oscuro rounded-2xl p-4 flex gap-4 shadow-lg">
-                        <button id="createPostBtn" class="bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all">
-                            <i data-lucide="edit-3" class="w-6 h-6"></i>
-                        </button>
-                        <button id="toggleFilterBtn" class="bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all flex items-center gap-2">
-                            <i data-lucide="filter" class="w-6 h-6"></i>
-                            <span id="filterText">Filtros Avanzados</span>
-                        </button>
-                    </div>
-
-                            <!-- Inline Quick-Post Panel: permite texto + imagen y publicar directamente -->
-                            <div id="quickPostInline" class="collapsed bg-white rounded-2xl p-4 shadow-md mt-4">
-                                <form id="quickPostForm" class="flex flex-col gap-3">
-                                    <textarea id="quickPostContent" class="w-full h-28 px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors resize-none" placeholder="¿Qué quieres compartir con los aprendices?"></textarea>
-
-                                    <div class="flex items-center gap-3">
-                                        <label for="quickPostImage" class="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-xl transition-colors flex items-center gap-2 cursor-pointer">
-                                            <i data-lucide="image" class="w-5 h-5"></i>
-                                            <span class="text-sm">Subir Imagen</span>
-                                        </label>
-                                        <input type="file" id="quickPostImage" class="hidden" accept="image/*">
-                                        <span id="quickImageFileName" class="text-gray-600 text-sm flex-1 truncate">Ningún archivo seleccionado</span>
-
-                                        <div class="ml-auto">
-                                            <button type="button" id="quickPublishBtn" class="px-5 py-2 bg-sena-verde text-white rounded-xl font-bold shadow-lg hover:bg-green-700 transition-colors flex items-center gap-2">
-                                                <i data-lucide="send" class="w-5 h-5"></i>
-                                                <span>Publicar</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-
-                    <div id="filterPanel" class="hidden bg-white p-6 rounded-2xl shadow-xl mt-4 border border-gray-200">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Filtrar Publicaciones por Formación</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Centro de Formación</label>
-                                <select class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-sena-verde focus:outline-none">
-                                    <option>Todos los Centros</option>
-                                    <option>Centro de Electricidad y Automatización Industrial</option>
-                                    <option>Centro de Diseño y Metrología</option>
-                                    <option>Centro para la Industria Petroquímica</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Etapa</label>
-                                <select class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-sena-verde focus:outline-none">
-                                    <option>Todas las Etapas</option>
-                                    <option>Lectiva</option>
-                                    <option>Productiva</option>
-                                    <option>Egresado</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Trimestre</label>
-                                <select class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-sena-verde focus:outline-none">
-                                    <option>Todos los Trimestres</option>
-                                    <option>1°</option>
-                                    <option>2°</option>
-                                    <option>3°</option>
-                                    <option>4° o superior</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-6 flex justify-end gap-3">
-                            <button class="px-5 py-2 bg-gray-200 text-gray-800 rounded-xl font-semibold hover:bg-gray-300 transition-colors">
-                                Limpiar Filtros
-                            </button>
-                            <button class="px-5 py-2 bg-sena-verde text-white rounded-xl font-semibold hover:bg-green-700 transition-colors">
-                                Aplicar Filtros
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-
+            <div id="homeFeed" class="space-y-6">
                 <div id="postsFeed" class="space-y-6">
-                    <article class="bg-white rounded-3xl shadow-xl overflow-hidden">
-                        <div class="bg-sena-verde-claro p-6">
-                            <div class="flex items-start gap-4">
-                                <div class="bg-sena-azul-oscuro rounded-full p-3">
-                                    <i data-lucide="user" class="w-8 h-8 text-white"></i>
-                                </div>
-                                <div class="flex-1 cursor-pointer view-other-profile">
-                                    <h3 class="text-xl font-bold text-gray-900 hover:text-sena-verde transition-colors">Juan Miguel Álvarez</h3>
-                                    <p class="text-gray-800 font-semibold">2° Trimestre</p>
-                                    <p class="text-gray-700 text-sm">Técnico Contabilización de Operaciones Comerciales y Financieras</p>
-                                </div>
-                                <div class="bg-yellow-400 rounded-full p-2">
-                                    <svg class="w-6 h-6 text-yellow-700" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="p-6">
-                            <p class="text-gray-800 font-semibold text-lg mb-4">¡Reunión con mis compañeros!</p>
-                            <img src="assets/placeholders/post-1.svg" alt="Post" class="w-full rounded-2xl shadow-lg max-h-64 object-cover" />
-                        </div>
-
-                        <div class="bg-gray-100 p-6">
-                            
-                            <div id="commentsContainer-1" class="comments-section space-y-4 border-b border-gray-300 pb-4 mb-4">
-                                
-                                <div class="flex items-start gap-3">
-                                    <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
-                                        <i data-lucide="user" class="w-4 h-4"></i>
-                                    </div>
-                                    <div class="bg-white p-3 rounded-xl shadow-sm flex-1">
-                                        <p class="text-sm font-semibold text-gray-800 cursor-pointer view-other-profile hover:text-sena-verde transition-colors">María Fernanda Castro</p>
-                                        <p class="text-gray-700 text-sm">¡Qué bien! Se ve que están muy concentrados en su proyecto. Mucho éxito con la evidencia final.</p>
-                                        <p class="text-xs text-gray-500 text-right mt-1">Hace 2 horas</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-start gap-3">
-                                    <div class="w-8 h-8 bg-sena-verde rounded-full flex items-center justify-center text-white flex-shrink-0">
-                                        <i data-lucide="user" class="w-4 h-4"></i>
-                                    </div>
-                                    <div class="bubble-self p-3 shadow-sm flex-1">
-                                        <p class="text-sm font-semibold text-gray-800">Tú (Daniel Esteban)</p>
-                                        <p class="text-gray-700 text-sm">¡Gracias por el ánimo! Estamos terminando los ajustes.</p>
-                                        <p class="text-xs text-gray-700 text-right mt-1">Hace 1 hora</p>
-                                    </div>
-                                </div>
-
-                            </div>
-                            
-                            <div class="flex items-center gap-4">
-                                <div class="bg-gray-800 rounded-full p-2">
-                                    <i data-lucide="user" class="w-6 h-6 text-white"></i>
-                                </div>
-                                <input type="text" placeholder="Crea un comentario" class="comment-input flex-1 px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" data-post-id="1" />
-                                <label for="commentFile-1" class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors cursor-pointer">
-                                    <i data-lucide="paperclip" class="w-6 h-6 text-gray-700"></i>
-                                </label>
-                                <input type="file" id="commentFile-1" class="hidden" />
-
-                                <label for="commentCamera-1" class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors cursor-pointer">
-                                    <i data-lucide="camera" class="w-6 h-6 text-gray-700"></i>
-                                </label>
-                                <input type="file" id="commentCamera-1" accept="image/*" class="hidden" />
-                                <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
-                                    <i data-lucide="smile" class="w-6 h-6 text-gray-700"></i>
-                                </button>
-                                <button class="send-comment-btn bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all" data-post-id="1">
-                                    <i data-lucide="send" class="w-6 h-6"></i>
-                                </button>
-                            </div>
-                            
-                            <p class="comment-count text-gray-600 text-sm mt-3 ml-14">2 comentarios</p>
-                        </div>
-                    </article>
-
-                    <article class="bg-white rounded-3xl shadow-xl overflow-hidden">
-                        <div class="bg-sena-verde-claro p-6">
-                            <div class="flex items-start gap-4">
-                                <div class="bg-sena-azul-oscuro rounded-full p-3">
-                                    <i data-lucide="user" class="w-8 h-8 text-white"></i>
-                                </div>
-                                <div class="flex-1 cursor-pointer view-other-profile">
-                                    <h3 class="text-xl font-bold text-gray-900 hover:text-sena-verde transition-colors">María Fernanda Castro</h3>
-                                    <p class="text-gray-800 font-semibold">4° Trimestre</p>
-                                    <p class="text-gray-700 text-sm">Tecnólogo en Análisis y Desarrollo de Software</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="p-6">
-                            <p class="text-gray-800 font-semibold text-lg mb-4">Proyecto final de trimestre - Sistema de gestión para aprendices 💻</p>
-                            <img src="assets/placeholders/post-2.svg" alt="Post" class="w-full rounded-2xl shadow-lg max-h-64 object-cover" />
-                        </div>
-
-                        <div class="bg-gray-100 p-6">
-                            
-                            <div id="commentsContainer-2" class="comments-section space-y-4 border-b border-gray-300 pb-4 mb-4">
-                                <div class="flex items-start gap-3">
-                                    <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
-                                        <i data-lucide="user" class="w-4 h-4"></i>
-                                    </div>
-                                    <div class="bg-white p-3 rounded-xl shadow-sm flex-1">
-                                        <p class="text-sm font-semibold text-gray-800 cursor-pointer view-other-profile hover:text-sena-verde transition-colors">Carlos Peña</p>
-                                        <p class="text-gray-700 text-sm">Excelente trabajo con la interfaz, muy profesional.</p>
-                                        <p class="text-xs text-gray-500 text-right mt-1">Hace 5 horas</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center gap-4">
-                                <div class="bg-gray-800 rounded-full p-2">
-                                    <i data-lucide="user" class="w-6 h-6 text-white"></i>
-                                </div>
-                                <input type="text" placeholder="Crea un comentario" class="comment-input flex-1 px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" data-post-id="2" />
-                                <label for="commentFile-2" class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors cursor-pointer">
-                                    <i data-lucide="paperclip" class="w-6 h-6 text-gray-700"></i>
-                                </label>
-                                <input type="file" id="commentFile-2" class="hidden" />
-
-                                <label for="commentCamera-2" class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors cursor-pointer">
-                                    <i data-lucide="camera" class="w-6 h-6 text-gray-700"></i>
-                                </label>
-                                <input type="file" id="commentCamera-2" accept="image/*" class="hidden" />
-                                <button class="send-comment-btn bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all" data-post-id="2">
-                                    <i data-lucide="send" class="w-6 h-6"></i>
-                                </button>
-                            </div>
-                            
-                            <p class="comment-count text-gray-600 text-sm mt-3 ml-14">1 comentario</p>
-                        </div>
-                    </article>
+                    <!-- Posts renderizados dinámicamente aquí -->
                 </div>
             </div>
-
-            <div id="newsFeed" class="space-y-6 hidden">
-                <article class="bg-white rounded-3xl shadow-xl overflow-hidden border-t-4 border-red-600">
-                    <div class="p-6">
-                        <div class="flex flex-col sm:flex-row items-start gap-4 mb-4">
-                            <div class="bg-red-600 rounded-full p-2">
-                                <i data-lucide="megaphone" class="w-6 h-6 text-white"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-gray-900 flex-1">¡ATENCIÓN! Abiertas las Convocatorias de Formación Titulada - Modalidad Virtual</h3>
-                            <p class="text-sm text-gray-500 pt-2">Publicado: 10/Oct/2025</p>
-                        </div>
-                        
-                        <p class="text-gray-700 mb-4">
-                            El SENA informa a todos los interesados que se ha abierto una nueva ronda de inscripciones para programas de formación titulada en modalidad virtual. Esta es una oportunidad única para estudiar desde cualquier lugar del país.
-                        </p>
-                        
-                                                <picture>
-                                                    <source srcset="assets/noticias/noticia1.webp" type="image/webp" />
-                                                    <img src="assets/noticias/noticia1.png" alt="Inscripciones" class="w-full rounded-xl shadow-md mb-4 max-h-48 object-cover" />
-                                                </picture>
-
-                        <div class="mt-4 pt-4 border-t border-gray-200 space-y-3">
-                            <h4 class="text-lg font-semibold text-gray-800">Enlaces y Documentos de Interés:</h4>
-                            <a href="https://www.sena.edu.co/inscripciones" target="_blank" class="flex items-center gap-3 text-blue-600 hover:text-blue-800 font-medium transition-colors">
-                                <i data-lucide="link" class="w-5 h-5"></i>
-                                Enlace Directo a la Fuente Original
-                            </a>
-                            <div class="flex items-center gap-3 text-gray-700">
-                                <i data-lucide="file-text" class="w-5 h-5 text-red-600"></i>
-                                <span class="font-medium">Documento de Requisitos.PDF</span>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="bg-white rounded-3xl shadow-xl overflow-hidden border-t-4 border-sena-verde">
-                    <div class="p-6">
-                        <div class="flex flex-col sm:flex-row items-start gap-4 mb-4">
-                            <div class="bg-sena-verde rounded-full p-2">
-                                <i data-lucide="rocket" class="w-6 h-6 text-white"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-gray-900 flex-1">Proyecto Innovador: SENA Lanza Simulador de Negocios en Metaverso</h3>
-                            <p class="text-sm text-gray-500 pt-2">Publicado: 01/Oct/2025</p>
-                        </div>
-                        
-                        <p class="text-gray-700 mb-4">
-                            El Centro de Tecnología de la Manufactura Avanzada desarrolla un entorno de realidad virtual para la práctica empresarial, permitiendo a los aprendices interactuar con clientes y tomar decisiones en un ambiente sin riesgos.
-                        </p>
-
-                                                <picture>
-                                                    <source srcset="assets/noticias/noticia2.webp" type="image/webp" />
-                                                    <img src="assets/noticias/noticia2.png" alt="Simulador de Negocios" class="w-full rounded-xl shadow-md mb-4 max-h-48 object-cover" />
-                                                </picture>
-                        
-                        <a href="https://www.sena.edu.co/noticias/metaverso-sena" target="_blank" class="flex items-center gap-3 text-blue-600 hover:text-blue-800 font-medium transition-colors mt-4">
-                            <i data-lucide="link" class="w-5 h-5"></i>
-                            Leer la noticia completa en SENA Comunicaciones
-                        </a>
-                    </div>
-                </article>
+            
+            <div id="newsContainer" class="hidden">
+                <!-- Noticias renderizadas dinámicamente aquí -->
             </div>
           </div>
-        </div>
+          </div>
 
         <aside class="block md:block md:w-32 w-14 fixed md:static right-4 top-1/3 z-40">
-                    <div class="bg-sena-verde-claro rounded-3xl shadow-xl p-2 md:p-4 space-y-3 md:space-y-6 md:sticky md:top-6 flex flex-col items-center">
-                        <!-- Mobile: icon-only small buttons. Desktop: full-width buttons with labels -->
-                        <button id="goToProfileEditBtn" class="w-10 h-10 md:w-full md:p-4 bg-white hover:bg-gray-100 rounded-2xl flex items-center justify-center md:justify-start transition-all group" aria-label="Perfil">
-                            <i data-lucide="user" class="w-5 h-5 text-gray-800 group-hover:text-sena-verde"></i>
-                            <span class="hidden md:inline-block ml-3 text-sm font-semibold text-gray-800">Perfil</span>
-                        </button>
+            <div class="bg-sena-verde-claro rounded-3xl shadow-xl p-2 md:p-4 space-y-3 md:space-y-6 md:sticky md:top-6 flex flex-col items-center">
+                <!-- Mobile: icon-only small buttons. Desktop: full-width buttons with labels -->
+                <button id="goToProfileEditBtn" class="w-10 h-10 md:w-full md:p-4 bg-white hover:bg-gray-100 rounded-2xl flex items-center justify-center md:justify-start transition-all group" aria-label="Perfil">
+                    <i data-lucide="user" class="w-5 h-5 text-gray-800 group-hover:text-sena-verde"></i>
+                    <span class="hidden md:inline-block ml-3 text-sm font-semibold text-gray-800">Perfil</span>
+                </button>
 
-                        <button id="goToChatBtn" class="w-10 h-10 md:w-full md:p-4 bg-white hover:bg-gray-100 rounded-2xl flex items-center justify-center md:justify-start transition-all group" aria-label="Chats">
-                            <i data-lucide="message-circle" class="w-5 h-5 text-gray-800 group-hover:text-sena-verde"></i>
-                            <span class="hidden md:inline-block ml-3 text-sm font-semibold text-gray-800">Chats</span>
-                        </button>
+                <button id="goToChatBtn" class="w-10 h-10 md:w-full md:p-4 bg-white hover:bg-gray-100 rounded-2xl flex items-center justify-center md:justify-start transition-all group" aria-label="Chats">
+                    <i data-lucide="message-circle" class="w-5 h-5 text-gray-800 group-hover:text-sena-verde"></i>
+                    <span class="hidden md:inline-block ml-3 text-sm font-semibold text-gray-800">Chats</span>
+                </button>
 
-                        <button id="goToConfigBtn" class="w-10 h-10 md:w-full md:p-4 bg-white hover:bg-gray-100 rounded-2xl flex items-center justify-center md:justify-start transition-all group" aria-label="Configuración">
-                            <i data-lucide="settings" class="w-5 h-5 text-gray-800 group-hover:text-sena-verde"></i>
-                            <span class="hidden md:inline-block ml-3 text-sm font-semibold text-gray-800">Config</span>
-                        </button>
-                    </div>
-                </aside>
+                <button id="goToConfigBtn" class="w-10 h-10 md:w-full md:p-4 bg-white hover:bg-gray-100 rounded-2xl flex items-center justify-center md:justify-start transition-all group" aria-label="Configuración">
+                    <i data-lucide="settings" class="w-5 h-5 text-gray-800 group-hover:text-sena-verde"></i>
+                    <span class="hidden md:inline-block ml-3 text-sm font-semibold text-gray-800">Config</span>
+                </button>
+            </div>
+        </aside>
+        </div>
       </div>
     </div>
   </div>
@@ -470,51 +191,98 @@
             </div>
             
             <div class="flex justify-end items-center space-x-3 mt-4">
-                <button class="flex items-center space-x-2 px-4 py-2 bg-sena-verde text-white font-semibold rounded-full hover:bg-sena-azul-oscuro transition duration-150 text-sm">
-                    <i data-lucide="edit" class="w-4 h-4"></i>
-                    <span>Editar Perfil</span>
+                <button id="sendMessageToUserBtn" class="flex items-center space-x-2 px-4 py-2 bg-sena-verde text-white font-semibold rounded-full hover:bg-green-700 transition duration-150 text-sm">
+                    <i data-lucide="message-circle" class="w-4 h-4"></i>
+                    <span>Enviar Mensaje</span>
                 </button>
             </div>
             
             <div class="mt-4 pt-10 pl-32 sm:pl-0">
                 <h2 class="text-2xl font-bold text-sena-azul-oscuro">Nombre del Usuario</h2>
-                <p class="text-md text-gray-600">Aprendiz - Programa de Formación</p>
-                <p class="text-sm text-sena-verde font-semibold mt-1 bg-sena-verde-claro px-2 py-0.5 rounded-full inline-block">Trimestre - Centro de Formación</p>
+                <p class="text-md text-gray-600 font-medium">@usuario</p>
+                <div class="flex items-center gap-2 mt-2">
+                    <i data-lucide="map-pin" class="w-5 h-5 text-sena-verde"></i>
+                    <span class="text-gray-700">Ciudad</span>
+                </div>
             </div>
         </div>
 
-            <div class="border-t border-gray-200 pt-6 space-y-4">
+            <div class="border-t border-gray-200 pt-6 space-y-6">
                 <h3 class="text-2xl font-bold text-gray-800">Biografía</h3>
                 <p class="text-gray-700 leading-relaxed bg-sena-fondo p-4 rounded-xl border border-gray-200">
                     Biografía del usuario. Aquí se mostrará la información personal que el usuario haya configurado en su perfil.
                 </p>
 
-                <div class="grid grid-cols-2 gap-4 text-lg">
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="graduation-cap" class="w-6 h-6 text-sena-azul-oscuro"></i>
-                        <span class="font-semibold text-gray-800">Tecnólogo en Análisis y Desarrollo de Software</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="calendar" class="w-6 h-6 text-sena-azul-oscuro"></i>
-                        <span class="font-semibold text-gray-800">4° Trimestre - Etapa Lectiva</span>
+                <!-- Ficha Institucional -->
+                <div class="bg-gradient-to-br from-sena-azul-claro to-blue-50 p-6 rounded-2xl border-2 border-sena-azul-oscuro shadow-md">
+                    <h4 class="text-xl font-bold text-sena-azul-oscuro mb-4 flex items-center gap-2">
+                        <i data-lucide="briefcase" class="w-6 h-6"></i>
+                        Ficha Institucional SENA
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Programa -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Programa de Formación</p>
+                            <div class="flex items-start gap-3">
+                                <i data-lucide="graduation-cap" class="w-5 h-5 text-sena-verde flex-shrink-0 mt-0.5"></i>
+                                <p class="text-sm font-semibold text-gray-800" id="programaField">Tecnólogo en Análisis y Desarrollo de Software</p>
+                            </div>
+                        </div>
+
+                        <!-- Trimestre / Etapa -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Trimestre y Etapa</p>
+                            <div class="flex items-start gap-3">
+                                <i data-lucide="calendar" class="w-5 h-5 text-sena-azul-oscuro flex-shrink-0 mt-0.5"></i>
+                                <p class="text-sm font-semibold text-gray-800" id="trimestreField">4° Trimestre - Etapa Lectiva</p>
+                            </div>
+                        </div>
+
+                        <!-- Regional -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Regional SENA</p>
+                            <div class="flex items-start gap-3">
+                                <i data-lucide="map-pin" class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"></i>
+                                <p class="text-sm font-semibold text-gray-800" id="regionalField">Centro para la Industria Petroquímica</p>
+                            </div>
+                        </div>
+
+                        <!-- Centro -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Centro de Formación</p>
+                            <div class="flex items-start gap-3">
+                                <i data-lucide="building-2" class="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5"></i>
+                                <p class="text-sm font-semibold text-gray-800" id="centroField">Barrancabermeja</p>
+                            </div>
+                        </div>
+
+                        <!-- Modalidad -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Modalidad de Formación</p>
+                            <div class="flex items-start gap-3">
+                                <i data-lucide="monitor" class="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5"></i>
+                                <p class="text-sm font-semibold text-gray-800" id="modalidadField">Presencial</p>
+                            </div>
+                        </div>
+
+                        <!-- Documento -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Documento</p>
+                            <div class="flex items-start gap-3">
+                                <i data-lucide="id-card" class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"></i>
+                                <p class="text-sm font-semibold text-gray-800" id="documentoField">1234567890</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <div class="mt-8 pt-6 border-t border-gray-200">
+            <div class="mt-8 pt-6 border-t border-gray-200" id="otherProfilePostsSection">
                 <h3 class="text-2xl font-bold text-gray-800 mb-6">Publicaciones Recientes</h3>
                 
-                <article class="bg-sena-fondo rounded-2xl shadow-md overflow-hidden other-profile-feed p-4 mb-4">
-                    <div class="p-4 border-b border-gray-200">
-                         <p class="text-gray-800 font-semibold text-lg mb-3">Proyecto final de trimestre - Sistema de gestión para aprendices 💻</p>
-                        <img src="assets/placeholders/post-3.svg" alt="Post" class="w-full rounded-xl shadow-lg" />
-                    </div>
-                    <div class="p-4 text-right text-sm text-gray-500">
-                        Publicado hace 5 horas
-                    </div>
-                </article>
-                
-                <p class="text-center text-gray-600 mt-6">No hay más publicaciones por el momento.</p>
+                <!-- Las publicaciones se renderizarán dinámicamente aquí -->
+                <p class="text-center text-gray-600 mt-6">Cargando publicaciones...</p>
             </div>
         </div>
 
@@ -609,20 +377,56 @@
                         </div>
 
                         <div id="content3" class="tab-content hidden bg-white p-8 rounded-3xl shadow-xl">
-                            <h2 class="text-3xl font-bold text-gray-800 mb-4">Formación</h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <h2 class="text-3xl font-bold text-gray-800 mb-4">Ficha Institucional</h2>
+                            <p class="text-gray-600 mb-6">Información de tu formación en el SENA</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Programa</label>
-                                    <input type="text" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300" value="Tecnólogo en Análisis y Desarrollo de Software" />
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Programa de Formación</label>
+                                    <input type="text" class="w-full px-4 py-3 rounded-xl bg-gray-100 border-2 border-gray-300" placeholder="No editable" readonly />
                                 </div>
+
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Etapa</label>
-                                    <select class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Trimestre</label>
+                                    <input type="text" class="w-full px-4 py-3 rounded-xl bg-gray-100 border-2 border-gray-300" placeholder="No editable" readonly />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Etapa Actual</label>
+                                    <select class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 disabled:bg-gray-100" disabled>
                                         <option>Lectiva</option>
                                         <option>Productiva</option>
                                         <option>Egresado</option>
                                     </select>
+                                    <p class="text-xs text-gray-500 mt-1">Campo administrado por SENA</p>
                                 </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Regional SENA</label>
+                                    <input type="text" class="w-full px-4 py-3 rounded-xl bg-gray-100 border-2 border-gray-300" placeholder="No editable" readonly />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Centro de Formación</label>
+                                    <input type="text" class="w-full px-4 py-3 rounded-xl bg-gray-100 border-2 border-gray-300" placeholder="No editable" readonly />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Modalidad</label>
+                                    <select class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 disabled:bg-gray-100" disabled>
+                                        <option>Presencial</option>
+                                        <option>Virtual</option>
+                                        <option>Mixta</option>
+                                    </select>
+                                    <p class="text-xs text-gray-500 mt-1">Campo administrado por SENA</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                                <p class="text-sm text-blue-800">
+                                    <i data-lucide="info" class="w-4 h-4 inline mr-2"></i>
+                                    Los datos institucionales son administrados por el SENA. Si necesitas actualizar tu información, contacta a tu coordinador de programa.
+                                </p>
                             </div>
                         </div>
 

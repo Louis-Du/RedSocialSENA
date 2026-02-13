@@ -78,9 +78,13 @@ class UserService {
                 'mock'
             );
 
-            // Guardar en localStorage
+            // Guardar sesión en AppState (que maneja localStorage correctamente)
             appState.currentUser = user;
-            localStorage.setItem('currentUser', JSON.stringify(user));
+            appState.saveToStorage(); // Guardar en 'appState'
+            localStorage.setItem('userSession', JSON.stringify({ tipoDoc, documento })); // Guardar sesión
+            
+            // Notificar a suscriptores
+            appState.notifySubscribers('currentUser');
 
             return {
                 success: true,

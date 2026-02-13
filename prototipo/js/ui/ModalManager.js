@@ -20,6 +20,13 @@ class ModalManager {
         this.setupQuickPostPanel();
     }
 
+    getQuickPostPanel() {
+        if (!this.modals.quickPostInline) {
+            this.modals.quickPostInline = document.getElementById('quickPostInline');
+        }
+        return this.modals.quickPostInline;
+    }
+
     /**
      * Configura los handlers de la modal de crear publicación
      */
@@ -90,10 +97,10 @@ class ModalManager {
      * Abre el panel rápido de crear post
      */
     openQuickPostPanel() {
-        const panel = this.modals.quickPostInline;
+        const panel = this.getQuickPostPanel();
         if (panel) {
             panel.classList.remove('collapsed');
-            panel.classList.add('open');
+            panel.classList.add('expanded');
             
             // Enfocar el textarea después de la transición
             setTimeout(() => {
@@ -107,9 +114,9 @@ class ModalManager {
      * Cierra el panel rápido de crear post
      */
     closeQuickPostPanel() {
-        const panel = this.modals.quickPostInline;
+        const panel = this.getQuickPostPanel();
         if (panel) {
-            panel.classList.remove('open');
+            panel.classList.remove('expanded');
             panel.classList.add('collapsed');
         }
     }
@@ -118,10 +125,10 @@ class ModalManager {
      * Alterna el panel rápido (abre si está cerrado, cierra si está abierto)
      */
     toggleQuickPostPanel() {
-        const panel = this.modals.quickPostInline;
+        const panel = this.getQuickPostPanel();
         if (!panel) return;
 
-        if (panel.classList.contains('open')) {
+        if (panel.classList.contains('expanded')) {
             this.closeQuickPostPanel();
         } else {
             this.openQuickPostPanel();

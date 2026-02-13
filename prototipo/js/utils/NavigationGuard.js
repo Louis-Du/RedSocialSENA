@@ -82,7 +82,7 @@ class NavigationGuard {
 
             // Log para debugging (opcional)
             if (window.DEBUG_NAVIGATION) {
-                console.log(`📍 Navegación: ${previousView || 'inicio'} → ${viewName}`);
+                // Log de navegación deshabilitado en producción
             }
         });
     }
@@ -243,12 +243,12 @@ class NavigationGuard {
         
         container.innerHTML = breadcrumbs.map((crumb, index) => `
             <span class="breadcrumb-item ${crumb.active ? 'font-semibold text-sena-verde' : 'text-gray-600'}">
-                ${crumb.active ? crumb.name : `
+                ${crumb.active ? escapeHTML(crumb.name) : `
                     <button 
-                        onclick="navigationGuard.navigateWithGuard('${crumb.view}')"
+                        onclick="navigationGuard.navigateWithGuard('${escapeHTML(crumb.view)}')"
                         class="hover:text-sena-verde transition-colors"
                     >
-                        ${crumb.name}
+                        ${escapeHTML(crumb.name)}
                     </button>
                 `}
                 ${index < breadcrumbs.length - 1 ? '<span class="mx-2">/</span>' : ''}

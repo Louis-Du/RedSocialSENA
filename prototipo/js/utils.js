@@ -178,16 +178,20 @@ export function isValidImageFile(file) {
  * @param {number} duration - Duración en ms
  */
 export function showNotification(message, type = 'info', duration = 3000) {
-    void message;
-    void type;
-    void duration;
+    // TODO: Implementar sistema de notificaciones toast
+    // Por ahora usa MessageManager directamente desde los componentes
 }
 
 // === DEBUG ===
+// Control de debug: cambiar a true solo durante desarrollo
+const DEBUG_MODE = false;
+
 /**
- * Log de debug condicional
+ * Log de debug condicional - Solo activo cuando DEBUG_MODE = true
  * @param {*} args - Argumentos a loguear
  */
 export function debug(...args) {
-    void args;
+    if (DEBUG_MODE) {
+        console.log('[DEBUG]', ...args);
+    }
 }

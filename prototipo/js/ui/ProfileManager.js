@@ -11,6 +11,7 @@
 
 import { appState } from '../AppState.js';
 import { userService } from '../services/UserService.js';
+import { postService } from '../services/PostService.js';
 import { messageManager } from './MessageManager.js';
 import { navigationManager } from './NavigationManager.js';
 
@@ -34,16 +35,11 @@ class ProfileManager {
      * @param {string} userId - ID del usuario (null para perfil propio)
      */
     loadProfile(userId = null) {
-        console.log('[ProfileManager] loadProfile called with userId:', userId);
-        
         const currentUser = userService.getCurrentUser();
-        console.log('[ProfileManager] currentUser:', currentUser.id, currentUser.nombre);
         
         // Determinar si es perfil propio o de otro usuario
         this.isOwnProfile = !userId || userId === currentUser.id;
         this.viewedUserId = this.isOwnProfile ? currentUser.id : userId;
-        
-        console.log('[ProfileManager] isOwnProfile:', this.isOwnProfile, 'viewedUserId:', this.viewedUserId);
         
         // Obtener datos del usuario a mostrar
         const viewedUser = this.isOwnProfile 
@@ -51,13 +47,10 @@ class ProfileManager {
             : userService.getUserById(userId);
         
         if (!viewedUser) {
-            console.error('[ProfileManager] Usuario no encontrado:', userId);
             messageManager.error('Usuario no encontrado');
             navigationManager.showView('app');
             return;
         }
-        
-        console.log('[ProfileManager] viewedUser:', viewedUser.id, viewedUser.nombre);
         
         // Cargar datos en el formulario
         this.loadProfileData(viewedUser);
@@ -96,11 +89,8 @@ class ProfileManager {
      */
     loadProfileData(user) {
         if (!user) {
-            console.error('[ProfileManager] No se proporcionó usuario para cargar perfil');
             return;
         }
-        
-        console.log('[ProfileManager] loadProfileData - user:', user);
         
         // === INFORMACIÓN GENERAL ===
         const content1 = document.querySelector('#content1');
@@ -108,14 +98,11 @@ class ProfileManager {
             const inputs = content1.querySelectorAll('input');
             const textarea = content1.querySelector('textarea');
             
-            console.log('[ProfileManager] Encontrados inputs:', inputs.length, 'textarea:', !!textarea);
-            
             // Primer input: nombre
             if (inputs[0]) {
                 inputs[0].value = user.nombre || 'Aprendiz Sin Nombre';
                 inputs[0].setAttribute('data-field', 'nombre');
                 inputs[0].readOnly = !this.isOwnProfile;
-                console.log('[ProfileManager] Input[0] (nombre) actualizado a:', inputs[0].value);
             }
 
             // Segundo input: apodo/usuario
@@ -123,7 +110,6 @@ class ProfileManager {
                 inputs[1].value = user.apodo || 'usuario_' + user.id;
                 inputs[1].setAttribute('data-field', 'apodo');
                 inputs[1].readOnly = !this.isOwnProfile;
-                console.log('[ProfileManager] Input[1] (apodo) actualizado a:', inputs[1].value);
             }
 
             // Textarea: bio
@@ -131,10 +117,7 @@ class ProfileManager {
                 textarea.value = user.bio || 'Sin biografía';
                 textarea.setAttribute('data-field', 'bio');
                 textarea.readOnly = !this.isOwnProfile;
-                console.log('[ProfileManager] Textarea (bio) actualizado a:', textarea.value);
             }
-        } else {
-            console.error('[ProfileManager] No se encontró #content1');
         }
 
         // === CONTACTO ===
@@ -180,24 +163,44 @@ class ProfileManager {
         const content3 = document.querySelector('#content3');
         if (content3) {
             const inputs = content3.querySelectorAll('input');
-            const select = content3.querySelector('select');
+            const selects = content3.querySelectorAll('select');
             
-            // Programa (solo lectura)
+            // Programa (solo lectura) - input[0]
             if (inputs[0]) {
                 inputs[0].value = user.programa || 'Programa no definido';
                 inputs[0].setAttribute('readonly', 'readonly');
             }
 
-            // Etapa/Trimestre
-            if (select) {
-                const trimestres = ['Lectiva', 'Productiva', 'Egresado'];
-                const currentTrimestre = user.trimestre?.includes('Productiva') ? 'Productiva' 
-                                        : user.trimestre?.includes('Egresado') ? 'Egresado' 
-                                        : 'Lectiva';
-                
-                select.value = currentTrimestre;
-                select.setAttribute('data-field', 'etapa');
-                select.disabled = !this.isOwnProfile;
+            // Trimestre (solo lectura) - input[1]
+            if (inputs[1]) {
+                inputs[1].value = user.trimestre || 'Sin trimestre definido';
+                inputs[1].setAttribute('readonly', 'readonly');
+            }
+
+            // Regional (solo lectura) - input[2]
+            if (inputs[2]) {
+                inputs[2].value = user.regional || 'Regional no definida';
+                inputs[2].setAttribute('readonly', 'readonly');
+            }
+
+            // Centro (solo lectura) - input[3]
+            if (inputs[3]) {
+                inputs[3].value = user.centro || 'Centro no definido';
+                inputs[3].setAttribute('readonly', 'readonly');
+            }
+
+            // Etapa - select[0]
+            if (selects[0]) {
+                selects[0].value = user.etapa || 'Lectiva';
+                selects[0].setAttribute('data-field', 'etapa');
+                selects[0].disabled = true; // Siempre deshabilitado para el usuario
+            }
+
+            // Modalidad - select[1]
+            if (selects[1]) {
+                selects[1].value = user.modalidad || 'Presencial';
+                selects[1].setAttribute('data-field', 'modalidad');
+                selects[1].disabled = true; // Siempre deshabilitado para el usuario
             }
         }
     }
@@ -234,12 +237,10 @@ class ProfileManager {
      * Carga las publicaciones del usuario
      * @param {string} userId - ID del usuario
      */
-    loadUserPosts(userId) {
-        const posts = appState.getPostsByUserId(userId);
+    async loadUserPosts(userId) {
+        const posts = await postService.getUserPosts(userId);
         
         // TODO: Renderizar publicaciones en una sección del perfil
-        // Por ahora solo logueamos
-        console.log(`Usuario ${userId} tiene ${posts.length} publicaciones`);
     }
 
     /**

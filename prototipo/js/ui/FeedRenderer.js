@@ -31,19 +31,28 @@ class FeedRenderer {
 
         // Event delegation para botones de comentarios y eliminación
         this.feedContainer.addEventListener('click', (e) => {
-            console.log('[FeedRenderer] Click detectado en:', e.target);
-            
             // Click en perfil de autor
             if (e.target.closest('.view-other-profile')) {
                 const profileDiv = e.target.closest('.view-other-profile');
                 const userId = profileDiv.getAttribute('data-user-id');
-                console.log('[FeedRenderer] Click en view-other-profile, userId:', userId);
                 if (userId) {
                     this.handleViewProfile(userId);
-                } else {
-                    console.error('[FeedRenderer] No se encontró data-user-id en el div');
                 }
                 return; // Evitar que se ejecuten otros handlers
+            }
+
+            // Botón de upvote
+            if (e.target.closest('.upvote-btn')) {
+                const btn = e.target.closest('.upvote-btn');
+                const postId = btn.getAttribute('data-post-id');
+                this.handleUpvote(postId);
+            }
+
+            // Botón de downvote
+            if (e.target.closest('.downvote-btn')) {
+                const btn = e.target.closest('.downvote-btn');
+                const postId = btn.getAttribute('data-post-id');
+                this.handleDownvote(postId);
             }
 
             // Botón de enviar comentario
@@ -127,6 +136,21 @@ class FeedRenderer {
     }
 
     /**
+     * Renderiza el feed completo sin filtros
+     */
+    async renderFullFeed() {
+        const posts = await postService.getPosts();
+        const enrichedPosts = posts.map(post => {
+            return {
+                ...post,
+                author: userService.getUserById(post.userId) || {},
+                commentCount: commentService.getCommentCount(post.id)
+            };
+        });
+        this.renderFeed(enrichedPosts);
+    }
+
+    /**
      * Genera el HTML de un post
      * @param {Object} post - Post con autor
      * @returns {string} HTML del post
@@ -136,8 +160,19 @@ class FeedRenderer {
         const commentCount = post.commentCount || 0;
         const canDelete = userService.canDeletePost(post);
         
+        // Datos de votación
+        const votes = post.votes || { upvotes: 0, downvotes: 0, usersVoted: {} };
+        const currentUser = userService.getCurrentUser();
+        const userVote = votes.usersVoted[currentUser.id] || null;
+        const voteBalance = votes.upvotes - votes.downvotes;
+        
+        // Colores de botones según voto
+        const upvoteClass = userVote === 'up' ? 'bg-green-200 text-sena-verde' : 'bg-white text-gray-700 hover:bg-green-100';
+        const downvoteClass = userVote === 'down' ? 'bg-red-200 text-red-600' : 'bg-white text-gray-700 hover:bg-red-100';
+        const balanceClass = voteBalance > 0 ? 'text-green-600' : voteBalance < 0 ? 'text-red-600' : 'text-gray-600';
+        
         const imageBlock = post.imageUrl
-            ? `<img src="${escapeHTML(post.imageUrl)}" alt="Post del usuario" class="w-full rounded-2xl shadow-lg max-h-64 object-cover" />`
+            ? `<img src="${escapeHTML(post.imageUrl)}" alt="Post del usuario" class="w-full rounded-2xl shadow-lg max-h-64 object-cover" loading="lazy" />`
             : '';
 
         const deleteBtn = canDelete
@@ -167,6 +202,25 @@ class FeedRenderer {
                 <div class="p-6">
                     <p class="text-gray-800 text-lg mb-4">${escapeHTML(post.content)}</p>
                     ${imageBlock}
+                </div>
+
+                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <div class="flex items-center gap-2">
+                            <button class="upvote-btn ${upvoteClass} p-2 rounded-lg transition-all flex items-center gap-1" data-post-id="${post.id}" title="Votar positivo">
+                                <i data-lucide="thumbs-up" class="w-5 h-5"></i>
+                                <span class="text-sm font-semibold">${votes.upvotes}</span>
+                            </button>
+                            <button class="downvote-btn ${downvoteClass} p-2 rounded-lg transition-all flex items-center gap-1" data-post-id="${post.id}" title="Votar negativo">
+                                <i data-lucide="thumbs-down" class="w-5 h-5"></i>
+                                <span class="text-sm font-semibold">${votes.downvotes}</span>
+                            </button>
+                            <div class="px-3 py-1 rounded-lg bg-gray-200 text-sm font-semibold ${balanceClass}">
+                                ${voteBalance > 0 ? '+' : ''}${voteBalance}
+                            </div>
+                        </div>
+                        <span class="text-gray-500 text-sm">${formatTime(post.createdAt)}</span>
+                    </div>
                 </div>
 
                 <div class="bg-gray-100 p-6">
@@ -259,6 +313,82 @@ class FeedRenderer {
     }
 
     /**
+     * Maneja el upvote de un post
+     * @param {string} postId - ID del post
+     */
+    async handleUpvote(postId) {
+        const btn = document.querySelector(`.upvote-btn[data-post-id="${postId}"]`);
+        if (!btn) return;
+
+        // Añadir estado de carga
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+
+        try {
+            const result = await postService.toggleUpvote(postId);
+            if (!result.success) {
+                messageManager.error(`No fue posible registrar el voto: ${result.error}`);
+                return;
+            }
+
+            // Re-renderizar el post para actualizar los votos
+            const post = postService.getPostById(postId);
+            if (post) {
+                const article = document.querySelector(`article[data-post-id="${postId}"]`);
+                if (article) {
+                    const newHTML = this.generatePostHTML(post);
+                    article.outerHTML = newHTML;
+                    if (window.loadLucideIcons) loadLucideIcons();
+                }
+            }
+        } catch (error) {
+            console.error('Error al votar:', error);
+            messageManager.error('Erro al procesar el voto. Intenta novamente.');
+        } finally {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        }
+    }
+
+    /**
+     * Maneja el downvote de un post
+     * @param {string} postId - ID del post
+     */
+    async handleDownvote(postId) {
+        const btn = document.querySelector(`.downvote-btn[data-post-id="${postId}"]`);
+        if (!btn) return;
+
+        // Añadir estado de carga
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+
+        try {
+            const result = await postService.toggleDownvote(postId);
+            if (!result.success) {
+                messageManager.error(`No fue posible registrar el voto: ${result.error}`);
+                return;
+            }
+
+            // Re-renderizar el post para actualizar los votos
+            const post = postService.getPostById(postId);
+            if (post) {
+                const article = document.querySelector(`article[data-post-id="${postId}"]`);
+                if (article) {
+                    const newHTML = this.generatePostHTML(post);
+                    article.outerHTML = newHTML;
+                    if (window.loadLucideIcons) loadLucideIcons();
+                }
+            }
+        } catch (error) {
+            console.error('Error al votar:', error);
+            messageManager.error('Erro al procesar el voto. Intenta novamente.');
+        } finally {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        }
+    }
+
+    /**
      * Maneja el envío de comentarios
      * @param {string} postId - ID del post
      */
@@ -296,9 +426,7 @@ class FeedRenderer {
      * @param {string} userId - ID del usuario a visualizar
      */
     handleViewProfile(userId) {
-        console.log('[FeedRenderer] handleViewProfile called with userId:', userId);
         if (!userId) {
-            console.error('[FeedRenderer] No userId provided to handleViewProfile');
             return;
         }
         navigationManager.navigateToProfile(userId);

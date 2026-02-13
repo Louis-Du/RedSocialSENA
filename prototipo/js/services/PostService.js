@@ -85,6 +85,28 @@ class PostService {
     }
 
     /**
+     * Obtiene posts de un usuario con información enriquecida
+     * @param {string} userId - ID del usuario
+     * @returns {Promise<Array>} Posts con autor y comentarios
+     */
+    async getUserPosts(userId) {
+        try {
+            const posts = this.getPostsByUserId(userId);
+            
+            // Enriquecer cada post con info del autor y comentarios
+            const enrichedPosts = posts.map(post => ({
+                ...post,
+                author: userService.getUserById(post.userId) || {},
+                commentCount: appState.getCommentCount(post.id)
+            }));
+            
+            return enrichedPosts;
+        } catch (error) {
+            return [];
+        }
+    }
+
+    /**
      * Actualiza una publicación
      * @param {string} postId - ID del post
      * @param {string} newContent - Nuevo contenido
@@ -216,6 +238,130 @@ class PostService {
         }
 
         return false;
+    }
+
+    /**
+     * Alterna un voto positivo en un post
+     * @param {string} postId - ID del post
+     * @returns {Promise<Object>}
+     */
+    async toggleUpvote(postId) {
+        try {
+            const userId = userService.getCurrentUser().id;
+            appState.toggleUpvote(postId, userId);
+            return {
+                success: true,
+                post: this.getPostById(postId)
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Alterna un voto negativo en un post
+     * @param {string} postId - ID del post
+     * @returns {Promise<Object>}
+     */
+    async toggleDownvote(postId) {
+        try {
+            const userId = userService.getCurrentUser().id;
+            appState.toggleDownvote(postId, userId);
+            return {
+                success: true,
+                post: this.getPostById(postId)
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Obtiene el voto actual del usuario en un post
+     * @param {string} postId - ID del post
+     * @returns {string|null} 'up', 'down' o null
+     */
+    getUserVote(postId) {
+        const post = this.getPostById(postId);
+        if (!post || !post.votes) return null;
+        
+        const userId = userService.getCurrentUser().id;
+        return post.votes.usersVoted[userId] || null;
+    }
+
+    /**
+     * Obtiene el balance neto de votaciones de un post
+     * @param {string} postId - ID del post
+     * @returns {number} upvotes - downvotes
+     */
+    getVoteBalance(postId) {
+        const post = this.getPostById(postId);
+        if (!post || !post.votes) return 0;
+        return post.votes.upvotes - post.votes.downvotes;
+    }
+
+    /**
+     * Obtiene posts filtrados según criterios
+     * @param {Object} filters - Objeto con filtros { centro, regional, etapa, modalidad }
+     * @returns {Array} Posts filtrados con autor
+     */
+    getFilteredPosts(filters = {}) {
+        try {
+            const allPosts = appState.getPosts();
+            
+            // Si no hay filtros activos, retornar todos los posts
+            if (!filters.centro && !filters.regional && !filters.etapa && !filters.modalidad) {
+                return allPosts.map(post => ({
+                    ...post,
+                    author: userService.getUserById(post.userId) || {},
+                    commentCount: appState.getCommentCount(post.id)
+                }));
+            }
+            
+            // Aplicar filtros
+            const filtered = allPosts.filter(post => {
+                const author = userService.getUserById(post.userId);
+                if (!author) return false;
+                
+                // Filtro centro
+                if (filters.centro && author.centro !== filters.centro) {
+                    return false;
+                }
+                
+                // Filtro regional
+                if (filters.regional && author.regional !== filters.regional) {
+                    return false;
+                }
+                
+                // Filtro etapa
+                if (filters.etapa && author.etapa !== filters.etapa) {
+                    return false;
+                }
+                
+                // Filtro modalidad
+                if (filters.modalidad && author.modalidad !== filters.modalidad) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            // Enriquecer los posts filtrados
+            return filtered.map(post => ({
+                ...post,
+                author: userService.getUserById(post.userId) || {},
+                commentCount: appState.getCommentCount(post.id)
+            }));
+        } catch (error) {
+            console.error('Error al filtrar posts:', error);
+            return [];
+        }
     }
 }
 

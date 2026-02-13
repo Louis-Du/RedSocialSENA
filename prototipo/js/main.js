@@ -25,6 +25,13 @@ import { tabManager } from './ui/TabManager.js';
 import { feedRenderer } from './ui/FeedRenderer.js';
 import { profileManager } from './ui/ProfileManager.js';
 import { otherProfileManager } from './ui/OtherProfileManager.js';
+import { filterManager } from './ui/FilterManager.js';
+import { newsManager } from './ui/NewsManager.js';
+import { feedControlsManager } from './ui/FeedControlsManager.js';
+import { searchManager } from './ui/SearchManager.js';
+
+// Importar datos de ejemplo
+import { initializeMockPosts } from './data/MockPosts.js';
 
 // Importar utils
 import { debug } from './utils.js';
@@ -37,33 +44,34 @@ async function initializeApp() {
         // 1. Verificar sesión existente
         const isLoggedIn = userService.isLoggedIn();
 
-        // 2. Suscribirse a cambios de posts
+        // 2. Inicializar datos de ejemplo si es necesario
+        initializeMockPosts();
+
+        // 3. Suscribirse a cambios de posts
         appState.subscribe('posts', async () => {
             const posts = await postService.getFeed();
             feedRenderer.renderFeed(posts);
         });
 
-        // 3. Suscribirse a cambios de comentarios
+        // 4. Suscribirse a cambios de comentarios
         appState.subscribe('comments', () => {
             // Los comentarios se renderizarán cuando se abra un post
         });
 
-        // 4. Suscribirse a cambios de usuario
+        // 5. Suscribirse a cambios de usuario
         appState.subscribe('currentUser', () => {
         });
 
-        // 5. Suscribirse a cambios de chats
+        // 6. Suscribirse a cambios de chats
         appState.subscribe('chats', () => {
             chatManager.loadConversationsList();
         });
 
-        // 6. Cargar y renderizar feed inicial si está logueado
-        if (isLoggedIn) {
-            const posts = await postService.getFeed();
-            feedRenderer.renderFeed(posts);
-        }
+        // 7. Cargar y renderizar feed inicial
+        const posts = await postService.getFeed();
+        feedRenderer.renderFeed(posts);
     } catch (error) {
-        void error;
+        // Error durante inicialización - la app continuará funcionando
     }
 }
 
