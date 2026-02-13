@@ -33,14 +33,6 @@ class OtherProfileManager {
         document.getElementById('returnToAppBtnOtherProfile')?.addEventListener('click', () => {
             navigationManager.showView('app');
         });
-
-        // Listener para botón de enviar mensaje
-        document.getElementById('sendMessageToUserBtn')?.addEventListener('click', () => {
-            if (this.currentViewedUserId) {
-                // TODO: Implementar navegación a chat con este usuario
-                messageManager.info('Función de mensajería próximamente disponible');
-            }
-        });
     }
     
     /**
@@ -151,21 +143,31 @@ class OtherProfileManager {
         // 12. Mostrar/ocultar botón según si es perfil propio o ajeno
         const sendMessageBtn = document.getElementById('sendMessageToUserBtn');
         if (sendMessageBtn) {
+            // Clonar el botón para eliminar listeners anteriores
+            const newBtn = sendMessageBtn.cloneNode(true);
+            sendMessageBtn.parentNode.replaceChild(newBtn, sendMessageBtn);
+            
             if (isOwnProfile) {
                 // Si es perfil propio, cambiar a "Editar Perfil"
-                sendMessageBtn.innerHTML = '<i data-lucide="edit-3" class="w-5 h-5"></i><span>Editar Perfil</span>';
-                sendMessageBtn.style.display = 'flex';
+                newBtn.innerHTML = '<i data-lucide="edit-3" class="w-5 h-5"></i><span>Editar Perfil</span>';
+                newBtn.style.display = 'flex';
                 
-                // Cambiar el listener del botón
-                const newBtn = sendMessageBtn.cloneNode(true);
-                sendMessageBtn.parentNode.replaceChild(newBtn, sendMessageBtn);
+                // Agregar listener para ir a editar perfil
                 newBtn.addEventListener('click', () => {
                     navigationManager.showView('editProfile');
                 });
             } else {
                 // Si es perfil ajeno, mostrar "Enviar Mensaje"
-                sendMessageBtn.innerHTML = '<i data-lucide="message-circle" class="w-5 h-5"></i><span>Enviar Mensaje</span>';
-                sendMessageBtn.style.display = 'flex';
+                newBtn.innerHTML = '<i data-lucide="message-circle" class="w-5 h-5"></i><span>Enviar Mensaje</span>';
+                newBtn.style.display = 'flex';
+                
+                // Agregar listener para abrir chat
+                newBtn.addEventListener('click', () => {
+                    if (this.currentViewedUserId) {
+                        // TODO: Implementar navegación a chat con este usuario
+                        messageManager.info('Función de mensajería próximamente disponible');
+                    }
+                });
             }
         }
 
