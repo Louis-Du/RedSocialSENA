@@ -19,6 +19,7 @@ import { navigationManager } from './ui/NavigationManager.js';
 import { modalManager } from './ui/ModalManager.js';
 import { messageManager } from './ui/MessageManager.js';
 import { authManager } from './ui/AuthManager.js';
+import { registerManager } from './ui/RegisterManager.js';
 import { postManager } from './ui/PostManager.js';
 import { chatManager } from './ui/ChatManager.js';
 import { tabManager } from './ui/TabManager.js';
@@ -87,3 +88,30 @@ window.reloadFeed = async () => {
     const posts = await postService.getFeed();
     feedRenderer.renderFeed(posts);
 };
+
+// Exponer objetos globales para testing y debugging
+window.__APP__ = {
+    appState,
+    userService,
+    postService,
+    commentService,
+    chatService,
+    navigationManager,
+    modalManager,
+    messageManager,
+    authManager,
+    registerManager,
+    postManager,
+    chatManager,
+    tabManager,
+    feedRenderer,
+    profileManager,
+    otherProfileManager,
+    filterManager,
+    newsManager,
+    feedControlsManager,
+    searchManager
+};
+
+// Hacer window.__APP__ accesible globalmente
+window.APP = window.__APP__;

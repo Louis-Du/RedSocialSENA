@@ -250,11 +250,11 @@ class NavigationManager {
 
         // Si mostramos la vista de editProfile, inicializar las tabs
         if (viewName === 'editProfile') {
-            // Esperar un tick para que el DOM se actualice
+            // Esperar más tiempo para que el DOM se actualice completamente
             setTimeout(() => {
                 // Disparar evento para reinicializar tabs con params
                 window.dispatchEvent(new CustomEvent('editProfileShown', { detail: { params } }));
-            }, 50);
+            }, 150); // Aumentado de 50ms a 150ms para mayor estabilidad
         }
 
         // Si mostramos otherProfile, inicializar con userId
@@ -264,7 +264,7 @@ class NavigationManager {
                 if (params.userId) {
                     window.dispatchEvent(new CustomEvent('otherProfileShown', { detail: { params } }));
                 }
-            }, 50);
+            }, 150); // Aumentado de 50ms a 150ms para mayor estabilidad
         }
 
         // Disparar evento personalizado para que otros sistemas reaccionen

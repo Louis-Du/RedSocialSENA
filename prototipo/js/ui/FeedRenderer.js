@@ -181,14 +181,19 @@ class FeedRenderer {
               </button>`
             : '';
 
+        // Usar foto de perfil si existe, si no mostrar icono
+        const avatarBlock = author.profilePicture && author.profilePicture !== 'assets/placeholders/avatar-placeholder.svg'
+            ? `<img src="${escapeHTML(author.profilePicture)}" alt="Avatar de ${escapeHTML(author.apodo || 'Usuario')}" class="w-16 h-16 rounded-full object-cover border-3 border-white" />`
+            : `<div class="bg-sena-verde rounded-full p-3 w-16 h-16 flex items-center justify-center">
+                <i data-lucide="user" class="w-8 h-8 text-white"></i>
+              </div>`;
+
         return `
             <article class="bg-white rounded-3xl shadow-xl overflow-hidden" data-post-id="${post.id}">
                 <div class="bg-sena-verde-claro p-6">
                     <div class="flex items-start justify-between gap-4">
                         <div class="flex items-start gap-4">
-                            <div class="bg-sena-verde rounded-full p-3">
-                                <i data-lucide="user" class="w-8 h-8 text-white"></i>
-                            </div>
+                            ${avatarBlock}
                             <div class="flex-1 view-other-profile cursor-pointer hover:opacity-80" data-user-id="${post.userId || ''}">
                                 <h3 class="text-xl font-bold text-gray-900">${escapeHTML(author.apodo || 'Usuario')}</h3>
                                 <p class="text-gray-800 font-semibold">${escapeHTML(author.trimestre || '')}</p>
@@ -395,29 +400,48 @@ class FeedRenderer {
     async handleSendComment(postId) {
         const input = document.querySelector(`.comment-input[data-post-id="${postId}"]`);
         const commentText = input?.value.trim();
-
-        if (!commentText) {
-            messageManager.error('El comentario no puede estar vacio. Por favor redacta tu aporte.');
-            return;
-        }
-
-        // Por ahora, solo texto. En futuro soportar imágenes
-        const result = await commentService.addComment(postId, commentText);
         
-        if (!result.success) {
-            messageManager.error(`No fue posible registrar el comentario: ${result.error}`);
+        // Obtener archivo de imagen si existe
+        const fileInput = document.getElementById(`commentFile-${postId}`);
+        const cameraInput = document.getElementById(`commentCamera-${postId}`);
+        const imageFile = fileInput?.files[0] || cameraInput?.files[0];
+
+        if (!commentText && !imageFile) {
+            messageManager.error('El comentario no puede estar vacío. Por favor agrega texto o una imagen.');
             return;
         }
 
-        input.value = '';
-        this.renderComments(postId);
+        try {
+            const result = await commentService.addComment(postId, commentText, imageFile);
+            
+            if (!result.success) {
+                messageManager.error(`No fue posible registrar el comentario: ${result.error}`);
+                return;
+            }
 
-        // Actualizar contador
-        const post = postService.getPostById(postId);
-        const countEl = document.querySelector(`[data-post-id="${postId}"] .comment-count`);
-        if (countEl && post) {
-            const count = commentService.getCommentCount(postId);
-            countEl.textContent = `${count} comentario${count !== 1 ? 's' : ''}`;
+            // Limpiar inputs
+            if (input) input.value = '';
+            if (fileInput) fileInput.value = '';
+            if (cameraInput) cameraInput.value = '';
+            
+            // Limpiar preview de imagen si existe
+            const preview = document.getElementById(`commentImagePreview-${postId}`);
+            if (preview) preview.remove();
+
+            this.renderComments(postId);
+
+            // Actualizar contador
+            const post = postService.getPostById(postId);
+            const countEl = document.querySelector(`[data-post-id="${postId}"] .comment-count`);
+            if (countEl && post) {
+                const count = commentService.getCommentCount(postId);
+                countEl.textContent = `${count} comentario${count !== 1 ? 's' : ''}`;
+            }
+            
+            messageManager.success('Comentario publicado correctamente');
+        } catch (error) {
+            messageManager.error('Error al publicar el comentario. Intenta de nuevo.');
+            console.error(error);
         }
     }
 
@@ -499,12 +523,57 @@ class FeedRenderer {
         if (fileInput.files.length === 0) return;
         
         const file = fileInput.files[0];
-        const fileNameEl = document.getElementById(`quickImageFileName`) || 
-                           fileInput.parentElement?.querySelector('.file-name');
         
-        if (fileNameEl) {
-            fileNameEl.textContent = file.name;
+        // Validar que sea una imagen
+        if (!file.type.startsWith('image/')) {
+            messageManager.error('Por favor selecciona un archivo de imagen válido');
+            fileInput.value = '';
+            return;
         }
+
+        // Validar tamaño (5MB máximo)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            messageManager.error('La imagen debe ser menor a 5MB');
+            fileInput.value = '';
+            return;
+        }
+
+        // Crear preview de la imagen
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const imageUrl = e.target.result;
+            
+            // Buscar o crear contenedor de preview
+            let previewContainer = document.getElementById(`commentImagePreview-${postId}`);
+            
+            if (!previewContainer) {
+                const commentSection = document.querySelector(`[data-post-id="${postId}"]`)?.closest('.post-card')?.querySelector('.bg-gray-100');
+                if (commentSection) {
+                    previewContainer = document.createElement('div');
+                    previewContainer.id = `commentImagePreview-${postId}`;
+                    previewContainer.className = 'mb-3 relative inline-block';
+                    commentSection.insertBefore(previewContainer, commentSection.lastElementChild);
+                }
+            }
+            
+            if (previewContainer) {
+                previewContainer.innerHTML = `
+                    <div class="relative inline-block">
+                        <img src="${imageUrl}" class="max-h-32 rounded-lg border-2 border-sena-verde" alt="Preview" />
+                        <button class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600" onclick="document.getElementById('${fileInput.id}').value=''; this.parentElement.parentElement.remove();">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+                
+                if (window.loadLucideIcons) {
+                    window.loadLucideIcons();
+                }
+            }
+        };
+        
+        reader.readAsDataURL(file);
     }
 
     /**

@@ -92,6 +92,15 @@
                     </ul>
                     <p class="mt-2 text-xs text-gray-600">Contraseña para todos: sena123</p>
                 </div>
+
+                <div class="mt-6 text-center">
+                    <p class="text-gray-700 text-sm">
+                        ¿No tienes cuenta? 
+                        <button id="goToRegisterBtn" class="text-sena-verde font-bold hover:underline">
+                            Regístrate aquí
+                        </button>
+                    </p>
+                </div>
       </div>
     </div>
 
@@ -99,6 +108,107 @@
             <img src="assets/firma-digital-sena.png" alt="Firma Digital SENA" class="mx-auto h-24 sm:h-auto max-w-full" />
         </footer>
   </main>
+
+  <!-- Vista de Registro -->
+  <div id="registerView" class="hidden min-h-screen bg-sena-verde flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-2xl">
+      <div class="text-center mb-8">
+        <img src="assets/logo-sena-blanco.png" alt="Logo SENA" class="mx-auto w-28 mb-4" /> 
+        <p class="text-white font-semibold text-xl tracking-wide">Crear Nueva Cuenta</p>
+      </div>
+
+      <div class="bg-sena-fondo rounded-3xl shadow-2xl p-8 max-h-[80vh] overflow-y-auto">
+        <h2 class="text-2xl font-semibold text-gray-700 text-center mb-2">
+          Registro de Usuario
+        </h2>
+        <p class="text-center text-sm text-gray-600 mb-6">
+          Complete todos los campos para crear su cuenta
+        </p>
+
+        <form id="registerForm" class="space-y-4">
+          <!-- Información de Documento -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-800 mb-2">Tipo de Documento*</label>
+              <select id="registerTipoDoc" required class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors">
+                <option value="">Seleccionar</option>
+                <option value="CC">Cédula de Ciudadanía</option>
+                <option value="TI">Tarjeta de Identidad</option>
+                <option value="CE">Cédula de Extranjería</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-800 mb-2">Número de Documento*</label>
+              <input id="registerDocumento" type="text" required class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" placeholder="1234567890" />
+            </div>
+          </div>
+
+          <!-- Información Personal -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-800 mb-2">Nombre Completo*</label>
+            <input id="registerNombre" type="text" required class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" placeholder="Juan Pérez" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-800 mb-2">Email*</label>
+            <input id="registerEmail" type="email" required class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" placeholder="correo@sena.edu.co" />
+          </div>
+
+          <!-- Rol -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-800 mb-2">Rol*</label>
+            <select id="registerRol" required class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors">
+              <option value="">Seleccionar rol</option>
+              <option value="Aprendiz">Aprendiz</option>
+              <option value="Egresado">Egresado</option>
+            </select>
+          </div>
+
+          <!-- Información Académica -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-800 mb-2">Programa de Formación*</label>
+            <input id="registerPrograma" type="text" required class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" placeholder="Tecnólogo en Análisis y Desarrollo de Software" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-800 mb-2">Ciudad*</label>
+            <input id="registerCiudad" type="text" required class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" placeholder="Bogotá" />
+          </div>
+
+          <!-- Contraseña -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-800 mb-2">Contraseña*</label>
+            <input id="registerPassword" type="password" required class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" placeholder="Mínimo 6 caracteres" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-800 mb-2">Confirmar Contraseña*</label>
+            <input id="registerPasswordConfirm" type="password" required class="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" placeholder="Repita su contraseña" />
+          </div>
+
+          <!-- Botones -->
+          <div class="flex gap-3 mt-6">
+            <button type="button" id="backToLoginBtn" class="flex-1 bg-gray-300 text-gray-700 font-bold py-4 rounded-xl hover:bg-gray-400 transition-all">
+              Cancelar
+            </button>
+            <button type="submit" id="registerSubmitBtn" class="flex-1 bg-sena-verde text-white font-bold py-4 rounded-xl shadow-lg hover:bg-green-700 transform hover:scale-105 transition-all duration-200">
+              Crear Cuenta
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="mt-6 text-center">
+        <p class="text-white text-sm">
+          ¿Ya tienes cuenta? 
+          <button id="backToLoginBtn2" class="text-white font-bold underline hover:text-gray-200">
+            Inicia sesión
+          </button>
+        </p>
+      </div>
+    </div>
+  </div>
 
   <div id="appView" class="hidden min-h-screen">
     <header class="bg-sena-verde shadow-lg">
@@ -343,6 +453,25 @@
                     <div id="profileContentArea" class="space-y-6">
                         <div id="content1" class="tab-content bg-white p-8 rounded-3xl shadow-xl">
                             <h2 class="text-3xl font-bold text-gray-800 mb-4">Información General</h2>
+                            
+                            <!-- Foto de Perfil -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-3">Foto de Perfil</label>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-gray-200">
+                                        <img id="profilePicturePreview" src="assets/placeholders/avatar-placeholder.svg" alt="Foto de Perfil" class="w-full h-full object-cover" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <input type="file" id="profilePictureInput" accept="image/*" class="hidden" />
+                                        <button type="button" id="changeProfilePictureBtn" class="px-4 py-2 bg-sena-verde text-white rounded-xl font-semibold hover:bg-green-700 transition-colors flex items-center gap-2">
+                                            <i data-lucide="camera" class="w-4 h-4"></i>
+                                            Cambiar Foto
+                                        </button>
+                                        <p class="text-xs text-gray-500 mt-2">Formatos: JPG, PNG. Tamaño máximo: 5MB</p>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Nombre completo</label>
@@ -570,9 +699,10 @@
 
                 <div class="bg-gray-100 p-4 border-t border-gray-200 flex items-center gap-3">
                     <input type="text" id="chatInputMobile" placeholder="Escribe tu mensaje..." class="flex-1 px-4 py-3 rounded-2xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
-                    <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                    <label for="chatImageMobile" class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors cursor-pointer">
                         <i data-lucide="image" class="w-6 h-6 text-gray-700"></i>
-                    </button>
+                    </label>
+                    <input type="file" id="chatImageMobile" accept="image/*" class="hidden" />
                     <button id="sendChatBtnMobile" class="bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all">
                         <i data-lucide="send" class="w-6 h-6"></i>
                     </button>
@@ -581,9 +711,10 @@
 
                 <div class="bg-gray-100 p-4 border-t border-gray-200 flex items-center gap-3">
                     <input type="text" id="chatInput" placeholder="Escribe tu mensaje..." class="flex-1 px-4 py-3 rounded-2xl bg-white border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors" />
-                    <button class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors">
+                    <label for="chatImageDesktop" class="bg-white hover:bg-gray-100 p-3 rounded-xl transition-colors cursor-pointer">
                         <i data-lucide="image" class="w-6 h-6 text-gray-700"></i>
-                    </button>
+                    </label>
+                    <input type="file" id="chatImageDesktop" accept="image/*" class="hidden" />
                     <button id="sendChatBtn" class="bg-sena-verde hover:bg-green-700 text-white p-3 rounded-xl transition-all">
                         <i data-lucide="send" class="w-6 h-6"></i>
                     </button>
@@ -621,6 +752,14 @@
                   </label>
                   <input type="file" id="postImageUpload" class="hidden" accept="image/*">
                   <span id="imageFileName" class="text-gray-600 text-sm flex-1 truncate">Ningún archivo seleccionado</span>
+              </div>
+
+              <!-- Vista previa de imagen -->
+              <div id="imagePreviewContainer" class="hidden">
+                  <img id="postImagePreview" class="w-full h-64 object-cover rounded-xl border-2 border-gray-300" alt="Vista previa de imagen">
+                  <button type="button" id="removeImageBtn" class="mt-2 text-red-600 hover:text-red-800 text-sm font-semibold">
+                      ✕ Remover imagen
+                  </button>
               </div>
 
               <div class="flex justify-end gap-4">

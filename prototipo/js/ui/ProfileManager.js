@@ -25,8 +25,23 @@ class ProfileManager {
         
         // Escuchar cuando se muestre la vista de editar perfil
         window.addEventListener('editProfileShown', (e) => {
-            const params = e.detail?.params || {};
-            this.loadProfile(params.userId);
+            try {
+                const params = e.detail?.params || {};
+                
+                // Validar que la vista está disponible antes de continuar
+                const editProfileView = document.getElementById('editProfileView');
+                if (!editProfileView || editProfileView.classList.contains('hidden')) {
+                    console.warn('Edit profile view not visible yet');
+                    return;
+                }
+                
+                // Esperar un tick más para asegurar que todo está listo
+                setTimeout(() => {
+                    this.loadProfile(params.userId);
+                }, 50);
+            } catch (error) {
+                console.warn('Error al mostrar perfil:', error.message);
+            }
         });
     }
 
@@ -35,37 +50,69 @@ class ProfileManager {
      * @param {string} userId - ID del usuario (null para perfil propio)
      */
     loadProfile(userId = null) {
-        const currentUser = userService.getCurrentUser();
-        
-        // Determinar si es perfil propio o de otro usuario
-        this.isOwnProfile = !userId || userId === currentUser.id;
-        this.viewedUserId = this.isOwnProfile ? currentUser.id : userId;
-        
-        // Obtener datos del usuario a mostrar
-        const viewedUser = this.isOwnProfile 
-            ? currentUser 
-            : userService.getUserById(userId);
-        
-        if (!viewedUser) {
-            messageManager.error('Usuario no encontrado');
-            navigationManager.showView('app');
-            return;
+        try {
+            const currentUser = userService.getCurrentUser();
+            
+            // Determine if it's own profile or another user's profile
+            this.isOwnProfile = !userId || userId === currentUser.id;
+            this.viewedUserId = this.isOwnProfile ? currentUser.id : userId;
+            
+            // Get user data
+            const viewedUser = this.isOwnProfile 
+                ? currentUser 
+                : userService.getUserById(userId);
+            
+            if (!viewedUser) {
+                messageManager.error('Usuario no encontrado');
+                navigationManager.showView('app');
+                return;
+            }
+            
+            // Verify the view is visible and ready
+            const editProfileView = document.getElementById('editProfileView');
+            if (!editProfileView || editProfileView.classList.contains('hidden')) {
+                console.warn('Edit profile view not visible, skipping loadProfile');
+                return;
+            }
+            
+            // Verify DOM elements are ready
+            if (!document.querySelector('#content1')) {
+                console.warn('DOM elements not ready yet, skipping loadProfile');
+                return;
+            }
+            
+            // Load data into the form
+            this.loadProfileData(viewedUser);
+            
+            // Show/hide edit controls
+            this.updateEditControls();
+            
+            // Load user posts
+            this.loadUserPosts(this.viewedUserId);
+        } catch (error) {
+            console.error('Error en loadProfile:', error);
+            messageManager.error('Error al cargar perfil');
         }
-        
-        // Cargar datos en el formulario
-        this.loadProfileData(viewedUser);
-        
-        // Mostrar/ocultar controles de edición
-        this.updateEditControls();
-        
-        // Cargar publicaciones del usuario
-        this.loadUserPosts(this.viewedUserId);
     }
 
     /**
      * Configura los listeners para el formulario
      */
     setupEventListeners() {
+        // Cambiar foto de perfil
+        const changePhotoBtn = document.getElementById('changeProfilePictureBtn');
+        const photoInput = document.getElementById('profilePictureInput');
+        
+        if (changePhotoBtn && photoInput) {
+            changePhotoBtn.addEventListener('click', () => {
+                photoInput.click();
+            });
+
+            photoInput.addEventListener('change', async (e) => {
+                await this.handleProfilePictureChange(e);
+            });
+        }
+
         // Guardar información general
         document.addEventListener('click', (e) => {
             const saveBtn = e.target.closest('#content1 button');
@@ -84,6 +131,63 @@ class ProfileManager {
     }
 
     /**
+     * Maneja el cambio de foto de perfil
+     * @param {Event} event - Evento de cambio del input file
+     */
+    async handleProfilePictureChange(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // Validar que sea una imagen
+        if (!file.type.startsWith('image/')) {
+            messageManager.error('Por favor selecciona un archivo de imagen válido');
+            return;
+        }
+
+        // Validar tamaño (5MB máximo)
+        const maxSize = 5 * 1024 * 1024; // 5MB en bytes
+        if (file.size > maxSize) {
+            messageManager.error('La imagen debe ser menor a 5MB');
+            return;
+        }
+
+        try {
+            // Leer la imagen como Data URL
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const imageDataUrl = e.target.result;
+                
+                // Actualizar preview
+                const preview = document.getElementById('profilePicturePreview');
+                if (preview) {
+                    preview.src = imageDataUrl;
+                }
+
+                // Guardar en el perfil del usuario
+                const result = await userService.updateProfile({
+                    profilePicture: imageDataUrl
+                });
+
+                if (result.success) {
+                    messageManager.success('Foto de perfil actualizada correctamente');
+                } else {
+                    messageManager.error(result.error || 'Error al actualizar la foto');
+                }
+            };
+
+            reader.onerror = () => {
+                messageManager.error('Error al leer la imagen');
+            };
+
+            reader.readAsDataURL(file);
+
+        } catch (error) {
+            messageManager.error('Error al procesar la imagen');
+            console.error(error);
+        }
+    }
+
+    /**
      * Carga los datos del usuario en los campos del formulario
      * @param {Object} user - Usuario a mostrar
      */
@@ -92,32 +196,47 @@ class ProfileManager {
             return;
         }
         
+        // === FOTO DE PERFIL ===
+        try {
+            const profilePicPreview = document.getElementById('profilePicturePreview');
+            if (profilePicPreview && profilePicPreview.parentElement && user.profilePicture) {
+                // Verificar que el elemento aún está en el DOM
+                profilePicPreview.src = user.profilePicture;
+            }
+        } catch (error) {
+            console.warn('No se pudo cargar foto de perfil:', error.message);
+        }
+        
         // === INFORMACIÓN GENERAL ===
-        const content1 = document.querySelector('#content1');
-        if (content1) {
-            const inputs = content1.querySelectorAll('input');
-            const textarea = content1.querySelector('textarea');
-            
-            // Primer input: nombre
-            if (inputs[0]) {
-                inputs[0].value = user.nombre || 'Aprendiz Sin Nombre';
-                inputs[0].setAttribute('data-field', 'nombre');
-                inputs[0].readOnly = !this.isOwnProfile;
-            }
+        try {
+            const content1 = document.querySelector('#content1');
+            if (content1 && content1.parentElement) {
+                const inputs = content1.querySelectorAll('input');
+                const textarea = content1.querySelector('textarea');
+                
+                // Primer input: nombre
+                if (inputs[0]) {
+                    inputs[0].value = user.nombre || 'Aprendiz Sin Nombre';
+                    inputs[0].setAttribute('data-field', 'nombre');
+                    inputs[0].readOnly = !this.isOwnProfile;
+                }
 
-            // Segundo input: apodo/usuario
-            if (inputs[1]) {
-                inputs[1].value = user.apodo || 'usuario_' + user.id;
-                inputs[1].setAttribute('data-field', 'apodo');
-                inputs[1].readOnly = !this.isOwnProfile;
-            }
+                // Segundo input: apodo/usuario
+                if (inputs[1]) {
+                    inputs[1].value = user.apodo || 'usuario_' + user.id;
+                    inputs[1].setAttribute('data-field', 'apodo');
+                    inputs[1].readOnly = !this.isOwnProfile;
+                }
 
-            // Textarea: bio
-            if (textarea) {
-                textarea.value = user.bio || 'Sin biografía';
-                textarea.setAttribute('data-field', 'bio');
-                textarea.readOnly = !this.isOwnProfile;
+                // Textarea: bio
+                if (textarea) {
+                    textarea.value = user.bio || 'Sin biografía';
+                    textarea.setAttribute('data-field', 'bio');
+                    textarea.readOnly = !this.isOwnProfile;
+                }
             }
+        } catch (error) {
+            console.warn('No se pudo cargar información general:', error.message);
         }
 
         // === CONTACTO ===
@@ -132,26 +251,48 @@ class ProfileManager {
      * @param {Object} user - Usuario
      */
     loadContactInfo(user) {
-        const content2 = document.querySelector('#content2');
-        if (content2) {
+        try {
+            const content2 = document.querySelector('#content2');
+            
+            // Validar que el elemento existe, está en el DOM y es accesible
+            if (!content2) {
+                console.warn('No se encontró content2 en el DOM');
+                return;
+            }
+            
+            if (!content2.parentElement || !document.body.contains(content2)) {
+                console.warn('content2 no está conectado al DOM');
+                return;
+            }
+            
             const inputs = content2.querySelectorAll('input');
             
             // Email (solo lectura)
-            if (inputs[0]) {
-                inputs[0].value = user.email
-                    ? user.email
-                    : user.documento
-                        ? `${user.documento}@soy.sena.edu.co`
-                        : 'correo@soy.sena.edu.co';
-                inputs[0].setAttribute('readonly', 'readonly');
+            if (inputs.length > 0 && inputs[0]) {
+                try {
+                    inputs[0].value = user.email
+                        ? user.email
+                        : user.documento
+                            ? `${user.documento}@soy.sena.edu.co`
+                            : 'correo@soy.sena.edu.co';
+                    inputs[0].setAttribute('readonly', 'readonly');
+                } catch (e) {
+                    console.warn('Error cargando email:', e.message);
+                }
             }
 
             // Teléfono
-            if (inputs[1]) {
-                inputs[1].value = user.telefono || '+57 300 0000000';
-                inputs[1].setAttribute('data-field', 'telefono');
-                inputs[1].readOnly = !this.isOwnProfile;
+            if (inputs.length > 1 && inputs[1]) {
+                try {
+                    inputs[1].value = user.telefono || '+57 300 0000000';
+                    inputs[1].setAttribute('data-field', 'telefono');
+                    inputs[1].readOnly = !this.isOwnProfile;
+                } catch (e) {
+                    console.warn('Error cargando teléfono:', e.message);
+                }
             }
+        } catch (error) {
+            console.warn('No se pudo cargar información de contacto:', error.message);
         }
     }
 
@@ -160,48 +301,86 @@ class ProfileManager {
      * @param {Object} user - Usuario
      */
     loadEducationInfo(user) {
-        const content3 = document.querySelector('#content3');
-        if (content3) {
+        try {
+            const content3 = document.querySelector('#content3');
+            
+            // Validar que el elemento existe, está en el DOM y es accesible
+            if (!content3) {
+                console.warn('No se encontró content3 en el DOM');
+                return;
+            }
+            
+            if (!content3.parentElement || !document.body.contains(content3)) {
+                console.warn('content3 no está conectado al DOM');
+                return;
+            }
+            
             const inputs = content3.querySelectorAll('input');
             const selects = content3.querySelectorAll('select');
             
             // Programa (solo lectura) - input[0]
-            if (inputs[0]) {
-                inputs[0].value = user.programa || 'Programa no definido';
-                inputs[0].setAttribute('readonly', 'readonly');
+            if (inputs.length > 0 && inputs[0]) {
+                try {
+                    inputs[0].value = user.programa || 'Programa no definido';
+                    inputs[0].setAttribute('readonly', 'readonly');
+                } catch (e) {
+                    console.warn('Error cargando programa:', e.message);
+                }
             }
 
             // Trimestre (solo lectura) - input[1]
-            if (inputs[1]) {
-                inputs[1].value = user.trimestre || 'Sin trimestre definido';
-                inputs[1].setAttribute('readonly', 'readonly');
+            if (inputs.length > 1 && inputs[1]) {
+                try {
+                    inputs[1].value = user.trimestre || 'Sin trimestre definido';
+                    inputs[1].setAttribute('readonly', 'readonly');
+                } catch (e) {
+                    console.warn('Error cargando trimestre:', e.message);
+                }
             }
 
             // Regional (solo lectura) - input[2]
-            if (inputs[2]) {
-                inputs[2].value = user.regional || 'Regional no definida';
-                inputs[2].setAttribute('readonly', 'readonly');
+            if (inputs.length > 2 && inputs[2]) {
+                try {
+                    inputs[2].value = user.regional || 'Regional no definida';
+                    inputs[2].setAttribute('readonly', 'readonly');
+                } catch (e) {
+                    console.warn('Error cargando regional:', e.message);
+                }
             }
 
             // Centro (solo lectura) - input[3]
-            if (inputs[3]) {
-                inputs[3].value = user.centro || 'Centro no definido';
-                inputs[3].setAttribute('readonly', 'readonly');
+            if (inputs.length > 3 && inputs[3]) {
+                try {
+                    inputs[3].value = user.centro || 'Centro no definido';
+                    inputs[3].setAttribute('readonly', 'readonly');
+                } catch (e) {
+                    console.warn('Error cargando centro:', e.message);
+                }
             }
 
             // Etapa - select[0]
-            if (selects[0]) {
-                selects[0].value = user.etapa || 'Lectiva';
-                selects[0].setAttribute('data-field', 'etapa');
-                selects[0].disabled = true; // Siempre deshabilitado para el usuario
+            if (selects.length > 0 && selects[0]) {
+                try {
+                    selects[0].value = user.etapa || 'Lectiva';
+                    selects[0].setAttribute('data-field', 'etapa');
+                    selects[0].disabled = true;
+                } catch (e) {
+                    console.warn('Error cargando etapa:', e.message);
+                }
             }
 
             // Modalidad - select[1]
-            if (selects[1]) {
-                selects[1].value = user.modalidad || 'Presencial';
-                selects[1].setAttribute('data-field', 'modalidad');
-                selects[1].disabled = true; // Siempre deshabilitado para el usuario
+            if (selects.length > 1 && selects[1]) {
+                try {
+                    selects[1].value = user.modalidad || 'Presencial';
+                    selects[1].setAttribute('data-field', 'modalidad');
+                    selects[1].disabled = true;
+                } catch (e) {
+                    console.warn('Error cargando modalidad:', e.message);
+                }
             }
+        } catch (error) {
+            console.warn('No se pudo cargar información de formación:', error.message);
         }
     }
 

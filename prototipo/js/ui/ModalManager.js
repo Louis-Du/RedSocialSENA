@@ -49,15 +49,35 @@ class ModalManager {
         closeBtn?.addEventListener('click', closeModal);
         cancelBtn?.addEventListener('click', closeModal);
 
-        // Manejar cambio de archivo
         const fileInput = document.getElementById('postImageUpload');
         const fileNameSpan = document.getElementById('imageFileName');
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        const previewImg = document.getElementById('postImagePreview');
+        const removeImageBtn = document.getElementById('removeImageBtn');
+
         fileInput?.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
-                fileNameSpan.textContent = e.target.files[0].name;
+                const file = e.target.files[0];
+                fileNameSpan.textContent = file.name;
+
+                // Mostrar preview de la imagen
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    previewImg.src = event.target.result;
+                    previewContainer.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
             } else {
                 fileNameSpan.textContent = 'Ningún archivo seleccionado';
+                previewContainer.classList.add('hidden');
             }
+        });
+
+        removeImageBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+            fileInput.value = '';
+            fileNameSpan.textContent = 'Ningún archivo seleccionado';
+            previewContainer.classList.add('hidden');
         });
     }
 

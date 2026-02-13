@@ -12,6 +12,7 @@ import { chatService } from '../services/ChatService.js';
 import { userService } from '../services/UserService.js';
 import { escapeHTML, formatTime } from '../utils.js';
 import { modalManager } from './ModalManager.js';
+import { messageManager } from './MessageManager.js';
 import { uiComponents } from '../utils/UIComponents.js';
 
 class ChatManager {
@@ -27,6 +28,7 @@ class ChatManager {
     setupChatHandlers() {
         const sendBtn = document.getElementById('sendChatBtn');
         const input = document.getElementById('chatInput');
+        const imageInput = document.getElementById('chatImageDesktop');
 
         sendBtn?.addEventListener('click', () => this.sendMessage('desktop'));
         input?.addEventListener('keypress', (e) => {
@@ -34,6 +36,11 @@ class ChatManager {
                 e.preventDefault();
                 this.sendMessage('desktop');
             }
+        });
+
+        // Agregar preview de imagen
+        imageInput?.addEventListener('change', (e) => {
+            this.handleImageSelected('desktop', e.target);
         });
 
         // Cargar conversaciones iniciales
@@ -46,6 +53,7 @@ class ChatManager {
     setupMobileChat() {
         const sendBtn = document.getElementById('sendChatBtnMobile');
         const input = document.getElementById('chatInputMobile');
+        const imageInput = document.getElementById('chatImageMobile');
 
         sendBtn?.addEventListener('click', () => this.sendMessage('mobile'));
         input?.addEventListener('keypress', (e) => {
@@ -54,32 +62,109 @@ class ChatManager {
                 this.sendMessage('mobile');
             }
         });
+
+        // Agregar preview de imagen
+        imageInput?.addEventListener('change', (e) => {
+            this.handleImageSelected('mobile', e.target);
+        });
+    }
+
+    /**
+     * Maneja la selección de imagen para preview
+     * @param {string} source - 'desktop' o 'mobile'
+     * @param {HTMLInputElement} fileInput - Input de archivo
+     */
+    handleImageSelected(source, fileInput) {
+        if (!fileInput.files || fileInput.files.length === 0) return;
+
+        const file = fileInput.files[0];
+        
+        // Validar que sea una imagen
+        if (!file.type.startsWith('image/')) {
+            messageManager.error('Por favor selecciona un archivo de imagen válido');
+            fileInput.value = '';
+            return;
+        }
+
+        // Validar tamaño (5MB máximo)
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+            messageManager.error('La imagen debe ser menor a 5MB');
+            fileInput.value = '';
+            return;
+        }
+
+        // Crear preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const imageUrl = e.target.result;
+            const containerId = source === 'mobile' ? 'mobileConversationView' : 'activeChatArea';
+            const container = document.getElementById(containerId);
+            
+            if (!container) return;
+
+            // Remover preview anterior si existe
+            const oldPreview = document.getElementById(`chatImagePreview-${source}`);
+            if (oldPreview) oldPreview.remove();
+
+            // Crear nuevo preview
+            const previewDiv = document.createElement('div');
+            previewDiv.id = `chatImagePreview-${source}`;
+            previewDiv.className = 'p-3 border-t border-gray-200 bg-gray-50';
+            previewDiv.innerHTML = `
+                <div class="relative inline-block">
+                    <img src="${imageUrl}" class="max-h-32 rounded-lg border-2 border-sena-verde" alt="Preview" />
+                    <button class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600" onclick="document.getElementById('${fileInput.id}').value=''; this.parentElement.parentElement.remove();">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `;
+
+            // Insertar antes del formulario de envío
+            const form = container.querySelector('.bg-gray-100.p-4.border-t');
+            if (form) {
+                form.parentNode.insertBefore(previewDiv, form);
+                if (window.loadLucideIcons) {
+                    window.loadLucideIcons();
+                }
+            }
+        };
+
+        reader.readAsDataURL(file);
     }
 
     /**
      * Carga la lista de conversaciones
      */
     loadConversationsList() {
-        const conversations = chatService.getAllConversations();
-        const chatList = document.querySelector('.chat-list');
+        try {
+            const conversations = chatService.getAllConversations();
+            const chatList = document.querySelector('.chat-list');
 
-        if (!chatList) return;
+            if (!chatList) return;
 
-        if (conversations.length === 0) {
-            chatList.innerHTML = `
-                <li class="p-6 text-center text-gray-500">
-                    No hay conversaciones activas. Inicia un mensaje para comenzar.
-                </li>
-            `;
-        } else {
-            chatList.innerHTML = '';
-            conversations.forEach(conv => {
-                chatList.insertAdjacentHTML('beforeend', this.generateChatListItemHTML(conv));
-            });
+            if (conversations.length === 0) {
+                // Mostrar mensaje si no hay conversaciones
+                // pero permitir comenzar una nueva
+                chatList.innerHTML = `
+                    <li class="p-6 text-center text-gray-500">
+                        <p>No hay conversaciones activas.</p>
+                        <p class="text-xs mt-2">Selecciona un usuario para iniciar</p>
+                    </li>
+                `;
+            } else {
+                chatList.innerHTML = '';
+                conversations.forEach(conv => {
+                    chatList.insertAdjacentHTML('beforeend', this.generateChatListItemHTML(conv));
+                });
+            }
+
+            // Re-attach event listeners
+            this.attachChatListListeners();
+        } catch (error) {
+            console.error('Error cargando lista de conversaciones:', error);
+            messageManager.error('Error al cargar chats');
         }
-
-        // Re-attach event listeners
-        this.attachChatListListeners();
     }
 
     /**
@@ -124,26 +209,36 @@ class ChatManager {
      * @param {string} userId - ID del usuario
      */
     openChat(userId) {
-        this.currentChatUserId = userId;
-        const user = userService.getUserById(userId);
+        try {
+            if (!userId) {
+                messageManager.error('Usuario no válido');
+                return;
+            }
 
-        if (!user) {
-            modalManager.showError('No se encontro el usuario solicitado.');
-            return;
-        }
+            this.currentChatUserId = userId;
+            const user = userService.getUserById(userId);
 
-        // Actualizar título de chat
-        const title = document.querySelector('#activeChatArea h2');
-        if (title) {
-            title.textContent = user.apodo || user.nombre;
-        }
+            if (!user) {
+                messageManager.error('No se encontró el usuario solicitado.');
+                return;
+            }
 
-        // Renderizar mensajes
-        this.renderMessages(userId);
+            // Actualizar título de chat
+            const title = document.querySelector('#activeChatArea h2');
+            if (title) {
+                title.textContent = user.apodo || user.nombre;
+            }
 
-        // En mobile, mostrar conversación
-        if (window.innerWidth < 768) {
-            this.showMobileConversation(userId);
+            // Renderizar mensajes
+            this.renderMessages(userId);
+
+            // En mobile, mostrar conversación
+            if (window.innerWidth < 768) {
+                this.showMobileConversation(userId);
+            }
+        } catch (error) {
+            console.error('Error abriendo chat:', error);
+            messageManager.error('Error al abrir chat');
         }
     }
 
@@ -233,41 +328,58 @@ class ChatManager {
     async sendMessage(source) {
         try {
             if (!this.currentChatUserId) {
-                modalManager.showError('Selecciona una conversacion para continuar.');
+                messageManager.error('Selecciona una conversación para continuar.');
                 return;
             }
 
             const inputId = source === 'mobile' ? 'chatInputMobile' : 'chatInput';
+            const imageInputId = source === 'mobile' ? 'chatImageMobile' : 'chatImageDesktop';
+            
             const input = document.getElementById(inputId);
-            const content = input?.value.trim();
+            const imageInput = document.getElementById(imageInputId);
+            
+            if (!input || !imageInput) {
+                console.error('No se encontraron los inputs de chat');
+                messageManager.error('Error: No se puede enviar el mensaje');
+                return;
+            }
+            
+            const content = input.value.trim();
+            const imageFile = imageInput.files[0];
 
-            if (!content) {
-                modalManager.showError('El mensaje no puede estar vacio.');
+            // Validar que hay contenido (texto o imagen)
+            if (!content && !imageFile) {
+                messageManager.error('El mensaje no puede estar vacío.');
                 return;
             }
 
             // Validar regla: primer mensaje solo texto
-            const chatState = chatService.getChatState(this.currentChatUserId);
-            if (chatState.isFirstMessage) {
-                // Solo permitir texto en primer mensaje
-                const result = await chatService.sendMessage(this.currentChatUserId, content, null);
-
-                if (!result.success) {
-                    modalManager.showError(result.error);
-                    return;
-                }
-            } else {
-                // Ya hay mensajes, se pueden enviar imágenes en el futuro
-                const result = await chatService.sendMessage(this.currentChatUserId, content, null);
-
-                if (!result.success) {
-                    modalManager.showError(result.error);
-                    return;
-                }
+            const chatState = chatService.getConversationState(this.currentChatUserId);
+            const isFirstMessage = chatState.messageCount === 0;
+            
+            if (isFirstMessage && imageFile) {
+                messageManager.error('El primer mensaje solo puede contener texto.');
+                return;
             }
 
-            // Limpiar input
+            // Enviar mensaje
+            const result = await chatService.sendMessage(this.currentChatUserId, content, imageFile);
+
+            if (!result.success) {
+                messageManager.error(result.error);
+                return;
+            }
+
+            // Mostrar éxito
+            messageManager.success('Mensaje enviado');
+
+            // Limpiar inputs
             input.value = '';
+            imageInput.value = '';
+            
+            // Limpiar preview de imagen si existe
+            const preview = document.getElementById(`chatImagePreview-${source}`);
+            if (preview) preview.remove();
 
             // Re-renderizar mensajes
             this.renderMessages(this.currentChatUserId);
@@ -278,7 +390,8 @@ class ChatManager {
             }
 
         } catch (error) {
-            modalManager.showError('Error: ' + error.message);
+            console.error('Error enviando mensaje:', error);
+            messageManager.error('Error: ' + error.message);
         }
     }
 

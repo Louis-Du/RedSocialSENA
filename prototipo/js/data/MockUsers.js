@@ -10,6 +10,7 @@
  * - documento: Número de documento
  * - password: Contraseña en texto plano (SOLO para demo)
  * - nombre: Nombre completo
+ * - rol: 'Aprendiz' | 'Egresado'
  * - email: Email (simulado)
  * - bio: Biografía corta
  * - profilePicture: URL de foto de perfil (simulada)
@@ -26,6 +27,7 @@ export const MOCK_USERS = [
         password: 'sena123',
         nombre: 'Daniel Esteban',
         apodo: 'Daniel Esteban',
+        rol: 'Aprendiz',
         trimestre: '3° Trimestre',
         programa: 'Tecnólogo en Análisis y Desarrollo de Software',
         email: 'daniel.esteban@sena.edu.co',
@@ -42,6 +44,7 @@ export const MOCK_USERS = [
         password: 'sena123',
         nombre: 'María García',
         apodo: 'María',
+        rol: 'Aprendiz',
         trimestre: '2° Trimestre',
         programa: 'Técnica en Administración de Sistemas',
         email: 'maria.garcia@sena.edu.co',
@@ -58,6 +61,7 @@ export const MOCK_USERS = [
         password: 'sena123',
         nombre: 'Carlos López',
         apodo: 'Carlos',
+        rol: 'Aprendiz',
         trimestre: '1° Trimestre',
         programa: 'Técnica en Programación',
         email: 'carlos.lopez@sena.edu.co',
@@ -74,6 +78,7 @@ export const MOCK_USERS = [
         password: 'sena123',
         nombre: 'Ana Martínez',
         apodo: 'Ana',
+        rol: 'Egresado',
         trimestre: '4° Trimestre',
         programa: 'Marketing Digital',
         email: 'ana.martinez@sena.edu.co',
@@ -124,17 +129,49 @@ export function validateCredentials(tipoDoc, documento, password) {
 
 /**
  * Obtiene todos los usuarios excepto uno
+ * Incluye tanto MOCK_USERS como usuarios registrados en AppState
  * Útil para mostrar otros usuarios en chats, perfiles, etc.
  * @param {string} excludeUserId - ID del usuario a excluir
+ * @param {Object} appState - Estado de la aplicación (optional)
  * @returns {Array} Array de usuarios sin el usuario excluido
  */
-export function getOtherUsers(excludeUserId) {
-    return MOCK_USERS
+export function getOtherUsers(excludeUserId, appState = null) {
+    // Obtener usuarios mock sin contraseña
+    const mockUsers = MOCK_USERS
         .filter(user => user.id !== excludeUserId)
         .map(user => {
             const { password: _, ...userWithoutPassword } = user;
             return userWithoutPassword;
         });
+
+    // Intentar obtener usuarios de AppState si se pasa como parámetro
+    let appStateUsers = [];
+    if (appState && appState.users && Array.isArray(appState.users)) {
+        appStateUsers = appState.users.filter(user => user.id !== excludeUserId);
+    }
+
+    // Si no se pasa appState, intentar desde window.__APP__ (fallback)
+    if (appStateUsers.length === 0) {
+        try {
+            if (window.__APP__?.appState?.users) {
+                appStateUsers = window.__APP__.appState.users.filter(user => user.id !== excludeUserId);
+            }
+        } catch (error) {
+            // Si hay error, continuar solo con MOCK_USERS
+        }
+    }
+
+    // Combinar ambos arrays, evitando duplicados por ID
+    const allUsers = [...mockUsers];
+    const mockIds = new Set(mockUsers.map(u => u.id));
+    
+    appStateUsers.forEach(user => {
+        if (!mockIds.has(user.id)) {
+            allUsers.push(user);
+        }
+    });
+
+    return allUsers;
 }
 
 /**

@@ -15,7 +15,7 @@
 
 import { appState } from '../AppState.js';
 import { isValidDocument, isValidPassword } from '../utils.js';
-import { validateCredentials } from '../data/MockUsers.js';
+import { validateCredentials, getOtherUsers } from '../data/MockUsers.js';
 import { errorHandler } from '../utils/ErrorHandler.js';
 import { dataMapper } from '../utils/DataMapper.js';
 
@@ -99,6 +99,135 @@ class UserService {
             return {
                 success: false,
                 error: normalizedError.message,
+                user: null
+            };
+        }
+    }
+
+    /**
+     * Registra un nuevo usuario
+     * 
+     * @param {Object} userData - Datos del usuario a registrar
+     * @param {string} userData.tipoDoc - Tipo de documento
+     * @param {string} userData.documento - Número de documento
+     * @param {string} userData.password - Contraseña
+     * @param {string} userData.nombre - Nombre completo
+     * @param {string} userData.email - Email
+     * @param {string} userData.rol - Rol del usuario ('Aprendiz' | 'Instructor' | 'Coordinador')
+     * @param {string} userData.programa - Programa de formación
+     * @param {string} userData.ciudad - Ciudad
+     * 
+     * @returns {Promise<Object>} Respuesta con formato:
+     * {
+     *   success: boolean,
+     *   user: Object | null,
+     *   message: string,
+     *   error: string | null
+     * }
+     */
+    async register(userData) {
+        try {
+            const { tipoDoc, documento, password, nombre, email, rol, programa, ciudad } = userData;
+
+            // Validaciones básicas
+            if (!isValidDocument(tipoDoc, documento)) {
+                const error = errorHandler.createError(
+                    errorHandler.ERROR_CODES.VALIDATION_FORMAT,
+                    'Documento inválido'
+                );
+                return { success: false, error: error.message, user: null };
+            }
+
+            if (!isValidPassword(password)) {
+                const error = errorHandler.createError(
+                    errorHandler.ERROR_CODES.VALIDATION_LENGTH,
+                    'La contraseña debe tener al menos 6 caracteres'
+                );
+                return { success: false, error: error.message, user: null };
+            }
+
+            if (!nombre || nombre.trim().length < 3) {
+                return { 
+                    success: false, 
+                    error: 'El nombre debe tener al menos 3 caracteres', 
+                    user: null 
+                };
+            }
+
+            if (!email || !email.includes('@')) {
+                return { 
+                    success: false, 
+                    error: 'Email inválido', 
+                    user: null 
+                };
+            }
+
+            if (!rol || !['Aprendiz', 'Egresado'].includes(rol)) {
+                return { 
+                    success: false, 
+                    error: 'Rol inválido. Debe ser Aprendiz o Egresado', 
+                    user: null 
+                };
+            }
+
+            // Verificar si el usuario ya existe
+            const existingUser = validateCredentials(tipoDoc, documento, password);
+            if (existingUser) {
+                return { 
+                    success: false, 
+                    error: 'Ya existe un usuario con este documento', 
+                    user: null 
+                };
+            }
+
+            // TODO BACKEND: await fetch('/api/auth/register', { method: 'POST', body: JSON.stringify(userData) });
+            
+            // Crear nuevo usuario
+            const newUser = {
+                id: `user_${Date.now()}`,
+                tipoDoc,
+                documento,
+                nombre,
+                apodo: nombre.split(' ')[0], // Primer nombre como apodo por defecto
+                rol,
+                email: email || `${documento}@sena.edu.co`,
+                programa: programa || 'No especificado',
+                ciudad: ciudad || 'No especificado',
+                bio: `${rol} del SENA`,
+                profilePicture: 'assets/placeholders/avatar-placeholder.svg',
+                trimestre: rol === 'Aprendiz' ? '1° Trimestre' : 'N/A',
+                regional: 'Centro SENA',
+                centro: ciudad || 'No especificado',
+                etapa: rol === 'Aprendiz' ? 'Lectiva' : 'N/A',
+                modalidad: 'Presencial',
+                isLoggedIn: true
+            };
+
+            // Mapear a formato interno
+            const user = dataMapper.mapUser(newUser, 'mock');
+
+            // Guardar en AppState
+            appState.currentUser = user;
+            appState.users.push(user); // Agregar a lista de usuarios
+            appState.saveToStorage();
+            localStorage.setItem('userSession', JSON.stringify({ tipoDoc, documento }));
+            
+            // Notificar a suscriptores
+            appState.notifySubscribers('currentUser');
+
+            return {
+                success: true,
+                user: user,
+                message: 'Cuenta creada exitosamente. Bienvenido(a) a la Red Social SENA.'
+            };
+
+        } catch (error) {
+            const normalizedError = errorHandler.handleError(error, 'UserService.register');
+            errorHandler.logError(normalizedError, 'medium');
+            
+            return {
+                success: false,
+                error: normalizedError.message || 'Error al crear la cuenta',
                 user: null
             };
         }
@@ -319,6 +448,27 @@ class UserService {
     canDeleteComment(comment) {
         const currentUser = this.getCurrentUser();
         return comment.userId === currentUser.id;
+    }
+
+    /**
+     * Obtiene lista de todos los usuarios registrados
+     * Incluye usuarios Mock y usuarios registrados en AppState
+     * Excluye al usuario actual
+     * 
+     * @returns {Array<Object>} Lista de usuarios
+     * 
+     * @example
+     * const users = userService.getUsers();
+     * const otherUsers = users.filter(u => u.id !== currentUser.id);
+     */
+    getUsers() {
+        const currentUser = this.getCurrentUser();
+        if (!currentUser || !currentUser.id) {
+            // Retornar usuarios disponibles si no hay usuario logeado
+            return getOtherUsers(null, appState);
+        }
+        // Retorna todos los usuarios excepto el actual (incluye Mock + AppState)
+        return getOtherUsers(currentUser.id, appState);
     }
 }
 

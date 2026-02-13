@@ -30,6 +30,12 @@ class DataMapper {
             profilePicture: null,
             bio: null,
             email: null,
+            rol: null,
+            ciudad: null,
+            regional: null,
+            centro: null,
+            etapa: null,
+            modalidad: null,
             isLoggedIn: false
         };
 
@@ -47,6 +53,12 @@ class DataMapper {
                     profilePicture: data.avatarUrl || data.profile_picture || 'assets/placeholders/avatar-placeholder.svg',
                     bio: data.biography || data.bio || '',
                     email: data.email || data.correo,
+                    rol: data.rol || data.role || '',
+                    ciudad: data.ciudad || data.city || '',
+                    regional: data.regional || data.regional_center || '',
+                    centro: data.centro || data.center || '',
+                    etapa: data.etapa || data.stage || '',
+                    modalidad: data.modalidad || data.modality || '',
                     isLoggedIn: data.isLoggedIn !== undefined ? data.isLoggedIn : false
                 };
 
@@ -63,6 +75,12 @@ class DataMapper {
                     profilePicture: data.profilePicture || 'assets/placeholders/avatar-placeholder.svg',
                     bio: data.bio || '',
                     email: data.email,
+                    rol: data.rol || '',
+                    ciudad: data.ciudad || '',
+                    regional: data.regional || '',
+                    centro: data.centro || '',
+                    etapa: data.etapa || '',
+                    modalidad: data.modalidad || '',
                     isLoggedIn: data.isLoggedIn || false
                 };
 
@@ -80,6 +98,12 @@ class DataMapper {
                     profilePicture: data.profilePicture || 'assets/placeholders/avatar-placeholder.svg',
                     bio: data.bio || '',
                     email: data.email,
+                    rol: data.rol || '',
+                    ciudad: data.ciudad || '',
+                    regional: data.regional || '',
+                    centro: data.centro || '',
+                    etapa: data.etapa || '',
+                    modalidad: data.modalidad || '',
                     isLoggedIn: data.isLoggedIn || false
                 };
         }

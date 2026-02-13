@@ -100,11 +100,14 @@ class ChatService {
     getAllConversations() {
         // En el futuro: await fetch('/api/chats');
         const currentUser = userService.getCurrentUser();
-        const otherUsers = currentUser?.id
-            ? getOtherUsers(currentUser.id)
-            : [];
+        if (!currentUser || !currentUser.id) {
+            return [];
+        }
 
-        // Por ahora, retorna los usuarios simulados con info de conversación
+        // Obtener todas los usuarios disponibles (mock + registrados)
+        const otherUsers = getOtherUsers(currentUser.id, appState);
+
+        // Mapear a conversaciones con estado
         return otherUsers.map(user => {
             const conversation = this.getConversationState(user.id);
             return {
