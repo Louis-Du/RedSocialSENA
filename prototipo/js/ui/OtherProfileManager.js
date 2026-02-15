@@ -9,6 +9,7 @@
 
 import { userService } from '../services/UserService.js';
 import { postService } from '../services/PostService.js';
+import { commentService } from '../services/CommentService.js';
 import { navigationManager } from './NavigationManager.js';
 import { messageManager } from './MessageManager.js';
 import { escapeHTML } from '../utils.js';
@@ -58,6 +59,7 @@ class OtherProfileManager {
         this.currentViewedUserId = userId;
         this.renderProfile(user);
         this.loadUserPosts(userId);
+        this.loadUserComments(userId);
     }
     
     /**
@@ -70,19 +72,26 @@ class OtherProfileManager {
             return;
         }
         
-        // 1. Actualizar nombre principal (h2)
+        // 1. Actualizar foto de perfil (NUEVA)
+        const profilePhotoElement = profileView.querySelector('.w-32.h-32.rounded-full.overflow-hidden img');
+        if (profilePhotoElement && user.profilePicture) {
+            profilePhotoElement.src = escapeHTML(user.profilePicture);
+            profilePhotoElement.alt = `Foto de ${escapeHTML(user.nombre || 'Usuario')}`;
+        }
+
+        // 2. Actualizar nombre principal (h2)
         const nameElement = profileView.querySelector('h2');
         if (nameElement) {
             nameElement.textContent = escapeHTML(user.nombre || 'Usuario');
         }
 
-        // 2. Actualizar apodo/username (@username)
+        // 3. Actualizar apodo/username (@username)
         const apokoElement = profileView.querySelector('h2 + p');
         if (apokoElement) {
             apokoElement.textContent = `@${escapeHTML(user.apodo || user.nombre || 'usuario')}`;
         }
 
-        // 3. Actualizar ubicación (si hay campo)
+        // 4. Actualizar ubicación (si hay campo)
         const locationElement = profileView.querySelector('.flex.items-center.gap-2:has(i[data-lucide="map-pin"])');
         if (locationElement && user.ciudad) {
             locationElement.innerHTML = `
@@ -91,43 +100,43 @@ class OtherProfileManager {
             `;
         }
         
-        // 4. Actualizar biografía
+        // 5. Actualizar biografía
         const bioElement = profileView.querySelector('.text-gray-700.leading-relaxed');
         if (bioElement) {
             bioElement.textContent = escapeHTML(user.bio || 'Este usuario no ha agregado una biografía.');
         }
         
-        // 5. Actualizar Programa
+        // 6. Actualizar Programa
         const programaField = profileView.querySelector('#programaField');
         if (programaField) {
             programaField.textContent = escapeHTML(user.programa || 'Sin programa especificado');
         }
 
-        // 6. Actualizar Trimestre/Etapa
+        // 7. Actualizar Trimestre/Etapa
         const trimestreField = profileView.querySelector('#trimestreField');
         if (trimestreField) {
             trimestreField.textContent = escapeHTML(`${user.trimestre || 'Sin trimestre'} - ${user.etapa || 'Etapa Lectiva'}`);
         }
 
-        // 7. Actualizar Regional
+        // 8. Actualizar Regional
         const regionalField = profileView.querySelector('#regionalField');
         if (regionalField) {
             regionalField.textContent = escapeHTML(user.regional || 'Sin regional asignada');
         }
 
-        // 8. Actualizar Centro
+        // 9. Actualizar Centro
         const centroField = profileView.querySelector('#centroField');
         if (centroField) {
             centroField.textContent = escapeHTML(user.centro || 'Sin centro asignado');
         }
 
-        // 9. Actualizar Modalidad
+        // 10. Actualizar Modalidad
         const modalidadField = profileView.querySelector('#modalidadField');
         if (modalidadField) {
             modalidadField.textContent = escapeHTML(user.modalidad || 'Sin información de modalidad');
         }
 
-        // 10. Actualizar Documento
+        // 11. Actualizar Documento
         const documentoField = profileView.querySelector('#documentoField');
         if (documentoField) {
             const docText = user.tipoDoc && user.documento 
@@ -136,11 +145,11 @@ class OtherProfileManager {
             documentoField.textContent = docText;
         }
 
-        // 11. Verificar si es el perfil del usuario actual
+        // 12. Verificar si es el perfil del usuario actual
         const currentUser = userService.getCurrentUser();
         const isOwnProfile = user.id === currentUser.id;
 
-        // 12. Mostrar/ocultar botón según si es perfil propio o ajeno
+        // 13. Mostrar/ocultar botón según si es perfil propio o ajeno
         const sendMessageBtn = document.getElementById('sendMessageToUserBtn');
         if (sendMessageBtn) {
             // Clonar el botón para eliminar listeners anteriores
@@ -164,14 +173,13 @@ class OtherProfileManager {
                 // Agregar listener para abrir chat
                 newBtn.addEventListener('click', () => {
                     if (this.currentViewedUserId) {
-                        // TODO: Implementar navegación a chat con este usuario
                         messageManager.info('Función de mensajería próximamente disponible');
                     }
                 });
             }
         }
 
-        // 13. Reiniciar iconos de Lucide
+        // 14. Reiniciar iconos de Lucide
         if (window.loadLucideIcons) {
             loadLucideIcons();
         }
@@ -280,6 +288,102 @@ class OtherProfileManager {
         const diffMonths = Math.floor(diffDays / 30);
         if (diffMonths === 1) return 'Hace 1 mes';
         return `Hace ${diffMonths} meses`;
+    }
+
+    /**
+     * Carga los comentarios recientes del usuario
+     * @param {string} userId - ID del usuario
+     */
+    loadUserComments(userId) {
+        // Obtener todos los comentarios del usuario
+        const userComments = commentService.getUserComments(userId);
+        
+        // Ordenar por fecha descendente y tomar los últimos 5
+        const recentComments = userComments
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 5);
+        
+        this.renderUserComments(recentComments, userId);
+    }
+
+    /**
+     * Renderiza los comentarios recientes del usuario
+     * @param {Array} comments - Comentarios del usuario
+     * @param {string} userId - ID del usuario
+     */
+    renderUserComments(comments, userId) {
+        const profileView = document.getElementById('otherProfileView');
+        if (!profileView) return;
+
+        // Buscar o crear la sección de comentarios
+        let commentsSection = document.getElementById('otherProfileCommentsSection');
+        
+        if (!commentsSection) {
+            // Crear la sección si no existe
+            const postsSection = document.getElementById('otherProfilePostsSection');
+            if (postsSection && postsSection.parentNode) {
+                commentsSection = document.createElement('div');
+                commentsSection.id = 'otherProfileCommentsSection';
+                commentsSection.className = 'mt-8 pt-6 border-t border-gray-200';
+                commentsSection.innerHTML = '<h3 class="text-2xl font-bold text-gray-800 mb-6">Comentarios Recientes</h3>';
+                postsSection.parentNode.insertBefore(commentsSection, postsSection.nextSibling);
+            }
+        }
+
+        if (!commentsSection) return;
+
+        // Limpiar contenido actual (excepto el título)
+        const title = commentsSection.querySelector('h3');
+        commentsSection.innerHTML = '';
+        if (title) {
+            commentsSection.appendChild(title);
+        }
+
+        if (comments.length === 0) {
+            commentsSection.insertAdjacentHTML('beforeend', `
+                <p class="text-center text-gray-600 mt-6">Este usuario aún no ha realizado comentarios.</p>
+            `);
+            return;
+        }
+
+        // Renderizar cada comentario
+        comments.forEach(comment => {
+            const commentHTML = this.generateCommentHTML(comment);
+            commentsSection.insertAdjacentHTML('beforeend', commentHTML);
+        });
+
+        // Reiniciar iconos
+        if (window.loadLucideIcons) {
+            loadLucideIcons();
+        }
+    }
+
+    /**
+     * Genera HTML para un comentario en el perfil
+     * @param {Object} comment - Comentario
+     * @returns {string} HTML
+     */
+    generateCommentHTML(comment) {
+        const imageBlock = comment.imageUrl
+            ? `<img src="${escapeHTML(comment.imageUrl)}" alt="Imagen en comentario" class="w-full rounded-xl shadow-lg mt-3 max-w-xs" />`
+            : '';
+
+        const timeAgo = this.getTimeAgo(new Date(comment.createdAt));
+        
+        // Obtener información del post para mostrar contexto
+        const post = postService.getPostById(comment.postId);
+        const postPreview = post ? post.content.substring(0, 50) + (post.content.length > 50 ? '...' : '') : 'Publicación eliminada';
+
+        return `
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden mb-4 border border-gray-200 hover:shadow-lg transition-shadow p-4">
+                <div class="mb-3">
+                    <p class="text-xs text-gray-500 font-semibold">Comentario en: <span class="text-gray-700">"${escapeHTML(postPreview)}"</span></p>
+                </div>
+                <p class="text-gray-800 font-medium mb-3">${escapeHTML(comment.content)}</p>
+                ${imageBlock}
+                <div class="text-sm text-gray-500 mt-3">${timeAgo}</div>
+            </div>
+        `;
     }
 }
 

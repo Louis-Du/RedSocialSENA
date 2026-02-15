@@ -73,6 +73,29 @@ class CommentService {
     }
 
     /**
+     * Obtiene todos los comentarios de un usuario
+     * @param {string} userId - ID del usuario
+     * @returns {Array}
+     */
+    getUserComments(userId) {
+        const allComments = [];
+        
+        // Iterar sobre todos los posts y recolectar comentarios del usuario
+        const posts = appState.getPosts();
+        posts.forEach(post => {
+            const postComments = appState.getComments(post.id);
+            const userPostComments = postComments.filter(c => c.userId === userId);
+            allComments.push(...userPostComments);
+        });
+        
+        // Enriquecer con info del post
+        return allComments.map(comment => ({
+            ...comment,
+            author: userService.getUserById(comment.userId) || {}
+        }));
+    }
+
+    /**
      * Obtiene el conteo de comentarios
      * @param {string} postId - ID de la publicación
      * @returns {number}

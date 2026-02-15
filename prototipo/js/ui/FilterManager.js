@@ -122,7 +122,6 @@ class FilterManager {
                 messageManager.success(`Mostrando ${filteredPosts.length} publicación${filteredPosts.length !== 1 ? 'es' : ''} con los filtros aplicados`);
             }
         } catch (error) {
-            console.error('Error al aplicar filtros:', error);
             messageManager.error('Error al aplicar los filtros');
         }
     }
@@ -152,7 +151,6 @@ class FilterManager {
 
             messageManager.success('Filtros limpios. Mostrando todas las publicaciones');
         } catch (error) {
-            console.error('Error al limpiar filtros:', error);
             messageManager.error('Error al limpiar los filtros');
         }
     }

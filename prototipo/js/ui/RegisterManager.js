@@ -242,6 +242,9 @@ class RegisterManager {
                 // Esperar antes de cambiar vista
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
+                // Forzar ocultar el registro antes de mostrar la app
+                document.getElementById('registerView')?.classList.add('hidden');
+
                 // Cambiar a vista de app
                 navigationManager.showView('app');
 

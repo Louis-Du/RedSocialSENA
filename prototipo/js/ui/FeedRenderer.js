@@ -20,6 +20,7 @@ class FeedRenderer {
     constructor() {
         this.currentUser = userService.getCurrentUser();
         this.feedContainer = document.getElementById('postsFeed');
+        this.postsUnsubscribe = null;
         this.setupEventDelegation();
     }
 
@@ -136,18 +137,43 @@ class FeedRenderer {
     }
 
     /**
-     * Renderiza el feed completo sin filtros
+     * Renderiza el feed completo con listener en tiempo real
      */
     async renderFullFeed() {
-        const posts = await postService.getPosts();
-        const enrichedPosts = posts.map(post => {
-            return {
-                ...post,
-                author: userService.getUserById(post.userId) || {},
-                commentCount: commentService.getCommentCount(post.id)
-            };
+        // Limpiar listener anterior si existe
+        if (this.postsUnsubscribe) {
+            this.postsUnsubscribe();
+        }
+
+        // Iniciar listener en tiempo real
+        this.postsUnsubscribe = postService.listenToPosts(async (error, posts) => {
+            if (error) {
+                messageManager.error('Error al cargar publicaciones');
+                console.error('Posts listener error:', error);
+                return;
+            }
+
+            // Enriquecer posts con autor (usando userService)
+            const enrichedPosts = await Promise.all(
+                posts.map(async (post) => ({
+                   ...post,
+                    author: await userService.getUserById(post.userId) || {},
+                    commentCount: 0 // TODO: implementar comentarios
+                }))
+            );
+
+            this.renderFeed(enrichedPosts);
         });
-        this.renderFeed(enrichedPosts);
+    }
+
+    /**
+     * Limpia listeners activos
+     */
+    cleanup() {
+        if (this.postsUnsubscribe) {
+            this.postsUnsubscribe();
+            this.postsUnsubscribe = null;
+        }
     }
 
     /**
@@ -336,19 +362,10 @@ class FeedRenderer {
                 return;
             }
 
-            // Re-renderizar el post para actualizar los votos
-            const post = postService.getPostById(postId);
-            if (post) {
-                const article = document.querySelector(`article[data-post-id="${postId}"]`);
-                if (article) {
-                    const newHTML = this.generatePostHTML(post);
-                    article.outerHTML = newHTML;
-                    if (window.loadLucideIcons) loadLucideIcons();
-                }
-            }
+            // El listener en tiempo real actualizará automáticamente el UI
+            messageManager.success('Voto registrado');
         } catch (error) {
-            console.error('Error al votar:', error);
-            messageManager.error('Erro al procesar el voto. Intenta novamente.');
+            messageManager.error('Error al procesar el voto. Intenta novamente.');
         } finally {
             btn.disabled = false;
             btn.style.opacity = '1';
@@ -374,19 +391,10 @@ class FeedRenderer {
                 return;
             }
 
-            // Re-renderizar el post para actualizar los votos
-            const post = postService.getPostById(postId);
-            if (post) {
-                const article = document.querySelector(`article[data-post-id="${postId}"]`);
-                if (article) {
-                    const newHTML = this.generatePostHTML(post);
-                    article.outerHTML = newHTML;
-                    if (window.loadLucideIcons) loadLucideIcons();
-                }
-            }
+            // El listener en tiempo real actualizará automáticamente el UI
+            messageManager.success('Voto registrado');
         } catch (error) {
-            console.error('Error al votar:', error);
-            messageManager.error('Erro al procesar el voto. Intenta novamente.');
+            messageManager.error('Error al procesar el voto. Intenta novamente.');
         } finally {
             btn.disabled = false;
             btn.style.opacity = '1';
@@ -431,9 +439,8 @@ class FeedRenderer {
             this.renderComments(postId);
 
             // Actualizar contador
-            const post = postService.getPostById(postId);
             const countEl = document.querySelector(`[data-post-id="${postId}"] .comment-count`);
-            if (countEl && post) {
+            if (countEl) {
                 const count = commentService.getCommentCount(postId);
                 countEl.textContent = `${count} comentario${count !== 1 ? 's' : ''}`;
             }
@@ -441,7 +448,6 @@ class FeedRenderer {
             messageManager.success('Comentario publicado correctamente');
         } catch (error) {
             messageManager.error('Error al publicar el comentario. Intenta de nuevo.');
-            console.error(error);
         }
     }
 

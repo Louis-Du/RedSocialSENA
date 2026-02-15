@@ -169,7 +169,6 @@ class PostManager {
      * @param {string} postId - ID del post
      */
     async handleEditPost(postId) {
-        // TODO: Implementar edición de posts
         messageManager.info('La edición de publicaciones se habilitara en la siguiente fase.');
     }
 }
