@@ -296,9 +296,6 @@ class ErrorHandler {
         } else {
             console.warn('⚠️ [WARNING]', logEntry);
         }
-
-        // TODO: Cuando haya backend, enviar a API de logging
-        // await fetch('/api/logs/error', { method: 'POST', body: JSON.stringify(logEntry) });
     }
 }
 

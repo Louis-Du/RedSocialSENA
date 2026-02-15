@@ -31,7 +31,6 @@ class ProfileManager {
                 // Validar que la vista está disponible antes de continuar
                 const editProfileView = document.getElementById('editProfileView');
                 if (!editProfileView || editProfileView.classList.contains('hidden')) {
-                    console.warn('Edit profile view not visible yet');
                     return;
                 }
                 
@@ -40,7 +39,7 @@ class ProfileManager {
                     this.loadProfile(params.userId);
                 }, 50);
             } catch (error) {
-                console.warn('Error al mostrar perfil:', error.message);
+                // Error silencioso - será manejado por el caso de vista no visible
             }
         });
     }
@@ -71,13 +70,11 @@ class ProfileManager {
             // Verify the view is visible and ready
             const editProfileView = document.getElementById('editProfileView');
             if (!editProfileView || editProfileView.classList.contains('hidden')) {
-                console.warn('Edit profile view not visible, skipping loadProfile');
                 return;
             }
             
             // Verify DOM elements are ready
             if (!document.querySelector('#content1')) {
-                console.warn('DOM elements not ready yet, skipping loadProfile');
                 return;
             }
             
@@ -90,7 +87,6 @@ class ProfileManager {
             // Load user posts
             this.loadUserPosts(this.viewedUserId);
         } catch (error) {
-            console.error('Error en loadProfile:', error);
             messageManager.error('Error al cargar perfil');
         }
     }
@@ -183,7 +179,6 @@ class ProfileManager {
 
         } catch (error) {
             messageManager.error('Error al procesar la imagen');
-            console.error(error);
         }
     }
 
@@ -204,7 +199,7 @@ class ProfileManager {
                 profilePicPreview.src = user.profilePicture;
             }
         } catch (error) {
-            console.warn('No se pudo cargar foto de perfil:', error.message);
+            // Error silencioso - foto puede no estar cargada
         }
         
         // === INFORMACIÓN GENERAL ===
@@ -236,7 +231,7 @@ class ProfileManager {
                 }
             }
         } catch (error) {
-            console.warn('No se pudo cargar información general:', error.message);
+            // Error silencioso - información general puede no estar disponible
         }
 
         // === CONTACTO ===
@@ -256,12 +251,10 @@ class ProfileManager {
             
             // Validar que el elemento existe, está en el DOM y es accesible
             if (!content2) {
-                console.warn('No se encontró content2 en el DOM');
                 return;
             }
             
             if (!content2.parentElement || !document.body.contains(content2)) {
-                console.warn('content2 no está conectado al DOM');
                 return;
             }
             
@@ -277,7 +270,7 @@ class ProfileManager {
                             : 'correo@soy.sena.edu.co';
                     inputs[0].setAttribute('readonly', 'readonly');
                 } catch (e) {
-                    console.warn('Error cargando email:', e.message);
+                    // Error silencioso al cargar email
                 }
             }
 
@@ -288,11 +281,11 @@ class ProfileManager {
                     inputs[1].setAttribute('data-field', 'telefono');
                     inputs[1].readOnly = !this.isOwnProfile;
                 } catch (e) {
-                    console.warn('Error cargando teléfono:', e.message);
+                    // Error silencioso al cargar teléfono
                 }
             }
         } catch (error) {
-            console.warn('No se pudo cargar información de contacto:', error.message);
+            // Error silencioso - información de contacto puede no estar disponible
         }
     }
 
@@ -306,12 +299,10 @@ class ProfileManager {
             
             // Validar que el elemento existe, está en el DOM y es accesible
             if (!content3) {
-                console.warn('No se encontró content3 en el DOM');
                 return;
             }
             
             if (!content3.parentElement || !document.body.contains(content3)) {
-                console.warn('content3 no está conectado al DOM');
                 return;
             }
             
@@ -324,7 +315,7 @@ class ProfileManager {
                     inputs[0].value = user.programa || 'Programa no definido';
                     inputs[0].setAttribute('readonly', 'readonly');
                 } catch (e) {
-                    console.warn('Error cargando programa:', e.message);
+                    // Error silencioso al cargar programa
                 }
             }
 
@@ -334,7 +325,7 @@ class ProfileManager {
                     inputs[1].value = user.trimestre || 'Sin trimestre definido';
                     inputs[1].setAttribute('readonly', 'readonly');
                 } catch (e) {
-                    console.warn('Error cargando trimestre:', e.message);
+                    // Error silencioso al cargar trimestre
                 }
             }
 
@@ -344,7 +335,7 @@ class ProfileManager {
                     inputs[2].value = user.regional || 'Regional no definida';
                     inputs[2].setAttribute('readonly', 'readonly');
                 } catch (e) {
-                    console.warn('Error cargando regional:', e.message);
+                    // Error silencioso al cargar regional
                 }
             }
 
@@ -354,7 +345,7 @@ class ProfileManager {
                     inputs[3].value = user.centro || 'Centro no definido';
                     inputs[3].setAttribute('readonly', 'readonly');
                 } catch (e) {
-                    console.warn('Error cargando centro:', e.message);
+                    // Error silencioso al cargar centro
                 }
             }
 
@@ -365,7 +356,7 @@ class ProfileManager {
                     selects[0].setAttribute('data-field', 'etapa');
                     selects[0].disabled = true;
                 } catch (e) {
-                    console.warn('Error cargando etapa:', e.message);
+                    // Error silencioso al cargar etapa
                 }
             }
 
@@ -376,11 +367,11 @@ class ProfileManager {
                     selects[1].setAttribute('data-field', 'modalidad');
                     selects[1].disabled = true;
                 } catch (e) {
-                    console.warn('Error cargando modalidad:', e.message);
+                    // Error silencioso al cargar modalidad
                 }
             }
         } catch (error) {
-            console.warn('No se pudo cargar información de formación:', error.message);
+            // Error silencioso - información de formación puede no estar disponible
         }
     }
 
@@ -418,8 +409,7 @@ class ProfileManager {
      */
     async loadUserPosts(userId) {
         const posts = await postService.getUserPosts(userId);
-        
-        // TODO: Renderizar publicaciones en una sección del perfil
+        // Publicaciones se renderizan en el feed principal
     }
 
     /**

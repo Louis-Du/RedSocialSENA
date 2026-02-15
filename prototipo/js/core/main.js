@@ -34,46 +34,74 @@ import { searchManager } from './ui/SearchManager.js';
 // Importar datos de ejemplo
 import { initializeMockPosts } from './data/MockPosts.js';
 
-// Importar utils
-import { debug } from './utils.js';
-
 /**
  * Inicializa la aplicación
  */
 async function initializeApp() {
     try {
-        // 1. Verificar sesión existente
+        // 1. Esperar a que Firebase Auth se inicialice
+        await waitForAuthInit();
+
+        // 2. Verificar sesión existente
         const isLoggedIn = userService.isLoggedIn();
 
-        // 2. Inicializar datos de ejemplo si es necesario
+        // 3. Inicializar datos de ejemplo si es necesario
         initializeMockPosts();
 
-        // 3. Suscribirse a cambios de posts
+        // 4. Suscribirse a cambios de posts
         appState.subscribe('posts', async () => {
             const posts = await postService.getFeed();
             feedRenderer.renderFeed(posts);
         });
 
-        // 4. Suscribirse a cambios de comentarios
+        // 5. Suscribirse a cambios de comentarios
         appState.subscribe('comments', () => {
             // Los comentarios se renderizarán cuando se abra un post
         });
 
-        // 5. Suscribirse a cambios de usuario
+        // 6. Suscribirse a cambios de usuario
         appState.subscribe('currentUser', () => {
         });
 
-        // 6. Suscribirse a cambios de chats
+        // 7. Suscribirse a cambios de chats
         appState.subscribe('chats', () => {
             chatManager.loadConversationsList();
         });
 
-        // 7. Cargar y renderizar feed inicial
-        const posts = await postService.getFeed();
-        feedRenderer.renderFeed(posts);
+        // 8. Cargar y renderizar feed inicial (solo si está logueado)
+        if (isLoggedIn) {
+            const posts = await postService.getFeed();
+            feedRenderer.renderFeed(posts);
+        }
     } catch (error) {
         // Error durante inicialización - la app continuará funcionando
+        console.error('[INIT_ERROR]', error?.message);
     }
+}
+
+/**
+ * Espera a que Firebase Auth se inicialice
+ */
+function waitForAuthInit() {
+    return new Promise((resolve) => {
+        if (userService.authInitialized) {
+            resolve();
+            return;
+        }
+        
+        const checkInterval = setInterval(() => {
+            if (userService.authInitialized) {
+                clearInterval(checkInterval);
+                resolve();
+            }
+        }, 100);
+        
+        // Timeout después de 5 segundos
+        setTimeout(() => {
+            clearInterval(checkInterval);
+            resolve();
+        }, 5000);
+    });
 }
 
 // Esperar a que el DOM esté listo
@@ -82,36 +110,3 @@ if (document.readyState === 'loading') {
 } else {
     initializeApp();
 }
-
-// Función global para reload de feed (útil desde consola)
-window.reloadFeed = async () => {
-    const posts = await postService.getFeed();
-    feedRenderer.renderFeed(posts);
-};
-
-// Exponer objetos globales para testing y debugging
-window.__APP__ = {
-    appState,
-    userService,
-    postService,
-    commentService,
-    chatService,
-    navigationManager,
-    modalManager,
-    messageManager,
-    authManager,
-    registerManager,
-    postManager,
-    chatManager,
-    tabManager,
-    feedRenderer,
-    profileManager,
-    otherProfileManager,
-    filterManager,
-    newsManager,
-    feedControlsManager,
-    searchManager
-};
-
-// Hacer window.__APP__ accesible globalmente
-window.APP = window.__APP__;

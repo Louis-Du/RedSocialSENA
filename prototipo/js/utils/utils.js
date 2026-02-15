@@ -178,8 +178,8 @@ export function isValidImageFile(file) {
  * @param {number} duration - Duración en ms
  */
 export function showNotification(message, type = 'info', duration = 3000) {
-    // TODO: Implementar sistema de notificaciones toast
-    // Por ahora usa MessageManager directamente desde los componentes
+    // Usa MessageManager en los componentes
+    // Esta función se mantiene para compatibilidad futura
 }
 
 // === DEBUG ===
