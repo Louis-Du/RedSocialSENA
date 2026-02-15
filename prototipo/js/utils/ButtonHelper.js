@@ -1,3 +1,10 @@
+export function enableButton(button) {
+    button.disabled = false;
+}
+
+export function disableButton(button) {
+    button.disabled = true;
+}
 /**
  * ButtonHelper - Helper para estados de botones
  * 

@@ -4,44 +4,13 @@
  * Sistema simplificado de autenticación usando Firebase Auth + Firestore
  */
 
-import { auth, db } from '../firebase-config.js';
-import { 
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { 
-    doc, 
-    getDoc, 
-    setDoc, 
-    updateDoc,
-    serverTimestamp
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 class UserService {
+
     constructor() {
         this.currentUserData = null;
         this.authInitialized = false;
-        this.setupAuthListener();
-    }
-
-    /**
-     * Configura listener de cambios de autenticación
-     */
-    setupAuthListener() {
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // Usuario autenticado - cargar datos de Firestore
-                const userData = await this.getUserById(user.uid);
-                this.currentUserData = userData;
-                this.authInitialized = true;
-            } else {
-                // Usuario no autenticado
-                this.currentUserData = null;
-                this.authInitialized = true;
-            }
-        });
+        // TODO: Implementar lógica de usuario local/mock
     }
 
     /**
@@ -55,26 +24,12 @@ class UserService {
      * Login con Firebase Auth
      */
     async login(tipoDoc, documento, password) {
-        try {
-            const email = this._documentoToEmail(tipoDoc, documento);
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            
-            const userData = await this.getUserById(userCredential.user.uid);
-            this.currentUserData = userData;
-
-            return {
-                success: true,
-                user: userData,
-                message: 'Bienvenido(a)'
-            };
-        } catch (error) {
-            console.error('Login error:', error);
-            return {
-                success: false,
-                error: 'Credenciales incorrectas',
-                user: null
-            };
-        }
+        // TODO: Implementar login local/mock
+        return {
+            success: true,
+            user: { tipoDoc, documento, nombre: 'Usuario Demo' },
+            message: 'Bienvenido(a) (demo)'
+        };
     }
 
     /**

@@ -1,3 +1,7 @@
+export function validateForm(formData) {
+    // Lógica de validación simulada
+    return true;
+}
 /**
  * FormValidator - Validación en tiempo real de formularios
  * 

@@ -18,29 +18,7 @@
  *   - updatedAt: timestamp
  */
 
-import { auth, db, storage } from '../firebase-config.js';
-import { 
-    collection, 
-    addDoc, 
-    doc, 
-    getDoc,
-    getDocs,
-    updateDoc, 
-    deleteDoc, 
-    query, 
-    where,
-    orderBy, 
-    onSnapshot,
-    serverTimestamp,
-    arrayUnion,
-    arrayRemove,
-    increment
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { 
-    ref, 
-    uploadBytes, 
-    getDownloadURL 
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+// ...existing code...
 import { isValidText, isValidImageFile } from '../utils.js';
 import { userService } from './UserService.js';
 import { commentService } from './CommentService.js';
@@ -50,30 +28,9 @@ class PostService {
         this.activeListeners = new Map();
     }
 
-    /**
-     * Obtiene el usuario actual
-     * @private
-     */
-    _getCurrentUser() {
-        return auth.currentUser;
-    }
+    // Lógica de frontend para posts (sin backend)
+    // TODO: Implementar almacenamiento local o mock para posts
 
-    /**
-     * Valida archivo de imagen
-     * @private
-     */
-    _isValidImageFile(file) {
-        if (!file) return false;
-        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        return validTypes.includes(file.type) && file.size <= maxSize;
-    }
-    /**
-     * Crea una nueva publicación en Firestore
-     * @param {string} content - Contenido de la publicación
-     * @param {File|null} imageFile - Archivo de imagen
-     * @returns {Promise<Object>}
-     */
     async createPost(content, imageFile = null) {
         try {
             const user = this._getCurrentUser();

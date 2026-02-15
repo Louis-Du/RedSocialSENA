@@ -1,3 +1,7 @@
+export function renderComponent(componentName, props) {
+    // Renderiza un componente simulado
+    return `<div>${componentName}</div>`;
+}
 /**
  * UIComponents - Componentes UI reutilizables
  * 

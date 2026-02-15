@@ -6,33 +6,33 @@
  */
 
 // Importar AppState
-import { appState } from './AppState.js';
+import { appState } from '../core/AppState.js';
 
 // Importar servicios
-import { userService } from './services/UserService.js';
-import { postService } from './services/PostService.js';
-import { commentService } from './services/CommentService.js';
-import { chatService } from './services/ChatService.js';
+import { userService } from '../services/UserService.js';
+import { postService } from '../services/PostService.js';
+import { commentService } from '../services/CommentService.js';
+import { chatService } from '../services/ChatService.js';
 
 // Importar gestores de UI
-import { navigationManager } from './ui/NavigationManager.js';
-import { modalManager } from './ui/ModalManager.js';
-import { messageManager } from './ui/MessageManager.js';
-import { authManager } from './ui/AuthManager.js';
-import { registerManager } from './ui/RegisterManager.js';
-import { postManager } from './ui/PostManager.js';
-import { chatManager } from './ui/ChatManager.js';
-import { tabManager } from './ui/TabManager.js';
-import { feedRenderer } from './ui/FeedRenderer.js';
-import { profileManager } from './ui/ProfileManager.js';
-import { otherProfileManager } from './ui/OtherProfileManager.js';
-import { filterManager } from './ui/FilterManager.js';
-import { newsManager } from './ui/NewsManager.js';
-import { feedControlsManager } from './ui/FeedControlsManager.js';
-import { searchManager } from './ui/SearchManager.js';
+import { navigationManager } from '../ui/NavigationManager.js';
+import { modalManager } from '../ui/ModalManager.js';
+import { messageManager } from '../ui/MessageManager.js';
+import { authManager } from '../ui/AuthManager.js';
+import { registerManager } from '../ui/RegisterManager.js';
+import { postManager } from '../ui/PostManager.js';
+import { chatManager } from '../ui/ChatManager.js';
+import { tabManager } from '../ui/TabManager.js';
+import { feedRenderer } from '../ui/FeedRenderer.js';
+import { profileManager } from '../ui/ProfileManager.js';
+import { otherProfileManager } from '../ui/OtherProfileManager.js';
+import { filterManager } from '../ui/FilterManager.js';
+import { newsManager } from '../ui/NewsManager.js';
+import { feedControlsManager } from '../ui/FeedControlsManager.js';
+import { searchManager } from '../ui/SearchManager.js';
 
 // Importar datos de ejemplo
-import { initializeMockPosts } from './data/MockPosts.js';
+import { initializeMockPosts } from '../data/MockPosts.js';
 
 /**
  * Inicializa la aplicación

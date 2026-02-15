@@ -14,7 +14,7 @@
  * 3. La UI no cambiará
  */
 
-import { getFromStorage, saveToStorage, removeFromStorage, generateId, isValidText } from './utils.js';
+import { getFromStorage, saveToStorage, removeFromStorage, generateId, isValidText } from '../utils/utils.js';
 
 class AppState {
     constructor() {
