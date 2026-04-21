@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Aprendices SENA - Red Social</title>
+
+    <link rel="stylesheet" href="assets/css/tailwind.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+
+    <script>
+        // === FUNCIONES GLOBALES AUXILIARES ===
+        // Estos helpers se usan antes de que los módulos carguen
+        function loadLucideIcons() {
+                setTimeout(() => {
+                        if (window.lucide) {
+                                lucide.createIcons();
+                        }
+                }, 50);
+        }
+
+        window.loadLucideIcons = loadLucideIcons;
+    </script>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body class="min-h-screen bg-sena-fondo">
+  <div id="viewMount-login"></div>
+  <div id="viewMount-register"></div>
+  <div id="viewMount-feed"></div>
+  <div id="viewMount-profile"></div>
+  <div id="viewMount-chat"></div>
+
+    <!-- Cargar primero Lucide antes que nuestros módulos -->
+  <script src="vendor/lucide.min.js"></script>
+
+    <!-- Cargar vistas y luego inicializar aplicación -->
+  <script type="module" src="core/bootstrap.js"></script>
+
+    <!-- Modal Crear Publicación (moved from head to end of body) -->
+  <div id="createPostModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative">
+          <button id="closePostModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+              <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+          <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Crear Nueva Publicación</h2>
+
+          <form id="newPostForm" class="space-y-6">
+              <div>
+                  <textarea id="postContent" class="w-full h-32 px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-300 focus:border-sena-verde focus:outline-none transition-colors resize-none" placeholder="¿Qué quieres compartir con los aprendices?"></textarea>
+              </div>
+
+              <div class="flex items-center gap-3">
+                  <label for="postImageUpload" class="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-xl transition-colors flex items-center gap-2 cursor-pointer">
+                      <i data-lucide="image" class="w-6 h-6"></i>
+                      <span>Subir Imagen</span>
+                  </label>
+                  <input type="file" id="postImageUpload" class="hidden" accept="image/*">
+                  <span id="imageFileName" class="text-gray-600 text-sm flex-1 truncate">Ningún archivo seleccionado</span>
+              </div>
+
+              <!-- Vista previa de imagen -->
+              <div id="imagePreviewContainer" class="hidden">
+                  <img id="postImagePreview" class="w-full h-64 object-cover rounded-xl border-2 border-gray-300" alt="Vista previa de imagen">
+                  <button type="button" id="removeImageBtn" class="mt-2 text-red-600 hover:text-red-800 text-sm font-semibold">
+                      ✕ Remover imagen
+                  </button>
+              </div>
+
+              <div class="flex justify-end gap-4">
+                  <button type="button" id="cancelPostBtn" class="px-6 py-3 bg-gray-200 text-gray-800 rounded-xl font-semibold hover:bg-gray-300 transition-colors">
+                      Cancelar
+                  </button>
+                  <button type="submit" class="px-6 py-3 bg-sena-verde text-white rounded-xl font-bold shadow-lg hover:bg-green-700 transition-colors">
+                      Publicar
+                  </button>
+              </div>
+          </form>
+      </div>
+  </div>
+
+
+</body>
+</html>

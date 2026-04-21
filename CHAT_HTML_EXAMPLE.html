@@ -1,0 +1,440 @@
+<!--
+  EJEMPLO DE INTEGRACIÓN - Sistema de Chat Firebase
+  
+  Este archivo muestra cómo integrar el nuevo sistema de chat
+  en la estructura HTML existente de la red social.
+  
+  Fecha: 13 de febrero de 2026
+-->
+
+<!-- ESTRUCTURA HTML NECESARIA para chats (adaptado a tu diseño actual) -->
+
+<!-- ============================================================
+     1. DESKTOP - AREA DE CHATS (MAIN VIEW)
+     ============================================================ -->
+
+<div id="chatSection" class="flex gap-0 h-[calc(100vh-120px)] bg-white">
+  
+  <!-- Panel izquierdo: Lista de chats -->
+  <aside id="chatListAside" class="w-80 border-r border-gray-200 flex flex-col">
+    
+    <!-- Header de chats -->
+    <div class="p-4 border-b border-gray-200">
+      <h2 class="text-xl font-bold text-gray-900">Mensajes</h2>
+      <button id="newChatBtn" class="mt-3 w-full px-4 py-2 bg-sena-verde text-white rounded-lg hover:bg-green-700 transition">
+        + Nuevo Chat
+      </button>
+    </div>
+    
+    <!-- Lista de chats (scrolleable) -->
+    <ul class="chat-list flex-1 overflow-y-auto">
+      <!-- Se renderiza dinámicamente desde JavaScript -->
+      <li class="p-6 text-center text-gray-500">
+        <p>Cargando chats...</p>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Panel derecho: Chat activo -->
+  <div id="activeChatArea" class="flex-1 flex flex-col">
+    
+    <!-- Header del chat actual -->
+    <div class="p-4 border-b border-gray-200 bg-white">
+      <h2 class="text-lg font-semibold text-gray-900">Selecciona un chat</h2>
+      <p class="text-sm text-gray-500">Elige una conversación para comenzar</p>
+    </div>
+    
+    <!-- Area de mensajes (scrolleable) -->
+    <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-3">
+      <!-- Se renderizan dinámicamente -->
+      <div class="text-center text-gray-500 py-8">
+        No hay mensajes aún
+      </div>
+    </div>
+    
+    <!-- Area de envío de mensajes -->
+    <div class="border-t border-gray-200 bg-gray-100 p-4">
+      
+      <!-- Preview de imagen (si existe) -->
+      <div id="chatImagePreview-desktop" style="display: none;" class="mb-3">
+        <!-- Se renderiza cuando se selecciona imagen -->
+      </div>
+      
+      <!-- Formulario de envío -->
+      <div class="flex gap-2">
+        
+        <!-- Input de texto (multiline) -->
+        <textarea 
+          id="chatInput"
+          class="flex-1 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-sena-verde"
+          placeholder="Escribe un mensaje..."
+          rows="2"
+        ></textarea>
+        
+        <!-- Botón adjuntar imagen -->
+        <button id="attachImageBtn" class="px-4 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition" title="Adjuntar imagen">
+          📎
+        </button>
+        
+        <!-- Input file (oculto) -->
+        <input 
+          id="chatImageDesktop"
+          type="file"
+          accept="image/*"
+          style="display: none;"
+        />
+        
+        <!-- Botón enviar -->
+        <button 
+          id="sendChatBtn"
+          class="px-6 py-3 bg-sena-verde text-white rounded-lg hover:bg-green-700 transition font-semibold"
+        >
+          Enviar
+        </button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     2. MOBILE - VISTA DE CONVERSACIÓN
+     ============================================================ -->
+
+<!-- Mostrar solo en mobile (<768px) o cuando está hidden -->
+<div id="mobileConversationView" class="hidden md:hidden fixed inset-0 bg-white z-40 flex flex-col">
+  
+  <!-- Header mobile -->
+  <div class="bg-sena-verde text-white p-4 flex items-center justify-between">
+    <button id="backToChatList" class="text-2xl">← Volver</button>
+    <h2 id="mobileConversationTitle" class="font-semibold">Chat</h2>
+    <div class="w-8"></div> <!-- Spacer -->
+  </div>
+  
+  <!-- Mensajes mobile -->
+  <div id="messagesContainerMobile" class="flex-1 overflow-y-auto p-4 space-y-3">
+    <!-- Se renderizan dinámicamente -->
+  </div>
+  
+  <!-- Envío mobile -->
+  <div class="border-t border-gray-200 bg-gray-100 p-4">
+    
+    <div id="chatImagePreview-mobile" style="display: none;" class="mb-3">
+      <!-- Preview de imagen -->
+    </div>
+    
+    <div class="flex gap-2">
+      <textarea 
+        id="chatInputMobile"
+        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg resize-none text-sm"
+        placeholder="Mensaje..."
+        rows="2"
+      ></textarea>
+      
+      <input id="chatImageMobile" type="file" accept="image/*" style="display: none;" />
+      
+      <button id="attachImageBtnMobile" class="px-3 py-2 bg-gray-300 rounded-lg text-sm">📎</button>
+      
+      <button 
+        id="sendChatBtnMobile"
+        class="px-4 py-2 bg-sena-verde text-white rounded-lg text-sm font-semibold"
+      >
+        Enviar
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     3. MODAL - CREAR NUEVO CHAT
+     ============================================================ -->
+
+<div id="newChatModal" style="display: none;" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+  
+  <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+    
+    <h3 class="text-xl font-bold mb-4">Nuevo Chat</h3>
+    
+    <!-- Tabs: Privado vs Grupo -->
+    <div class="flex gap-4 mb-4 border-b">
+      <button class="tab-btn active pb-2 border-b-2 border-sena-verde text-sena-verde font-semibold" data-tab="private">
+        Privado
+      </button>
+      <button class="tab-btn pb-2 text-gray-600 hover:text-gray-900" data-tab="group">
+        Grupo
+      </button>
+    </div>
+    
+    <!-- Tab: Chat Privado -->
+    <div id="tab-private" class="tab-content">
+      <label class="block text-sm font-semibold mb-2">Seleccionar usuario:</label>
+      <div class="space-y-2 max-h-60 overflow-y-auto">
+        <!-- Se popula dinámicamente con lista de usuarios -->
+        <div class="p-3 border rounded hover:bg-gray-50 cursor-pointer user-option" data-user-id="user1">
+          <p class="font-medium">Juan Pérez</p>
+          <p class="text-xs text-gray-500">@juan_perez</p>
+        </div>
+        <div class="p-3 border rounded hover:bg-gray-50 cursor-pointer user-option" data-user-id="user2">
+          <p class="font-medium">María García</p>
+          <p class="text-xs text-gray-500">@maria.garcia</p>
+        </div>
+      </div>
+      <button id="createPrivateChatBtn" class="w-full mt-4 px-4 py-2 bg-sena-verde text-white rounded-lg hover:bg-green-700" disabled>
+        Iniciar Chat
+      </button>
+    </div>
+    
+    <!-- Tab: Chat Grupal -->
+    <div id="tab-group" class="tab-content hidden">
+      <label class="block text-sm font-semibold mb-2">Nombre del grupo:</label>
+      <input 
+        id="groupNameInput"
+        type="text"
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4"
+        placeholder="Ej: Proyecto Web"
+      >
+      
+      <label class="block text-sm font-semibold mb-2">Seleccionar miembros:</label>
+      <div class="space-y-2 max-h-60 overflow-y-auto mb-4">
+        <label class="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+          <input type="checkbox" class="group-member-checkbox" data-user-id="user1">
+          <div>
+            <p class="font-medium">Juan Pérez</p>
+            <p class="text-xs text-gray-500">@juan_perez</p>
+          </div>
+        </label>
+        <label class="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+          <input type="checkbox" class="group-member-checkbox" data-user-id="user2">
+          <div>
+            <p class="font-medium">María García</p>
+            <p class="text-xs text-gray-500">@maria.garcia</p>
+          </div>
+        </label>
+      </div>
+      
+      <button id="createGroupChatBtn" class="w-full px-4 py-2 bg-sena-verde text-white rounded-lg hover:bg-green-700" disabled>
+        Crear Grupo
+      </button>
+    </div>
+    
+    <!-- Botón cerrar modal -->
+    <button id="closeModalBtn" class="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-700">
+      ✕
+    </button>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     4. ESTILOS CSS ADICIONALES (Tailwind ya incluido)
+     ============================================================ -->
+
+<style>
+  /* Burbujas de mensaje */
+  .bubble-self {
+    @apply bg-sena-verde text-white rounded-tl-3xl rounded-bl-3xl rounded-br-lg;
+  }
+  
+  .bubble-other {
+    @apply bg-gray-100 text-gray-900 rounded-tr-3xl rounded-br-3xl rounded-bl-lg;
+  }
+  
+  /* Animación de escribiendo */
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .animate-bounce {
+    animation: bounce 1s infinite;
+  }
+  
+  /* Scroll area */
+  #messagesContainer::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  #messagesContainer::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  #messagesContainer::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+  
+  #messagesContainer::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    #chatListAside {
+      display: none;
+    }
+    
+    #mobileConversationView {
+      display: flex;
+    }
+  }
+</style>
+
+
+<!-- ============================================================
+     5. INICIALIZACIÓN JAVASCRIPT
+     ============================================================ -->
+
+<script type="module">
+  import { chatManager } from './prototipo/js/ui/ChatManager.js';
+  import { chatService } from './prototipo/js/services/ChatService.js';
+  import { messageManager } from './prototipo/js/ui/MessageManager.js';
+  import { userService } from './prototipo/js/services/UserService.js';
+
+  // ========== MODAL CONTROL ==========
+  
+  const newChatBtn = document.getElementById('newChatBtn');
+  const newChatModal = document.getElementById('newChatModal');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  newChatBtn.addEventListener('click', () => {
+    newChatModal.style.display = 'flex';
+  });
+  
+  closeModalBtn.addEventListener('click', () => {
+    newChatModal.style.display = 'none';
+  });
+  
+  newChatModal.addEventListener('click', (e) => {
+    if (e.target === newChatModal) {
+      newChatModal.style.display = 'none';
+    }
+  });
+  
+  // Tab switching
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => {
+        b.classList.remove('active', 'border-b-2', 'border-sena-verde', 'text-sena-verde');
+        b.classList.add('text-gray-600');
+      });
+      btn.classList.add('active', 'border-b-2', 'border-sena-verde', 'text-sena-verde');
+      btn.classList.remove('text-gray-600');
+      
+      const tab = btn.dataset.tab;
+      tabContents.forEach(content => {
+        content.classList.add('hidden');
+      });
+      document.getElementById(`tab-${tab}`).classList.remove('hidden');
+    });
+  });
+  
+  // ========== CHAT PRIVADO ==========
+  
+  let selectedPrivateUserId = null;
+  
+  document.querySelectorAll('.user-option').forEach(option => {
+    option.addEventListener('click', () => {
+      document.querySelectorAll('.user-option').forEach(o => o.classList.remove('bg-sena-verde', 'text-white'));
+      option.classList.add('bg-sena-verde', 'text-white');
+      selectedPrivateUserId = option.dataset.userId;
+      document.getElementById('createPrivateChatBtn').disabled = false;
+    });
+  });
+  
+  document.getElementById('createPrivateChatBtn').addEventListener('click', async () => {
+    try {
+      const chatId = await chatService.createPrivateChat(selectedPrivateUserId);
+      await chatManager.openChat(chatId);
+      newChatModal.style.display = 'none';
+      messageManager.success('Chat abierto');
+    } catch (error) {
+      messageManager.error('Error: ' + error.message);
+    }
+  });
+  
+  // ========== CHAT GRUPAL ==========
+  
+  let selectedGroupMembers = new Set();
+  
+  document.querySelectorAll('.group-member-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        selectedGroupMembers.add(checkbox.dataset.userId);
+      } else {
+        selectedGroupMembers.delete(checkbox.dataset.userId);
+      }
+      document.getElementById('createGroupChatBtn').disabled = selectedGroupMembers.size === 0;
+    });
+  });
+  
+  document.getElementById('createGroupChatBtn').addEventListener('click', async () => {
+    const groupName = document.getElementById('groupNameInput').value.trim();
+    
+    if (!groupName) {
+      messageManager.error('Ingresa un nombre para el grupo');
+      return;
+    }
+    
+    try {
+      const chatId = await chatService.createGroupChat(
+        groupName,
+        Array.from(selectedGroupMembers)
+      );
+      await chatManager.openChat(chatId);
+      newChatModal.style.display = 'none';
+      messageManager.success('Grupo creado');
+      
+      // Reset
+      document.getElementById('groupNameInput').value = '';
+      selectedGroupMembers.clear();
+      document.querySelectorAll('.group-member-checkbox').forEach(cb => cb.checked = false);
+    } catch (error) {
+      messageManager.error('Error: ' + error.message);
+    }
+  });
+  
+  // ========== IMAGEN HANDLER ==========
+  
+  document.getElementById('attachImageBtn').addEventListener('click', () => {
+    document.getElementById('chatImageDesktop').click();
+  });
+  
+  document.getElementById('attachImageBtnMobile').addEventListener('click', () => {
+    document.getElementById('chatImageMobile').click();
+  });
+  
+  // ========== LIMPIEZA AL DESMONTAR ==========
+  
+  window.addEventListener('beforeunload', () => {
+    chatManager.destroy();
+    chatService.cleanup();
+  });
+  
+  console.log('✅ Sistema de Chat Firebase inicializado');
+</script>
+
+<!--
+  NOTAS:
+  
+  1. Este es un ejemplo ADAPTADO a tu diseño. Ajusta colores/IDs según tu HTML
+  
+  2. Incluye los imports de:
+     - ChatManager (ya inicializado)
+     - ChatService (funciones auxiliares)
+     - MessageManager (feedback)
+  
+  3. Modal: Mostrado/ocultado con display
+  
+  4. Responsive automático con Tailwind
+  
+  5. Eventos del formulario integrados
+  
+  6. Limpieza de listeners al salir
+  
+  7. Los mensajes se renderizan automáticamente
+     desde ChatManager (usa onSnapshot)
+-->

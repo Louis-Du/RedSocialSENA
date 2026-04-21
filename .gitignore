@@ -48,6 +48,39 @@ logs/
 
 # If you ever add build artifacts or compiled assets
 *.min.js
+
+# Firestore security rules (solo referencia local, no subir)
+FIRESTORE_RULES.js
+
+# ═══════════════════════════════════════════════════════════
+# 🔐 CREDENCIALES Y ARCHIVOS SENSIBLES - NUNCA COMMITEAR
+# ═══════════════════════════════════════════════════════════
+
+# Firebase credentials
+prototipo/js/firebase-config.js
+!prototipo/js/firebase-config.example.js
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+env.js
+config.secret.js
+
+# API keys and secrets
+*secret*
+*credentials*
+*token*
+*.key
+*.pem
+
+# Local testing files with real data
+test-credentials.js
+local-config.js
+
+# 🛡️ Si alguien extrañamente commitea credenciales, ejecutar:
+# git filter-branch --tree-filter 'git rm -f prototipo/js/firebase-config.js' HEAD
+# (SOLO en caso de emergencia - destrúye commits anteriores)
 *.map
 
 # Secrets/local env

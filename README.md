@@ -8,17 +8,14 @@ Sitio público (prototipo): https://louis-du.github.io/RedSocialSENA/
 
 ---
 
-## Índice
+## Índice de Contenido
 
-- [Descripción](#descripción)  
-- [Prototipo (diseño y mockups)](#prototipo-diseño-y-mockups)  
-- [Características principales](#características-principales)  
-- [Cómo ver el prototipo localmente](#cómo-ver-el-prototipo-localmente)  
-- [Despliegue (GitHub Pages)](#despliegue-github-pages)  
-- [Contribuir](#contribuir)  
-- [Documentación y recursos](#documentación-y-recursos)  
-- [Autores y contacto](#autores-y-contacto)  
-- [Licencia](#licencia)
+- [Características](#características-principales)
+- [Estructura](#-estructura-del-proyecto)
+- [Inicio Rápido](#-inicio-rápido)
+- [Documentación](#-documentación)
+- [Arquitectura](#-arquitectura)
+- [Tecnologías](#-tecnologías)
 
 ---
 
@@ -28,59 +25,118 @@ Red Social para Aprendices del SENA es una aplicación dirigida a la comunidad S
 
 ---
 
-## Prototipo (diseño y mockups)
+## 🏗️ Estructura del Proyecto
 
-El repositorio incluye un prototipo visual estático (HTML + CSS + JS) con pantallas de login, feed, noticias, perfil, edición y chat.
-
-- Carpeta del prototipo: https://github.com/Louis-Du/RedSocialSENA/tree/main/prototipo  
-- Archivo principal del prototipo: https://github.com/Louis-Du/RedSocialSENA/blob/main/prototipo/index.html
-
-Contenido clave:
-- Diseño responsive con Tailwind.
-- Recursos en `prototipo/assets/`.
-- Script para convertir imágenes: `prototipo/scripts/convert_images.py`.
-
----
-
-## Documentación y recursos
-
-### 📂 [documents/](https://github.com/Louis-Du/RedSocialSENA/tree/main/documents)
-Documentación completa del proyecto organizada en las siguientes carpetas:
-
-- **[academico/](https://github.com/Louis-Du/RedSocialSENA/tree/main/documents/academico)** - Documentos académicos incluyendo el póster para Tecnova 2025 y la justificación del proyecto.
-
-- **[requisitos/](https://github.com/Louis-Du/RedSocialSENA/tree/main/documents/requisitos)** - Especificaciones y requisitos del sistema, incluyendo historias de usuario mejoradas.
-
-- **[sqa/](https://github.com/Louis-Du/RedSocialSENA/tree/main/documents/sqa)** - Aseguramiento de calidad del software (Software Quality Assurance) con planes de evaluación, listas de chequeo e informes de calidad.
-
-- **[pruebas/](https://github.com/Louis-Du/RedSocialSENA/tree/main/documents/pruebas)** - Documentación relacionada con las pruebas del sistema.
-
-### 🎨 [prototipo/](https://github.com/Louis-Du/RedSocialSENA/tree/main/prototipo)
-Prototipo visual del proyecto con diseño responsive:
-
-- **[assets/](https://github.com/Louis-Du/RedSocialSENA/tree/main/prototipo/assets)** - Recursos estáticos que incluyen estilos CSS, scripts JavaScript, imágenes de noticias en formato PNG y WebP, además de los logos y firma digital del SENA.
-
-- **[scripts/](https://github.com/Louis-Du/RedSocialSENA/tree/main/prototipo/scripts)** - Scripts de utilidad como el convertidor de imágenes (convert_images.py).
+```
+/
+├── src/                    # 🔵 Código fuente de la aplicación
+│   ├── core/              # bootstrap.js, main.js - inicialización
+│   ├── services/          # Servicios (auth, posts, chat) + repositorios
+│   ├── state/             # Estado global (Redux-like)
+│   ├── ui/                # Componentes y managers de interfaz
+│   ├── utils/             # Utilidades y helpers
+│   ├── assets/            # CSS, imágenes, iconos
+│   └── index.html         # Punto de entrada
+│
+├── docs/                  # 📖 Documentación completa
+│   ├── guides/            # Guías de inicio rápido
+│   ├── examples/          # Ejemplos de código
+│   ├── tools/             # Herramientas de debugging
+│   ├── firebase/          # Documentación Firebase
+│   └── troubleshooting/   # Solución de problemas
+│
+├── firebase/              # 🔐 Configuración y reglas Firebase
+├── scripts/               # 🛠️  Scripts de desarrollo y deployment
+└── package.json           # Dependencias del proyecto
+```
 
 ---
 
-## Contribuir
+## 🚀 Inicio Rápido
 
-1. Haz fork del repositorio.  
-2. Crea una rama descriptiva:
-   ```bash
-   git checkout -b feat/nombre-funcionalidad
-   ```
-3. Realiza cambios y agrega tests/ documentación si aplica.  
-4. Abre un Pull Request indicando la motivación y los cambios realizados.
+### 1. Clonar y entrar al proyecto
 
->[Sugerencias]
->- Añadir `CONTRIBUTING.md` con normas de estilo, formato de commits y proceso de PR.
->- Añadir plantillas: ISSUE_TEMPLATE y PULL_REQUEST_TEMPLATE.
+```bash
+git clone https://github.com/Louis-Du/RedSocialSENA.git
+cd RedSocialSENA
+```
+
+### 2. Instalar dependencias
+
+```bash
+npm install
+```
+
+### 3. Ejecutar servidor
+
+**Local (solo tu PC):**
+```bash
+python3 -m http.server 8080 --bind 127.0.0.1 --directory src
+```
+
+**Red (múltiples dispositivos en WiFi):**
+```bash
+python3 -m http.server 8080 --bind 0.0.0.0 --directory src
+```
+
+### 4. Abrir en navegador
+
+```
+http://localhost:8080/index.html
+```
 
 ---
 
-## Autores y contacto
+## 📚 Documentación
+
+- **[⚡ Inicio en 5 minutos](./docs/guides/INICIO_RAPIDO.md)** - Guía rápida
+- **[📘 Guía completa](./docs/guides/GUIA_EJECUCION_FIREBASE.md)** - Todo sobre Firebase, testing, deployment
+- **[🗺️ Índice](./docs/guides/INDICE_DOCUMENTACION.md)** - Navega toda la documentación
+- **[🧪 Plan de pruebas](./docs/guides/PLAN_PRUEBAS_FIREBASE.md)** - Validación
+- **[🔧 Troubleshooting](./docs/troubleshooting/COMANDOS_Y_TROUBLESHOOTING.md)** - Errores comunes
+
+---
+
+## ✨ Características Principales
+
+- 📝 **Publicaciones** - Crea y comparte posts
+- 💬 **Chat en tiempo real** - Mensajería privada y grupal
+- ❤️ **Likes y comentarios** - Interactúa con contenido
+- 👤 **Perfiles personalizables** - Información personal y académica
+- 📰 **Noticias** - Acceso a noticias del SENA
+- 📱 **Responsive** - Optimizado para móvil
+- 🔐 **Autenticación segura** - Login con documento
+
+---
+
+## 🏛️ Arquitectura
+
+**Capas:**
+```
+UI (Managers, Renderers)
+    ↓
+Services (Lógica de negocio)
+    ↓
+Repository (Source selector: local/Firebase)
+    ↓
+State (Redux-like)
+    ↓
+Data Sources (LocalStorage / Firebase)
+```
+
+---
+
+## 📦 Tecnologías
+
+- **Frontend**: Vanilla JavaScript (ES Modules)
+- **Estilos**: Tailwind CSS 3.4+
+- **Backend Opcional**: Firebase (Auth, Firestore, Storage)
+- **Iconos**: Lucide Icons
+- **Compatibilidad**: LocalStorage (fallback sin Firebase)
+
+---
+
+## 🤝 Autores y Contacto
 
 Equipo:
 - Luis Alberto Dueñas Franco  
