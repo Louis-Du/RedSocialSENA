@@ -2,7 +2,7 @@ import { postRepository } from './postRepository.js';
 import { postState } from './postState.js';
 import { userService } from '../UserService.js';
 import { commentService } from '../CommentService.js';
-import { isValidText } from '../../utils.js';
+import { isValidText } from '../../utils/utils.js';
 
 class PostService {
     async initialize() {

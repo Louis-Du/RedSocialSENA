@@ -17,7 +17,7 @@
 
 import { chatService } from './chatService.js';
 import { userService } from './userService.js';
-import { escapeHTML, formatTime } from '../utils.js';
+import { escapeHTML, formatTime } from '../utils/utils.js';
 import { messageManager } from '../common/MessageManager.js';
 
 class ChatManager {

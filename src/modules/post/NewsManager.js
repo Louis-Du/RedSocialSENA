@@ -16,8 +16,8 @@ import {
     sortNewsByReads,
     getNewsByCategory 
 } from '../data/MockNews.js';
-import { escapeHTML } from '../utils.js';
-import { messageManager } from './MessageManager.js';
+import { escapeHTML } from '../utils/utils.js';
+import { messageManager } from '../common/MessageManager.js';
 
 class NewsManager {
     constructor() {

@@ -10,7 +10,7 @@
 
 import { postService } from './postService.js';
 import { modalManager } from './ModalManager.js';
-import { messageManager } from './MessageManager.js';
+import { messageManager } from '../common/MessageManager.js';
 import { formValidator } from '../utils/FormValidator.js';
 import { buttonHelper } from '../utils/ButtonHelper.js';
 

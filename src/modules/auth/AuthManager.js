@@ -11,7 +11,7 @@
 
 import { userService } from './userService.js';
 import { navigationManager } from './NavigationManager.js';
-import { messageManager } from './MessageManager.js';
+import { messageManager } from '../common/MessageManager.js';
 import { formValidator } from '../utils/FormValidator.js';
 import { buttonHelper } from '../utils/ButtonHelper.js';
 
