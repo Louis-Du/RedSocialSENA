@@ -9,9 +9,9 @@
  */
 
 import { postState } from './postState.js';
-import { userService } from './userService.js';
-import { getNewsById, getAllNews } from '../data/MockNews.js';
-import { escapeHTML } from '../utils/utils.js';
+import { userService } from '../auth/userService.js';
+import { getNewsById, getAllNews } from './MockNews.js';
+import { escapeHTML } from '../../utils/utils.js';
 
 class SearchManager {
     constructor() {

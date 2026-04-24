@@ -8,13 +8,13 @@
  * - Escuchar eventos de cambios de estado
  */
 
-import { escapeHTML, formatTime } from '../utils/utils.js';
+import { escapeHTML, formatTime } from '../../utils/utils.js';
 import { postService } from './postService.js';
 import { commentService } from './CommentService.js';
-import { userService } from './userService.js';
+import { userService } from '../auth/userService.js';
 import { messageManager } from '../common/MessageManager.js';
-import { uiComponents } from '../utils/UIComponents.js';
-import { navigationManager } from './NavigationManager.js';
+import { uiComponents } from '../../utils/UIComponents.js';
+import { navigationManager } from '../common/NavigationManager.js';
 
 class FeedRenderer {
     constructor() {

@@ -169,6 +169,5 @@ class CommentService {
         return userService.canDeleteComment(comment);
     }
 }
-}
 
 export const commentService = new CommentService();

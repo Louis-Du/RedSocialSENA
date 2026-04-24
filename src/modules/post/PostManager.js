@@ -9,10 +9,10 @@
  */
 
 import { postService } from './postService.js';
-import { modalManager } from './ModalManager.js';
+import { modalManager } from '../common/ModalManager.js';
 import { messageManager } from '../common/MessageManager.js';
-import { formValidator } from '../utils/FormValidator.js';
-import { buttonHelper } from '../utils/ButtonHelper.js';
+import { formValidator } from '../../utils/FormValidator.js';
+import { buttonHelper } from '../../utils/ButtonHelper.js';
 
 class PostManager {
     constructor() {
