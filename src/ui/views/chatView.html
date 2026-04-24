@@ -1,0 +1,106 @@
+<!-- Vista: Chat -->
+<div id="chatView" class="hidden min-h-screen bg-sena-fondo flex flex-col">
+
+  <!-- Header -->
+  <nav class="bg-sena-verde text-white shadow-lg z-40">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
+      <button id="returnToAppBtnChat"
+        class="p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </button>
+      <i data-lucide="message-circle" class="w-5 h-5"></i>
+      <h2 class="font-bold text-lg">Mensajes</h2>
+    </div>
+  </nav>
+
+  <!-- Layout de dos columnas: lista de chats + conversación activa -->
+  <div class="flex flex-1 max-w-4xl mx-auto w-full divide-x divide-gray-200 bg-white shadow-sm rounded-2xl mt-4 mb-4 overflow-hidden" style="min-height: calc(100vh - 120px)">
+
+    <!-- Panel izquierdo: lista de chats -->
+    <aside id="chatListAside" class="w-full md:w-80 flex flex-col bg-white">
+
+      <div class="p-4 border-b border-gray-100">
+        <h3 class="font-bold text-gray-800">Conversaciones</h3>
+      </div>
+
+      <!-- Lista de chats (ChatManager renderiza aquí) -->
+      <div class="chat-list flex-1 overflow-y-auto divide-y divide-gray-50">
+        <div class="p-8 text-center text-gray-400">
+          <i data-lucide="message-circle" class="w-10 h-10 mx-auto mb-2"></i>
+          <p class="text-sm">No tienes conversaciones aún</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Panel derecho: conversación activa (desktop) -->
+    <section id="activeChatArea" class="hidden md:flex flex-1 flex-col">
+
+      <!-- Header conversación (ChatManager lo rellena) -->
+      <div class="p-4 border-b border-gray-100 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+          <img src="assets/placeholders/avatar-placeholder.svg" alt="" class="w-full h-full object-cover">
+        </div>
+        <div>
+          <h2 class="font-bold text-gray-900 text-sm">Selecciona una conversación</h2>
+        </div>
+      </div>
+
+      <!-- Mensajes -->
+      <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-3">
+        <div class="text-center text-gray-400 text-sm py-8">
+          <i data-lucide="message-square" class="w-8 h-8 mx-auto mb-2"></i>
+          Selecciona un chat para empezar
+        </div>
+      </div>
+
+      <!-- Indicador de escritura -->
+      <div id="typingIndicator" class="hidden px-4 py-2 text-xs text-gray-500 italic"></div>
+
+      <!-- Input de mensaje (desktop) -->
+      <div class="border-t bg-gray-100 p-3 flex items-center gap-3">
+        <label class="cursor-pointer text-gray-400 hover:text-sena-verde transition-colors">
+          <input id="chatImageDesktop" type="file" accept="image/*" class="hidden">
+          <i data-lucide="image" class="w-5 h-5"></i>
+        </label>
+        <input id="chatInput" type="text" placeholder="Escribe un mensaje..."
+          class="flex-1 px-4 py-2 rounded-full bg-white border-2 border-gray-200 focus:border-sena-verde focus:outline-none transition-colors text-sm">
+        <button id="sendChatBtn"
+          class="p-2 bg-sena-verde text-white rounded-full hover:bg-green-700 transition-colors">
+          <i data-lucide="send" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Vista móvil: conversación activa (overlay) -->
+  <div id="mobileConversationView" class="hidden fixed inset-0 bg-white z-50 flex flex-col md:hidden">
+
+    <!-- Header móvil -->
+    <div class="bg-sena-verde text-white p-3 flex items-center gap-3">
+      <button id="backToChatList" class="p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </button>
+      <h2 id="mobileConversationTitle" class="font-bold">Conversación</h2>
+    </div>
+
+    <!-- Mensajes móvil (mismo container pero visible aquí) -->
+    <div class="flex-1 overflow-y-auto p-4 space-y-3">
+      <!-- ChatManager duplica el renderizado aquí en móvil -->
+    </div>
+
+    <!-- Input móvil -->
+    <div class="border-t bg-gray-100 p-3 flex items-center gap-2">
+      <label class="cursor-pointer text-gray-400 hover:text-sena-verde">
+        <input id="chatImageMobile" type="file" accept="image/*" class="hidden">
+        <i data-lucide="image" class="w-5 h-5"></i>
+      </label>
+      <input id="chatInputMobile" type="text" placeholder="Escribe un mensaje..."
+        class="flex-1 px-4 py-2 rounded-full bg-white border-2 border-gray-200 focus:border-sena-verde focus:outline-none text-sm">
+      <button id="sendChatBtnMobile"
+        class="p-2 bg-sena-verde text-white rounded-full hover:bg-green-700 transition-colors">
+        <i data-lucide="send" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </div>
+
+</div>

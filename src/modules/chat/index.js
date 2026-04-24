@@ -1,22 +1,9 @@
 /**
- * Chat Module - Real-time messaging and conversations
- * Public interface for all chat-related functionality
+ * Chat Module - Interfaz pública
  */
 
-// Services
 export { chatService } from './chatService.js';
 export { chatRepository } from './chatRepository.js';
+export { chatState } from './chatState.js';
 
-// State management
-export { 
-  getMessages, 
-  setMessages, 
-  addMessage,
-  getConversations,
-  setConversations,
-  subscribeToChatChanges 
-} from './chatState.js';
-
-// UI Managers
-export { ChatManager } from './ChatManager.js';
-
+export { chatManager } from './ChatManager.js';

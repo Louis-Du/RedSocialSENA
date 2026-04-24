@@ -1,0 +1,108 @@
+<!-- Vista: Registro -->
+<div id="registerView" class="hidden min-h-screen flex items-center justify-center bg-sena-fondo p-4">
+  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8">
+
+    <!-- Encabezado -->
+    <div class="flex flex-col items-center mb-6">
+      <img src="assets/logo-sena-verde.png" alt="SENA" class="h-12 mb-2">
+      <h2 class="text-2xl font-bold text-gray-900">Crear cuenta</h2>
+      <p class="text-gray-500 text-sm mt-1">Completa tus datos de aprendiz SENA</p>
+    </div>
+
+    <!-- Formulario de registro -->
+    <form id="registerForm" class="space-y-4" novalidate>
+
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Tipo documento -->
+        <div>
+          <label for="registerTipoDoc" class="block text-sm font-semibold text-gray-700 mb-1">Tipo doc.</label>
+          <select id="registerTipoDoc"
+            class="w-full px-3 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-sena-verde focus:outline-none transition-colors text-sm">
+            <option value="">Selecciona...</option>
+            <option value="CC">CC</option>
+            <option value="TI">TI</option>
+            <option value="CE">CE</option>
+          </select>
+        </div>
+        <!-- Número documento -->
+        <div>
+          <label for="registerDocumento" class="block text-sm font-semibold text-gray-700 mb-1">Documento</label>
+          <input id="registerDocumento" type="text" inputmode="numeric" placeholder="1234567890"
+            class="w-full px-3 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-sena-verde focus:outline-none transition-colors text-sm">
+        </div>
+      </div>
+
+      <!-- Nombre completo -->
+      <div>
+        <label for="registerNombre" class="block text-sm font-semibold text-gray-700 mb-1">Nombre completo</label>
+        <input id="registerNombre" type="text" placeholder="Tu nombre y apellidos"
+          class="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-sena-verde focus:outline-none transition-colors">
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label for="registerEmail" class="block text-sm font-semibold text-gray-700 mb-1">Correo electrónico</label>
+        <input id="registerEmail" type="email" placeholder="correo@ejemplo.com"
+          class="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-sena-verde focus:outline-none transition-colors">
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Contraseña -->
+        <div>
+          <label for="registerPassword" class="block text-sm font-semibold text-gray-700 mb-1">Contraseña</label>
+          <input id="registerPassword" type="password" placeholder="Mín. 6 caracteres"
+            class="w-full px-3 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-sena-verde focus:outline-none transition-colors text-sm">
+        </div>
+        <!-- Confirmar contraseña -->
+        <div>
+          <label for="registerPasswordConfirm" class="block text-sm font-semibold text-gray-700 mb-1">Confirmar</label>
+          <input id="registerPasswordConfirm" type="password" placeholder="Repite la contraseña"
+            class="w-full px-3 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-sena-verde focus:outline-none transition-colors text-sm">
+        </div>
+      </div>
+
+      <!-- Programa de formación -->
+      <div>
+        <label for="registerPrograma" class="block text-sm font-semibold text-gray-700 mb-1">Programa de formación</label>
+        <input id="registerPrograma" type="text" placeholder="Ej: Análisis y Desarrollo de Software"
+          class="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-sena-verde focus:outline-none transition-colors">
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Ciudad -->
+        <div>
+          <label for="registerCiudad" class="block text-sm font-semibold text-gray-700 mb-1">Ciudad</label>
+          <input id="registerCiudad" type="text" placeholder="Tu ciudad"
+            class="w-full px-3 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-sena-verde focus:outline-none transition-colors text-sm">
+        </div>
+        <!-- Rol -->
+        <div>
+          <label for="registerRol" class="block text-sm font-semibold text-gray-700 mb-1">Rol</label>
+          <select id="registerRol"
+            class="w-full px-3 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-sena-verde focus:outline-none transition-colors text-sm">
+            <option value="aprendiz">Aprendiz</option>
+            <option value="egresado">Egresado</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex gap-3 pt-2">
+        <button id="backToLoginBtn" type="button"
+          class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">
+          Volver
+        </button>
+        <button id="registerSubmitBtn" type="submit"
+          class="flex-1 py-3 bg-sena-verde text-white font-bold rounded-xl shadow-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="user-plus" class="w-5 h-5"></i>
+          Crear cuenta
+        </button>
+      </div>
+
+      <button id="backToLoginBtn2" type="button"
+        class="w-full text-center text-sm text-gray-400 hover:text-gray-600 transition-colors mt-1">
+        Ya tengo cuenta — Iniciar sesión
+      </button>
+    </form>
+  </div>
+</div>

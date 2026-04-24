@@ -1,23 +1,13 @@
 /**
- * Auth Module - User authentication and profile management
- * Public interface for all auth-related functionality
+ * Auth Module - Interfaz pública
+ * Importar desde aquí en lugar de acceder a archivos internos del módulo.
  */
 
-// Services
 export { userService } from './userService.js';
 export { userRepository } from './userRepository.js';
+export { userState } from './authState.js';
 
-// State management
-export { 
-  getCurrentUser, 
-  setCurrentUser, 
-  getAuthData, 
-  setAuthData,
-  subscribeToAuthChanges 
-} from './authState.js';
-
-// UI Managers (these are instantiated in main.js)
-export { AuthManager } from './AuthManager.js';
-export { RegisterManager } from './RegisterManager.js';
-export { ProfileManager } from './ProfileManager.js';
-export { OtherProfileManager } from './OtherProfileManager.js';
+export { authManager } from './AuthManager.js';
+export { registerManager } from './RegisterManager.js';
+export { profileManager } from './ProfileManager.js';
+export { otherProfileManager } from './OtherProfileManager.js';

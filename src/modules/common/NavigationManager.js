@@ -15,7 +15,7 @@
  * - Persistencia de vista para continuidad de uso
  */
 
-import { userService } from './userService.js';
+import { userService } from '../auth/userService.js';
 
 class NavigationManager {
     constructor() {

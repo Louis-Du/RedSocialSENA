@@ -1,4 +1,4 @@
-import { userService } from '../UserService.js';
+import { userService } from '../auth/userService.js';
 import { chatState } from './chatState.js';
 import { generateId, getFromStorage, readFileAsDataURL, saveToStorage } from '../../utils/utils.js';
 

@@ -1,0 +1,159 @@
+<!-- Vista: Feed principal (appView) -->
+<div id="appView" class="hidden min-h-screen bg-sena-fondo">
+
+  <!-- Barra de navegación superior -->
+  <nav class="bg-sena-verde text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+
+      <div class="flex items-center gap-2">
+        <img src="assets/logo-sena-blanco.png" alt="SENA" class="h-8">
+        <span class="font-bold text-lg hidden sm:block">Aprendices SENA</span>
+      </div>
+
+      <!-- Búsqueda -->
+      <div id="searchContainer" class="flex-1 max-w-xs mx-4 relative">
+        <input id="searchInput" type="text" placeholder="Buscar usuarios, posts..."
+          class="w-full px-4 py-2 rounded-full bg-white bg-opacity-20 text-white placeholder-green-100 border border-green-300 focus:outline-none focus:bg-white focus:text-gray-900 focus:placeholder-gray-400 transition-all text-sm">
+        <i data-lucide="search" class="w-4 h-4 absolute right-3 top-2.5 text-green-100 pointer-events-none"></i>
+        <div id="searchResults" class="hidden absolute top-full left-0 right-0 mt-1 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50 max-h-80 overflow-y-auto"></div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="flex items-center gap-2">
+        <button id="goToChatBtn" title="Mensajes"
+          class="p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors">
+          <i data-lucide="message-circle" class="w-6 h-6"></i>
+        </button>
+        <button id="goToProfileEditBtn" title="Mi perfil"
+          class="p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors">
+          <i data-lucide="user" class="w-6 h-6"></i>
+        </button>
+        <button id="logoutBtn" title="Cerrar sesión"
+          class="p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors">
+          <i data-lucide="log-out" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenido principal -->
+  <main class="max-w-2xl mx-auto px-4 py-6 space-y-4">
+
+    <!-- Tabs: Inicio / Noticias -->
+    <div class="bg-white rounded-2xl shadow-sm p-1 flex gap-1">
+      <button id="tabInicio" data-tab="inicio"
+        class="tab-button flex-1 py-2 px-4 rounded-xl font-semibold text-sm transition-colors bg-sena-verde text-white">
+        <i data-lucide="home" class="w-4 h-4 inline mr-1"></i>Inicio
+      </button>
+      <button id="tabNoticias" data-tab="noticias"
+        class="tab-button flex-1 py-2 px-4 rounded-xl font-semibold text-sm transition-colors text-gray-600 hover:bg-gray-100">
+        <i data-lucide="newspaper" class="w-4 h-4 inline mr-1"></i>Noticias SENA
+      </button>
+    </div>
+
+    <!-- Tab: Inicio -->
+    <div id="homeFeed" class="tab-content space-y-4">
+
+      <!-- Quick post inline -->
+      <div id="quickPostInline" class="bg-white rounded-2xl shadow-sm p-4">
+        <form id="quickPostForm" class="space-y-3">
+          <textarea id="quickPostContent" rows="2"
+            placeholder="¿Qué quieres compartir con los aprendices?"
+            class="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-sena-verde focus:outline-none transition-colors resize-none text-sm"></textarea>
+          <div class="flex items-center gap-3">
+            <label class="cursor-pointer flex items-center gap-2 text-gray-500 hover:text-sena-verde transition-colors text-sm">
+              <input id="quickPostImage" type="file" accept="image/*" class="hidden">
+              <i data-lucide="image" class="w-5 h-5"></i>
+              <span id="quickImageFileName" class="truncate max-w-xs">Agregar imagen</span>
+            </label>
+            <button id="quickPublishBtn" type="submit"
+              class="ml-auto px-5 py-2 bg-sena-verde text-white font-semibold rounded-xl hover:bg-green-700 transition-colors text-sm flex items-center gap-2">
+              <i data-lucide="send" class="w-4 h-4"></i>Publicar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Controles: Filtros -->
+      <div class="flex items-center gap-2">
+        <button id="toggleFilterBtn"
+          class="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm text-gray-600 hover:text-sena-verde hover:shadow-md transition-all text-sm font-medium">
+          <i data-lucide="filter" class="w-4 h-4"></i>Filtrar
+        </button>
+        <button id="createPostBtn"
+          class="ml-auto flex items-center gap-2 px-4 py-2 bg-sena-verde text-white rounded-xl shadow-sm hover:bg-green-700 transition-colors text-sm font-semibold">
+          <i data-lucide="plus" class="w-4 h-4"></i>Nueva publicación
+        </button>
+      </div>
+
+      <!-- Panel de filtros (oculto por defecto) -->
+      <div id="filterPanel" class="hidden bg-white rounded-2xl shadow-sm p-5 space-y-4">
+        <h3 class="font-semibold text-gray-800">Filtrar publicaciones</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Regional</label>
+            <input id="filterRegional" type="text" placeholder="Ej: Antioquia"
+              class="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 focus:border-sena-verde focus:outline-none text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Centro</label>
+            <input id="filterCentro" type="text" placeholder="Nombre del centro"
+              class="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 focus:border-sena-verde focus:outline-none text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Etapa</label>
+            <select id="filterEtapa"
+              class="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 focus:border-sena-verde focus:outline-none text-sm">
+              <option value="">Todas</option>
+              <option value="lectiva">Lectiva</option>
+              <option value="productiva">Productiva</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Modalidad</label>
+            <select id="filterModalidad"
+              class="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 focus:border-sena-verde focus:outline-none text-sm">
+              <option value="">Todas</option>
+              <option value="presencial">Presencial</option>
+              <option value="virtual">Virtual</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Buscar texto</label>
+          <input id="filterText" type="text" placeholder="Palabras clave..."
+            class="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 focus:border-sena-verde focus:outline-none text-sm">
+        </div>
+        <div class="flex gap-3">
+          <button id="clearFiltersBtn"
+            class="flex-1 py-2 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors text-sm">
+            Limpiar
+          </button>
+          <button id="applyFiltersBtn"
+            class="flex-1 py-2 bg-sena-verde text-white font-semibold rounded-xl hover:bg-green-700 transition-colors text-sm">
+            Aplicar filtros
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenedor de posts -->
+      <div id="postsFeed" class="space-y-4">
+        <!-- Los posts se renderizan aquí por FeedRenderer -->
+        <div class="text-center py-12 text-gray-400">
+          <i data-lucide="loader" class="w-8 h-8 mx-auto mb-2 animate-spin"></i>
+          <p>Cargando publicaciones...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Noticias -->
+    <div id="newsContainer" class="tab-content hidden space-y-4">
+      <!-- NewsManager renderiza aquí -->
+      <div class="text-center py-12 text-gray-400">
+        <i data-lucide="newspaper" class="w-8 h-8 mx-auto mb-2"></i>
+        <p>Cargando noticias SENA...</p>
+      </div>
+    </div>
+
+  </main>
+</div>

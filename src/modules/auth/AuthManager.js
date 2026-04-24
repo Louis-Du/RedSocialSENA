@@ -10,10 +10,10 @@
  */
 
 import { userService } from './userService.js';
-import { navigationManager } from './NavigationManager.js';
+import { navigationManager } from '../common/NavigationManager.js';
 import { messageManager } from '../common/MessageManager.js';
-import { formValidator } from '../utils/FormValidator.js';
-import { buttonHelper } from '../utils/ButtonHelper.js';
+import { formValidator } from '../../utils/FormValidator.js';
+import { buttonHelper } from '../../utils/ButtonHelper.js';
 
 class AuthManager {
     constructor() {

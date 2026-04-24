@@ -8,11 +8,11 @@
  */
 
 import { userService } from './userService.js';
-import { postService } from './postService.js';
-import { commentService } from './CommentService.js';
-import { navigationManager } from './NavigationManager.js';
+import { postService } from '../post/postService.js';
+import { commentService } from '../post/CommentService.js';
+import { navigationManager } from '../common/NavigationManager.js';
 import { messageManager } from '../common/MessageManager.js';
-import { escapeHTML } from '../utils/utils.js';
+import { escapeHTML } from '../../utils/utils.js';
 
 class OtherProfileManager {
     constructor() {
