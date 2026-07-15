@@ -1,0 +1,39 @@
+name: Deploy prototipo to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  pages: write
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare public directory
+        run: |
+          if [ -d "prototipo" ]; then
+            rm -rf public
+            mkdir -p public
+            cp -a prototipo/. public/
+          else
+            echo "Directory prototipo not found"
+            exit 1
+          fi
+
+      - name: Upload artifact for Pages
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v1
